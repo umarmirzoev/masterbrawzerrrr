@@ -1,0 +1,130 @@
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/hooks/useAuth";
+import { CartProvider } from "@/hooks/useCart";
+import { AnimatePresence, motion } from "framer-motion";
+import { ThemeProvider } from "next-themes";
+import Index from "./pages/Index";
+import About from "./pages/About";
+import Contacts from "./pages/Contacts";
+import BecomeMaster from "./pages/BecomeMaster";
+import InstallApp from "./pages/InstallApp";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import MasterDashboardPage from "./pages/MasterDashboardPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import SuperAdminDashboardPage from "./pages/SuperAdminDashboardPage";
+import NotFound from "./pages/NotFound";
+import PriceList from "./pages/PriceList";
+import MasterProfile from "./pages/MasterProfile";
+import Masters from "./pages/Masters";
+import MasterDetail from "./pages/MasterDetail";
+import CategoryDetail from "./pages/CategoryDetail";
+import ServiceDetail from "./pages/ServiceDetail";
+import VerifyEmail from "./pages/VerifyEmail";
+import PendingApproval from "./pages/PendingApproval";
+import Shop from "./pages/Shop";
+import ShopCategory from "./pages/ShopCategory";
+import ProductDetail from "./pages/ProductDetail";
+import CartPage from "./pages/Cart";
+import MasterStore from "./pages/MasterStore";
+import ShopOrders from "./pages/ShopOrders";
+import ShopThankYou from "./pages/ShopThankYou";
+import ShopOrderDetail from "./pages/ShopOrderDetail";
+import ShopPromotions from "./pages/ShopPromotions";
+import ShopBrands from "./pages/ShopBrands";
+import ShopCompare from "./pages/ShopCompare";
+import ShopSearch from "./pages/ShopSearch";
+import ShopFavorites from "./pages/ShopFavorites";
+import ShopReviews from "./pages/ShopReviews";
+import { FavoritesProvider } from "@/components/favorites/FavoritesSection";
+
+const queryClient = new QueryClient();
+
+const PageTransition = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+          <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+          <Route path="/install-app" element={<PageTransition><InstallApp /></PageTransition>} />
+          <Route path="/categories" element={<PageTransition><PriceList /></PageTransition>} />
+          <Route path="/category/:id" element={<PageTransition><CategoryDetail /></PageTransition>} />
+          <Route path="/service/:id" element={<PageTransition><ServiceDetail /></PageTransition>} />
+          <Route path="/contacts" element={<PageTransition><Contacts /></PageTransition>} />
+          <Route path="/services" element={<PageTransition><NotFound /></PageTransition>} />
+          <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
+        <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+        <Route path="/master/:id" element={<PageTransition><MasterProfile /></PageTransition>} />
+        <Route path="/masters" element={<PageTransition><Masters /></PageTransition>} />
+        <Route path="/masters/:id" element={<PageTransition><MasterDetail /></PageTransition>} />
+        <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
+        <Route path="/pending-approval" element={<PageTransition><PendingApproval /></PageTransition>} />
+        <Route path="/shop" element={<PageTransition><Shop /></PageTransition>} />
+        <Route path="/promotions" element={<PageTransition><ShopPromotions /></PageTransition>} />
+        <Route path="/shop/promotions" element={<PageTransition><ShopPromotions /></PageTransition>} />
+        <Route path="/shop/brands" element={<PageTransition><ShopBrands /></PageTransition>} />
+        <Route path="/shop/compare" element={<PageTransition><ShopCompare /></PageTransition>} />
+        <Route path="/shop/search" element={<PageTransition><ShopSearch /></PageTransition>} />
+        <Route path="/shop/favorites" element={<PageTransition><ShopFavorites /></PageTransition>} />
+        <Route path="/shop/reviews" element={<PageTransition><ShopReviews /></PageTransition>} />
+        <Route path="/shop/category/:id" element={<PageTransition><ShopCategory /></PageTransition>} />
+        <Route path="/shop/product/:id" element={<PageTransition><ProductDetail /></PageTransition>} />
+        <Route path="/cart" element={<PageTransition><CartPage /></PageTransition>} />
+        <Route path="/shop/orders" element={<PageTransition><ShopOrders /></PageTransition>} />
+        <Route path="/shop/orders/:id" element={<PageTransition><ShopOrderDetail /></PageTransition>} />
+        <Route path="/shop/thank-you/:id" element={<PageTransition><ShopThankYou /></PageTransition>} />
+        <Route path="/master-store/:masterId" element={<PageTransition><MasterStore /></PageTransition>} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/master-dashboard" element={<MasterDashboardPage />} />
+        <Route path="/master-dashboard/*" element={<MasterDashboardPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/dashboard/*" element={<AdminDashboardPage />} />
+        <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
+        <Route path="/super-admin/dashboard/*" element={<SuperAdminDashboardPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+const App = () => (
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <CartProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <AnimatedRoutes />
+                </BrowserRouter>
+              </TooltipProvider>
+            </CartProvider>
+          </FavoritesProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
+);
+
+export default App;
