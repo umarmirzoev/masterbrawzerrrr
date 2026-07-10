@@ -6,6 +6,8 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  message?: string;
+  stack?: string;
 }
 
 // Ловит любые ошибки рендера в дереве ниже, чтобы вместо белого экрана
@@ -13,8 +15,8 @@ interface State {
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, message: error?.message, stack: error?.stack };
   }
 
   componentDidCatch(error: unknown, info: unknown) {
@@ -39,6 +41,13 @@ export default class ErrorBoundary extends Component<Props, State> {
           >
             Обновить страницу
           </button>
+          {this.state.message && (
+            <pre className="mt-4 max-w-lg w-full text-left text-[11px] text-red-500 bg-red-50 rounded-xl p-3 overflow-auto whitespace-pre-wrap">
+              {this.state.message}
+              {"\n"}
+              {this.state.stack}
+            </pre>
+          )}
         </div>
       );
     }
