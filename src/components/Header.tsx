@@ -128,12 +128,32 @@ export default function Header() {
                 <Button
                   onClick={() => navigate(getDashboardPath())}
                   variant="ghost"
+                  size="sm"
+                  className="rounded-xl h-10 px-3 bg-slate-50 gap-1.5 hidden sm:flex"
+                >
+                  <User className="w-4 h-4 text-slate-600" />
+                  <span className="text-xs font-bold text-slate-700">Кабинет</span>
+                </Button>
+                <Button
+                  onClick={() => navigate(getDashboardPath())}
+                  variant="ghost"
                   size="icon"
-                  className="rounded-full w-10 h-10 bg-slate-50"
+                  className="rounded-full w-10 h-10 bg-slate-50 sm:hidden"
                 >
                   <User className="w-5 h-5 text-slate-600" />
                 </Button>
               </div>
+            )}
+
+            {!loading && !user && (
+              <Button
+                onClick={() => navigate("/auth")}
+                variant="outline"
+                size="sm"
+                className="hidden md:flex rounded-xl h-10 px-4 font-bold border-slate-200 text-slate-700"
+              >
+                Войти
+              </Button>
             )}
 
             {/* Mobile Menu Trigger */}
@@ -177,14 +197,35 @@ export default function Header() {
                       );
                     })}
                   </nav>
-                  {user && (
-                    <div className="p-4 border-t border-slate-50">
-                      <Button onClick={signOut} variant="outline" className="w-full rounded-2xl h-14 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 gap-2">
-                        <LogOut className="w-5 h-5" />
-                        {t("logout")}
-                      </Button>
-                    </div>
-                  )}
+                  <div className="p-4 border-t border-slate-50 space-y-2">
+                    {user ? (
+                      <>
+                        <SheetClose asChild>
+                          <Button
+                            onClick={() => navigate(getDashboardPath())}
+                            className="w-full rounded-2xl h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-2"
+                          >
+                            <User className="w-5 h-5" />
+                            Кабинет
+                          </Button>
+                        </SheetClose>
+                        <Button onClick={signOut} variant="outline" className="w-full rounded-2xl h-14 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 gap-2">
+                          <LogOut className="w-5 h-5" />
+                          {t("logout")}
+                        </Button>
+                      </>
+                    ) : (
+                      <SheetClose asChild>
+                        <Button
+                          onClick={() => navigate("/auth")}
+                          className="w-full rounded-2xl h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-2"
+                        >
+                          <User className="w-5 h-5" />
+                          Войти / Регистрация
+                        </Button>
+                      </SheetClose>
+                    )}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

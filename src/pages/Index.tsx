@@ -239,7 +239,7 @@ const Index = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.8, duration: 0.8 }}
                     whileHover={{ scale: 1.05, rotate: 2 }}
-                    className="absolute top-12 right-0 md:right-4 z-20 bg-white/80 backdrop-blur-xl p-7 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/50 w-64 cursor-default"
+                    className="absolute bottom-2 right-0 md:-right-2 z-20 bg-white/80 backdrop-blur-xl p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/50 w-48 sm:w-64 cursor-default"
                   >
                      <div className="flex items-center justify-between mb-5">
                         <p className="text-4xl font-black text-slate-900 tracking-tighter">4.8</p>
