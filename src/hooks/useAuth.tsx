@@ -21,7 +21,6 @@ interface AuthContextType {
   hasRole: (role: AppRole) => boolean;
   signOut: () => Promise<void>;
   refetchUserData: () => Promise<void>;
-  mockLogin: (role: AppRole, email?: string) => void;
   getDashboardPath: () => string;
 }
 
@@ -34,7 +33,6 @@ const AuthContext = createContext<AuthContextType>({
   hasRole: () => false,
   signOut: async () => {},
   refetchUserData: async () => {},
-  mockLogin: () => {},
   getDashboardPath: () => "/dashboard",
 });
 
@@ -59,17 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ]);
     
     const userRoles: AppRole[] = rolesRes.data ? rolesRes.data.map((r) => r.role) : [];
-    
-    // Developer bypass: If email is the superadmin email, force super_admin role
-    if (userEmail === "superadmin@masterchas.tj" && !userRoles.includes("super_admin")) {
-      userRoles.push("super_admin");
-    }
-    
-    // Bypass for the user's requested admin email
-    if (userEmail === "admin1@gmail.com" && !userRoles.includes("admin")) {
-      userRoles.push("admin");
-    }
-    
+
     setRoles(userRoles);
     setProfile(profileRes.data ?? null);
   };
@@ -137,33 +125,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchUserData(user.id, user.email);
   };
 
-  const mockLogin = (role: AppRole, email?: string) => {
-    setRoles([role]);
-    
-    let full_name = "Пользователь";
-    if (role === "master") full_name = "Демо мастер";
-    if (role === "admin") full_name = "Администратор";
-    if (role === "super_admin") full_name = "Супер Администратор";
-    
-    // Custom name for the requested user
-    if (email === "umarmitzoev@gmail.com") {
-      full_name = "Умар Мирзоев";
-    }
-
-    setProfile({
-      full_name,
-      phone: "+992 000 00 00",
-      avatar_url: "",
-      approval_status: role === "master" ? "approved" : "active",
-      preferred_language: "ru",
-    });
-    setUser({
-      id: email === "umarmitzoev@gmail.com" ? "00000000-0000-0000-0000-000000000001" : (role === "master" ? "00000000-0000-0000-0000-000000000002" : "00000000-0000-0000-0000-000000000003"),
-      email: email || (role === "master" ? "master1@gmail.com" : "admin1@gmail.com"),
-    } as any);
-    setLoading(false);
-  };
-
   const getDashboardPath = () => {
     if (roles.includes("super_admin")) return "/super-admin/dashboard";
     if (roles.includes("admin")) return "/admin/dashboard";
@@ -172,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, roles, profile, hasRole, signOut, refetchUserData, mockLogin, getDashboardPath }}>
+    <AuthContext.Provider value={{ user, session, loading, roles, profile, hasRole, signOut, refetchUserData, getDashboardPath }}>
       {children}
     </AuthContext.Provider>
   );

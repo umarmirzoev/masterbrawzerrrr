@@ -52,8 +52,9 @@ const ALL_CATEGORIES = [
 const ALL_DISTRICTS = ["Сино", "Фирдавси", "Шохмансур", "Исмоили Сомони", "Пригород"];
 
 export default function Masters() {
-  const heroImage = new URL("../ы.jpg", import.meta.url).href;
-  const consultantImage = new URL("../н.jpg", import.meta.url).href;
+  // Временные стоковые изображения — замени на реальные фото.
+  const heroImage = "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1000&h=800&fit=crop";
+  const consultantImage = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=600&fit=crop";
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [masters, setMasters] = useState<MasterListing[]>(SAMPLE_MASTERS);

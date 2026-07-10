@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, Star, CheckCircle2, Clock, ShieldCheck, 
@@ -14,9 +14,29 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 import OrderModal from "@/components/OrderModal";
 import QuickBooking from "@/components/QuickBooking";
 import AiMasterMatch from "@/components/AiMasterMatch";
+
+const AVATAR_COLORS = [
+  "bg-emerald-500", "bg-blue-500", "bg-orange-500",
+  "bg-violet-500", "bg-amber-500", "bg-sky-500",
+];
+
+const getInitials = (fullName: string) => {
+  const parts = fullName.trim().split(/\s+/);
+  return parts.slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("");
+};
+
+interface TopMasterCard {
+  name: string;
+  rating: number;
+  reviews: number;
+  exp: string;
+  color: string;
+  initials: string;
+}
 
 const Index = () => {
   const { t } = useLanguage();
@@ -51,14 +71,44 @@ const Index = () => {
     { icon: <Grid className="text-slate-500" />, name: "Другие услуги", price: "уточняйте", color: "bg-slate-50" },
   ];
 
-  const topMasters = [
-    { name: "Фирдавс Каримов", rating: 4.9, reviews: 126, exp: "Опыт 7 лет", color: "bg-emerald-500", initials: "ФК" },
-    { name: "Бахром Ашуров", rating: 4.8, reviews: 87, exp: "Опыт 5 лет", color: "bg-blue-500", initials: "БА" },
-    { name: "Сироджиддин Хакимов", rating: 4.9, reviews: 112, exp: "Опыт 10 лет", color: "bg-orange-500", initials: "СХ" },
-    { name: "Рустам Саидов", rating: 4.8, reviews: 94, exp: "Опыт 8 лет", color: "bg-violet-500", initials: "РС" },
-    { name: "Фаррух Исмоилов", rating: 4.9, reviews: 54, exp: "Опыт 6 лет", color: "bg-amber-500", initials: "ФИ" },
-    { name: "Дилер Назаров", rating: 4.7, reviews: 65, exp: "Опыт 4 года", color: "bg-sky-500", initials: "ДН" },
-  ];
+  const [topMasters, setTopMasters] = useState<TopMasterCard[]>([]);
+
+  // Подтягиваем реальных топ-мастеров из Supabase вместо статичного списка.
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadTopMasters() {
+      const { data, error } = await supabase
+        .from("master_listings")
+        .select("full_name, average_rating, total_reviews, experience_years")
+        .eq("is_active", true)
+        .order("ranking_score", { ascending: false })
+        .limit(6);
+
+      if (!isMounted) return;
+
+      if (error || !data || data.length === 0) {
+        setTopMasters([]);
+        return;
+      }
+
+      setTopMasters(
+        data.map((m, idx) => ({
+          name: m.full_name ?? "",
+          rating: m.average_rating ?? 0,
+          reviews: m.total_reviews ?? 0,
+          exp: `Опыт ${m.experience_years ?? 0} лет`,
+          color: AVATAR_COLORS[idx % AVATAR_COLORS.length],
+          initials: getInitials(m.full_name ?? ""),
+        })),
+      );
+    }
+
+    loadTopMasters();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
@@ -280,6 +330,7 @@ const Index = () => {
       </section>
 
       {/* Best Masters Section */}
+      {topMasters.length > 0 && (
       <section className="py-28 bg-[#f9fafb] relative overflow-hidden">
         <div className="absolute top-0 left-1/4 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-50/50 via-transparent to-transparent opacity-50 -z-10" />
         
@@ -343,35 +394,7 @@ const Index = () => {
            </motion.div>
         </div>
       </section>
-
-      {/* Stats Banner */}
-      <section className="py-24 bg-emerald-700 relative overflow-hidden">
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-[120px] -mr-64 -mt-64" 
-        />
-        <motion.div 
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-[120px] -ml-64 -mb-64" 
-        />
-        
-        <div className="container px-4 mx-auto max-w-7xl relative z-10">
-           <motion.div 
-             variants={staggerContainer}
-             initial="initial"
-             whileInView="whileInView"
-             viewport={{ once: true }}
-             className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8"
-           >
-              <StatItem icon={<Users />} count="1000+" label="довольных клиентов" />
-              <StatItem icon={<ShieldCheck />} count="500+" label="проверенных мастеров" />
-              <StatItem icon={<Zap />} count="50+" label="видов услуг" />
-              <StatItem icon={<Star />} count="98%" label="положительных отзывов" />
-           </motion.div>
-        </div>
-      </section>
+      )}
 
       {/* How it Works */}
       <section className="py-32 bg-white relative">
@@ -536,31 +559,6 @@ const FeatureItem = ({ icon, title, sub }: { icon: React.ReactNode; title: strin
     <div>
       <h4 className="font-black text-slate-900 text-base leading-tight mb-1 group-hover:text-emerald-600 transition-colors">{title}</h4>
       <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{sub}</p>
-    </div>
-  </motion.div>
-);
-
-const StatItem = ({ icon, count, label }: { icon: React.ReactNode; count: string; label: string }) => (
-  <motion.div 
-    variants={{
-      initial: { opacity: 0, scale: 0.8 },
-      whileInView: { opacity: 1, scale: 1 }
-    }}
-    className="flex flex-col items-center lg:items-start text-center lg:text-left gap-5 group"
-  >
-    <div className="w-16 h-16 rounded-2xl bg-white/15 text-white flex items-center justify-center group-hover:bg-white group-hover:text-emerald-700 group-hover:rotate-[360deg] transition-all duration-700 shadow-lg backdrop-blur-sm">
-      {React.cloneElement(icon as React.ReactElement, { className: "w-8 h-8" })}
-    </div>
-    <div className="space-y-1">
-      <motion.p 
-        initial={{ scale: 0.5 }}
-        whileInView={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 100 }}
-        className="text-5xl font-black text-white tracking-tighter"
-      >
-        {count}
-      </motion.p>
-      <p className="text-[12px] font-black text-emerald-100/60 uppercase tracking-[0.2em]">{label}</p>
     </div>
   </motion.div>
 );

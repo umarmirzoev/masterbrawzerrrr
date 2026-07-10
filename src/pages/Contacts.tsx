@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 const Contacts = () => {
-  const contactHeroImage = new URL("../.э.jpg", import.meta.url).href;
+  // Временное стоковое изображение — замени на реальное фото.
+  const contactHeroImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&h=1400&fit=crop";
   const { t } = useLanguage();
   const { toast } = useToast();
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });

@@ -51,7 +51,8 @@ interface Service {
 }
 
 export default function PriceList() {
-  const heroImage = new URL("../ы.jpg", import.meta.url).href;
+  // Временное стоковое изображение — замени на реальное фото.
+  const heroImage = "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1000&h=800&fit=crop";
   const { language, t } = useLanguage();
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [services, setServices] = useState<Service[]>([]);

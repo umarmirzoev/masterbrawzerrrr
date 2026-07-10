@@ -19,7 +19,7 @@ type RoleChoice = "client" | "master";
 // Страница авторизации объединяет вход, регистрацию и оформление анкеты мастера.
 const Auth = () => {
   const { t } = useLanguage();
-  const { user, getDashboardPath, mockLogin } = useAuth();
+  const { user, getDashboardPath } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mode, setMode] = useState<AuthMode>("login");
@@ -46,25 +46,6 @@ const Auth = () => {
     
     setLoading(true);
     try {
-      // Локальные демо-входы для быстрого просмотра кабинетов.
-      if (email.trim() === "admin1@gmail.com" && password === "admin123!") {
-        mockLogin("admin", "admin1@gmail.com");
-        toast({ title: "Успешный вход", description: "Добро пожаловать, Администратор!" });
-        return;
-      }
-
-      if (email.trim() === "master1@gmail.com" && password === "master123!") {
-        mockLogin("master", "master1@gmail.com");
-        toast({ title: "Успешный вход", description: "Открываем кабинет мастера." });
-        return;
-      }
-
-      if (email.trim() === "umarmitzoev@gmail.com" && password === "umarjon.1711") {
-        mockLogin("client", "umarmitzoev@gmail.com");
-        toast({ title: "Успешный вход", description: "Добро пожаловать в кабинет пользователя!" });
-        return;
-      }
-
       const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       
       if (error) {

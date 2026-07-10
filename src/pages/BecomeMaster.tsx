@@ -56,7 +56,8 @@ const SPECIALIZATIONS = [
 const DISTRICTS = ["Сино", "Фирдавси", "Шохмансур", "Исмоили Сомони", "Пригород"];
 
 const BecomeMaster = () => {
-  const heroImage = new URL("../hero-cropped.jpg", import.meta.url).href;
+  // Временное стоковое изображение — замени на реальное фото.
+  const heroImage = "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1200&h=1400&fit=crop";
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();

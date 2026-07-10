@@ -27,8 +27,9 @@ import {
 } from "lucide-react";
 
 const About = () => {
-  const heroImage = new URL("../hero-cropped.jpg", import.meta.url).href;
-  const missionImage = new URL("../п.jpg", import.meta.url).href;
+  // Временные стоковые изображения — замени на реальные фото компании.
+  const heroImage = "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1200&h=1400&fit=crop";
+  const missionImage = "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=1000&h=800&fit=crop";
 
   const topStats = [
     { icon: Users, value: "1000+", label: "проверенных мастеров" },
