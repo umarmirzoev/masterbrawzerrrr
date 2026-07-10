@@ -72,7 +72,8 @@ export default function ClientDashboard() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>("orders");
+  const [tab, setTab] = useState<Tab>("profile");
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [masterInfo, setMasterInfo] = useState<any>(null);
@@ -87,6 +88,7 @@ export default function ClientDashboard() {
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -97,6 +99,15 @@ export default function ClientDashboard() {
       .order("created_at", { ascending: false });
     setOrders(data || []);
     setLoading(false);
+  };
+
+  const fetchFavoritesCount = async () => {
+    if (!user) return;
+    const { count } = await supabase
+      .from("favorites")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    setFavoritesCount(count || 0);
   };
 
   const fetchApplication = async () => {
@@ -110,7 +121,7 @@ export default function ClientDashboard() {
     if (data && data.length > 0) setMyApplication(data[0]);
   };
 
-  useEffect(() => { fetchOrders(); fetchApplication(); }, [user]);
+  useEffect(() => { fetchOrders(); fetchApplication(); fetchFavoritesCount(); }, [user]);
   useEffect(() => {
     if (profile) {
       setEditName(profile.full_name || "");
@@ -191,6 +202,8 @@ export default function ClientDashboard() {
   const clientReviews = orders.filter(o => o.status === "reviewed");
 
   const paidOrders = orders.filter(o => (o as any).payment_status === "paid");
+  const totalSpent = paidOrders.reduce((sum, o) => sum + Number((o as any).total_amount || (o as any).service_price || o.budget || 0), 0);
+  const initials = (profile?.full_name || user?.email || "?").trim().split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   const navItems = [
     { path: "/dashboard", label: "Мои заказы", icon: ClipboardList, badge: activeOrders.length },
@@ -302,24 +315,100 @@ export default function ClientDashboard() {
 
       {/* Content */}
       {tab === "profile" ? (
-        <Card>
-          <CardHeader><CardTitle className="text-lg">{t("clientProfileTitle")}</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-1 block">{t("clientProfileNameLabel")}</label>
-              <Input value={editName} onChange={e => setEditName(e.target.value)} className="h-11" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-1 block">{t("clientProfilePhoneLabel")}</label>
-              <Input value={editPhone} onChange={e => setEditPhone(e.target.value)} className="h-11" />
-            </div>
-            <LanguagePreferenceSelect />
-            <Button onClick={saveProfile} disabled={savingProfile} className="rounded-full">
-              {savingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              {t("clientProfileSave")}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-4 -mt-2">
+          {/* Profile header card */}
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 pt-10 pb-16 px-5">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]" />
+          </div>
+          <Card className="-mt-14 border-0 shadow-md">
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 border-4 border-white shadow flex items-center justify-center shrink-0 -mt-10">
+                <span className="text-xl font-black text-emerald-600">{initials}</span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-foreground truncate">{profile?.full_name || "Без имени"}</p>
+                <p className="text-sm text-muted-foreground truncate">{profile?.phone || user?.email}</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full gap-1.5 shrink-0"
+                onClick={() => setEditingProfile((v) => !v)}
+              >
+                {editingProfile ? "Закрыть" : "Изменить"}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {editingProfile && (
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-1 block">{t("clientProfileNameLabel")}</label>
+                  <Input value={editName} onChange={e => setEditName(e.target.value)} className="h-11" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-1 block">{t("clientProfilePhoneLabel")}</label>
+                  <Input value={editPhone} onChange={e => setEditPhone(e.target.value)} className="h-11" />
+                </div>
+                <LanguagePreferenceSelect />
+                <Button onClick={() => { saveProfile(); setEditingProfile(false); }} disabled={savingProfile} className="rounded-full">
+                  {savingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  {t("clientProfileSave")}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Real stats */}
+          <div className="grid grid-cols-3 gap-3">
+            <Card className="border-0 shadow-sm bg-blue-50/60">
+              <CardContent className="p-4 text-center">
+                <ClipboardList className="w-5 h-5 text-blue-600 mx-auto mb-1.5" />
+                <p className="text-xl font-black text-foreground">{orders.length}</p>
+                <p className="text-[11px] text-muted-foreground">Заказы</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm bg-rose-50/60">
+              <CardContent className="p-4 text-center">
+                <Heart className="w-5 h-5 text-rose-500 mx-auto mb-1.5" />
+                <p className="text-xl font-black text-foreground">{favoritesCount}</p>
+                <p className="text-[11px] text-muted-foreground">Избранное</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm bg-amber-50/60">
+              <CardContent className="p-4 text-center">
+                <DollarSign className="w-5 h-5 text-amber-600 mx-auto mb-1.5" />
+                <p className="text-xl font-black text-foreground">{totalSpent.toLocaleString()}</p>
+                <p className="text-[11px] text-muted-foreground">Потрачено, сом.</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick menu */}
+          <Card className="border-0 shadow-sm divide-y divide-border/60">
+            {[
+              { label: "История заказов", icon: ClipboardList, action: () => setTab("orders") },
+              { label: "Способы оплаты", icon: CreditCard, action: () => setTab("payments") },
+              { label: "Избранное", icon: Heart, action: () => navigate("/dashboard/favorites") },
+              ...(myApplication ? [{ label: "Заявка мастера", icon: FileText, action: () => setTab("application") }] : []),
+              { label: "Уведомления", icon: Bell, action: () => setTab("notifications") },
+              { label: "Поддержка", icon: HelpCircle, action: () => setSupportOpen(true) },
+            ].map((item, i) => (
+              <button
+                key={i}
+                onClick={item.action}
+                className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/50 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon className="w-4.5 h-4.5 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">{item.label}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+              </button>
+            ))}
+          </Card>
+        </div>
       ) : tab === "payments" ? (
         <div className="space-y-3">
           <h3 className="text-base font-semibold mb-2">История оплат</h3>
