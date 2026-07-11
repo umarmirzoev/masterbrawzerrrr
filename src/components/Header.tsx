@@ -25,6 +25,7 @@ import {
   User,
   ShoppingBag,
   Wrench,
+  Bot,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 
@@ -47,6 +48,7 @@ export default function Header() {
     { path: "/categories", labelKey: "navCategories", icon: Wrench },
     { path: "/masters", labelKey: "navMasters", icon: User },
     { path: "/shop", labelKey: "navShop", icon: ShoppingBag },
+    { path: "/ai-call", labelKey: "navAiCall", icon: Bot },
     { path: "/about", labelKey: "navAbout", icon: null },
     { path: "/contacts", labelKey: "navContacts", icon: Phone },
   ];
