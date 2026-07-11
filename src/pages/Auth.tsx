@@ -72,10 +72,32 @@ const Auth = () => {
     }
   };
 
+  // Лучший эффорт: параллельно с Supabase регистрируем клиента в старом .NET-бэкенде,
+  // который питает панель админа/суперадмина в Flutter-приложении. Ошибки здесь никогда
+  // не блокируют и не ломают основной поток регистрации на сайте.
+  const syncToLegacyBackend = async () => {
+    try {
+      const [firstName, ...rest] = fullName.trim().split(/\s+/);
+      await supabase.functions.invoke("legacy-sync", {
+        body: {
+          action: "register",
+          phone,
+          password,
+          role: roleChoice,
+          firstName: firstName || undefined,
+          lastName: rest.join(" ") || undefined,
+          email,
+        },
+      });
+    } catch (err) {
+      console.warn("legacy-sync register skipped:", err);
+    }
+  };
+
   // Регистрация создаёт аккаунт, а для мастера дополнительно открывает шаг с анкетой.
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
+    if (password.length < 8) {
       toast({ title: t("error"), description: t("authPasswordMinLength"), variant: "destructive" });
       return;
     }
@@ -113,6 +135,9 @@ const Auth = () => {
       title: "Регистрация успешна!",
       description: roleChoice === "master" ? "Заполните данные мастера" : "Добро пожаловать!",
     });
+
+    // Не блокируем и не ждём — если это упадёт, пользователь всё равно попадёт в кабинет.
+    void syncToLegacyBackend();
 
     if (roleChoice === "master") {
       setNewUserId(data.user.id);
@@ -164,7 +189,7 @@ const Auth = () => {
                       </div>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input placeholder={t("authPhone")} value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10" type="tel" />
+                        <Input placeholder={t("authPhone")} value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10" type="tel" required />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <Button type="button" variant={roleChoice === "client" ? "default" : "outline"} onClick={() => setRoleChoice("client")} className="rounded-full">
@@ -182,7 +207,7 @@ const Auth = () => {
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input placeholder={t("authPassword")} value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10" type="password" required minLength={6} />
+                    <Input placeholder={t("authPassword")} value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10" type="password" required minLength={8} />
                   </div>
                   <Button type="submit" className="w-full rounded-full h-12 text-base" disabled={loading}>
                     {loading ? "..." : mode === "login" ? t("authSignIn") : t("authRegister")}

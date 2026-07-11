@@ -104,6 +104,17 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
       }
     }
 
+    // Лучший эффорт: тот же заказ зеркалим в старый .NET-бэкенд (панель админа Flutter-приложения).
+    // Ошибки не показываем пользователю и не блокируем успех оформления заявки на сайте.
+    supabase.functions.invoke("legacy-sync", {
+      body: {
+        action: "order",
+        title: initialServiceName || category || "Заявка с сайта emaster.tj",
+        description: `${initialServiceName ? initialServiceName + ". " : ""}${comment}`.trim(),
+        address: `${district ? t(district) + ", " : ""}${address}`,
+      },
+    }).catch((err) => console.warn("legacy-sync order skipped:", err));
+
     setSubmitted(true);
     toast({ title: t("orderModalSuccess") });
 
