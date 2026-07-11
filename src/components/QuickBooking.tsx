@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Zap, Phone, MapPin, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { buildLocalizedNotification } from "@/lib/notifications";
+import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 
 interface QuickBookingProps { open: boolean; onOpenChange: (open: boolean) => void; }
 
@@ -48,6 +49,11 @@ export default function QuickBooking({ open, onOpenChange }: QuickBookingProps) 
       toast({ title: t("error"), description: error.message, variant: "destructive" });
     } else {
       setSuccess(true);
+      syncOrderToLegacyBackend({
+        title: "Срочная заявка с сайта emaster.tj",
+        description: description.trim(),
+        address: address.trim(),
+      });
       const { data: admins } = await supabase.from("user_roles").select("user_id").in("role", ["admin", "super_admin"]);
       if (admins) {
         await Promise.all(

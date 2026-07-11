@@ -11,6 +11,7 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { buildLocalizedNotification } from "@/lib/notifications";
+import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -104,16 +105,11 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
       }
     }
 
-    // Лучший эффорт: тот же заказ зеркалим в старый .NET-бэкенд (панель админа Flutter-приложения).
-    // Ошибки не показываем пользователю и не блокируем успех оформления заявки на сайте.
-    supabase.functions.invoke("legacy-sync", {
-      body: {
-        action: "order",
-        title: initialServiceName || category || "Заявка с сайта emaster.tj",
-        description: `${initialServiceName ? initialServiceName + ". " : ""}${comment}`.trim(),
-        address: `${district ? t(district) + ", " : ""}${address}`,
-      },
-    }).catch((err) => console.warn("legacy-sync order skipped:", err));
+    syncOrderToLegacyBackend({
+      title: initialServiceName || category || "Заявка с сайта emaster.tj",
+      description: `${initialServiceName ? initialServiceName + ". " : ""}${comment}`.trim(),
+      address: `${district ? t(district) + ", " : ""}${address}`,
+    });
 
     setSubmitted(true);
     toast({ title: t("orderModalSuccess") });

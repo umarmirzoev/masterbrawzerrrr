@@ -18,6 +18,7 @@ import {
   DollarSign, Package, Wrench,
 } from "lucide-react";
 import { buildLocalizedNotification } from "@/lib/notifications";
+import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 
 interface AiMasterMatchProps {
   open: boolean;
@@ -212,6 +213,11 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
     if (error) {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
     } else {
+      syncOrderToLegacyBackend({
+        title: selectedService?.service_name || matchResult?.category_name || "Заявка с сайта emaster.tj",
+        description: description.trim(),
+        address: address.trim(),
+      });
       toast({ title: `✅ ${t("qbOrderCreated")}`, description: t("aiMasterNotified") });
       // Notify master
       if (selectedMaster) {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,11 @@ export default function MasterBookingDialog({ open, onOpenChange, master }: Prop
       toast({ title: "Хатогӣ", description: error.message, variant: "destructive" });
       return;
     }
+    syncOrderToLegacyBackend({
+      title: `Мастер: ${master?.full_name}`,
+      description: `Мастер: ${master?.full_name}. ${desc}`,
+      address: `${district ? district + ", " : ""}${address}`,
+    });
     setDone(true);
     toast({ title: "Фармоиш қабул шуд! Мастер ба зудӣ бо шумо тамос мегирад." });
     setTimeout(() => {

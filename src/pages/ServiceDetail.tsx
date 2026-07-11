@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { SAMPLE_SERVICE_CATEGORIES, SAMPLE_SERVICES, SAMPLE_MASTERS } from "@/data/seedData";
+import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 import {
   ArrowLeft, Star, MapPin, Clock, Phone,
   Users, Wrench, CheckCircle, Loader2, Filter, Map as MapIcon, List, X,
@@ -225,6 +226,11 @@ export default function ServiceDetail() {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
       return;
     }
+    syncOrderToLegacyBackend({
+      title: service ? getName(service) : "Заявка с сайта emaster.tj",
+      description: `${service ? getName(service) : ""}${selectedMaster ? ` — Мастер: ${selectedMaster.full_name}` : ""}. ${bDesc}`,
+      address: `${bDistrict ? bDistrict + ", " : ""}${bAddress}`,
+    });
     setBookingDone(true);
     toast({ title: "Заявка отправлена. Мастер скоро свяжется с вами." });
     setTimeout(() => {
