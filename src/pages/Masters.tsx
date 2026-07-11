@@ -150,6 +150,16 @@ export default function Masters() {
 
   const activeFilters = [category !== "all", district !== "all", minRating > 0].filter(Boolean).length;
 
+  // Показываем найденную по поиску категорию первой в бейджах карточки — иначе она может
+  // не попасть в первые 2 показанные категории и результат выглядит так, будто фильтр не сработал.
+  const getDisplayCategories = (categories: string[]) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return categories.slice(0, 2);
+    const matched = categories.filter((c) => c.toLowerCase().includes(q));
+    const rest = categories.filter((c) => !c.toLowerCase().includes(q));
+    return [...matched, ...rest].slice(0, 2);
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
@@ -501,7 +511,7 @@ function MasterCard({ master, index, isComparing, onToggleCompare, compareDisabl
 
             {/* Badges */}
             <div className="flex flex-wrap gap-1.5 mb-5">
-              {master.service_categories.slice(0, 2).map((cat) => (
+              {getDisplayCategories(master.service_categories).map((cat) => (
                 <span key={cat} className="px-2.5 py-1 bg-slate-50 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                   {cat}
                 </span>
