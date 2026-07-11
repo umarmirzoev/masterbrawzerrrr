@@ -162,7 +162,7 @@ export default function Shop() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
             {popularProducts.map((p, i) => (
               <motion.div
                 key={p.id}
@@ -182,7 +182,7 @@ export default function Shop() {
                     </div>
                   </div>
                   
-                  <CardContent className="p-5 flex flex-col flex-1">
+                  <CardContent className="p-3 sm:p-5 flex flex-col flex-1">
                     <h3 className="text-sm font-bold text-slate-900 mb-2 line-clamp-2 leading-snug h-10">
                       {p.name}
                     </h3>
@@ -193,18 +193,18 @@ export default function Shop() {
                        <span className="text-[11px] text-slate-400">({p.reviews})</span>
                     </div>
                     
-                    <div className="mt-auto flex items-center justify-between gap-2">
-                      <div>
-                        <p className="text-lg font-black text-slate-900">{p.price} сомони</p>
-                        {p.oldPrice && <p className="text-[11px] text-slate-400 line-through">{p.oldPrice} сомони</p>}
+                    <div className="mt-auto flex items-center justify-between gap-1.5">
+                      <div className="min-w-0">
+                        <p className="text-base sm:text-lg font-black text-slate-900 truncate">{p.price} сомони</p>
+                        {p.oldPrice && <p className="text-[11px] text-slate-400 line-through truncate">{p.oldPrice} сомони</p>}
                       </div>
-                      
-                      <div className="flex gap-2">
-                        <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full text-slate-400 hover:text-red-500 transition-colors">
-                          <Heart className="w-4 h-4" />
+
+                      <div className="flex gap-1 shrink-0">
+                        <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full text-slate-400 hover:text-red-500 transition-colors shrink-0">
+                          <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
-                        <Button size="icon" className="h-9 w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100" onClick={() => addToCart(p.id)}>
-                          <ShoppingCart className="w-4 h-4" />
+                        <Button size="icon" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100 shrink-0" onClick={() => addToCart(p.id)}>
+                          <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
                       </div>
                     </div>
