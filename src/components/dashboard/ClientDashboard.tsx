@@ -14,6 +14,8 @@ import {
   CreditCard, DollarSign, Heart, HelpCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useToast } from "@/hooks/use-toast";
@@ -68,6 +70,7 @@ type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews
 export default function ClientDashboard() {
   const { user, profile, refetchUserData, hasRole } = useAuth();
   const { language, t } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
@@ -206,28 +209,28 @@ export default function ClientDashboard() {
   const initials = (profile?.full_name || user?.email || "?").trim().split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   const navItems = [
-    { path: "/dashboard", label: "Мои заказы", icon: ClipboardList, badge: activeOrders.length },
+    { path: "/dashboard", label: t("navMyOrders"), icon: ClipboardList, badge: activeOrders.length },
     { path: "/dashboard/favorites", label: t("favorites"), icon: Heart },
-    { path: "/dashboard/payments", label: "Оплата", icon: CreditCard },
-    { path: "/dashboard/profile", label: "Профиль", icon: User },
-    { path: "/dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
+    { path: "/dashboard/payments", label: t("navPayments"), icon: CreditCard },
+    { path: "/dashboard/profile", label: t("dashProfile"), icon: User },
+    { path: "/dashboard/notifications", label: t("clientMenuNotifications"), icon: Bell, badge: unreadCount },
   ];
 
   const stats = [
-    { label: "Всего", value: orders.length, icon: ClipboardList, gradient: "from-blue-500/10 to-sky-500/10", iconColor: "text-blue-600", iconBg: "bg-blue-500/10" },
-    { label: "Активных", value: activeOrders.length, icon: Clock, gradient: "from-amber-500/10 to-yellow-500/10", iconColor: "text-amber-600", iconBg: "bg-amber-500/10" },
-    { label: "Завершённых", value: completedOrders.length, icon: CheckCircle, gradient: "from-emerald-500/10 to-green-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
-    { label: "Оплачено", value: paidOrders.length, icon: DollarSign, gradient: "from-emerald-500/10 to-teal-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
+    { label: t("statTotal"), value: orders.length, icon: ClipboardList, gradient: "from-blue-500/10 to-sky-500/10", iconColor: "text-blue-600", iconBg: "bg-blue-500/10" },
+    { label: t("statActive"), value: activeOrders.length, icon: Clock, gradient: "from-amber-500/10 to-yellow-500/10", iconColor: "text-amber-600", iconBg: "bg-amber-500/10" },
+    { label: t("statCompleted"), value: completedOrders.length, icon: CheckCircle, gradient: "from-emerald-500/10 to-green-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
+    { label: t("statPaid"), value: paidOrders.length, icon: DollarSign, gradient: "from-emerald-500/10 to-teal-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
-    { key: "orders", label: "Все заказы", icon: ClipboardList, count: orders.length },
-    { key: "active", label: "Активные", icon: Clock, count: activeOrders.length },
-    { key: "completed", label: "Завершённые", icon: CheckCircle, count: completedOrders.length },
-    { key: "payments", label: "Оплата", icon: CreditCard, count: paidOrders.length },
-    ...(myApplication ? [{ key: "application" as Tab, label: "Заявка мастера", icon: FileText }] : []),
-    { key: "profile", label: "Профиль", icon: User },
-    { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
+    { key: "orders", label: t("tabAllOrders"), icon: ClipboardList, count: orders.length },
+    { key: "active", label: t("tabActive"), icon: Clock, count: activeOrders.length },
+    { key: "completed", label: t("tabCompleted"), icon: CheckCircle, count: completedOrders.length },
+    { key: "payments", label: t("tabPayments"), icon: CreditCard, count: paidOrders.length },
+    ...(myApplication ? [{ key: "application" as Tab, label: t("clientMenuMasterApplication"), icon: FileText }] : []),
+    { key: "profile", label: t("dashProfile"), icon: User },
+    { key: "notifications", label: t("clientMenuNotifications"), icon: Bell, count: unreadCount },
   ];
 
   const displayOrders = tab === "active" ? activeOrders : tab === "completed" ? completedOrders : orders;
@@ -282,20 +285,22 @@ export default function ClientDashboard() {
 
   return (
     <DashboardLayout title={t("clientCabinet")} navItems={navItems}>
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {stats.map((s, i) => (
-          <Card key={i} className={`bg-gradient-to-br ${s.gradient} border-0 shadow-sm`}>
-            <CardContent className="p-4">
-              <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2`}>
-                <s.icon className={`w-5 h-5 ${s.iconColor}`} />
-              </div>
-              <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Stats (hidden on the profile landing screen, which has its own stat cards) */}
+      {tab !== "profile" && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {stats.map((s, i) => (
+            <Card key={i} className={`bg-gradient-to-br ${s.gradient} border-0 shadow-sm`}>
+              <CardContent className="p-4">
+                <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2`}>
+                  <s.icon className={`w-5 h-5 ${s.iconColor}`} />
+                </div>
+                <p className="text-2xl font-bold text-foreground">{s.value}</p>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1.5 mb-4 border-b border-border pb-2 overflow-x-auto scrollbar-hide">
@@ -326,7 +331,7 @@ export default function ClientDashboard() {
                 <span className="text-xl font-black text-emerald-600">{initials}</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-foreground truncate">{profile?.full_name || "Без имени"}</p>
+                <p className="font-bold text-foreground truncate">{profile?.full_name || t("clientProfileNoName")}</p>
                 <p className="text-sm text-muted-foreground truncate">{profile?.phone || user?.email}</p>
               </div>
               <Button
@@ -335,7 +340,7 @@ export default function ClientDashboard() {
                 className="rounded-full gap-1.5 shrink-0"
                 onClick={() => setEditingProfile((v) => !v)}
               >
-                {editingProfile ? "Закрыть" : "Изменить"}
+                {editingProfile ? t("clientProfileClose") : t("clientProfileEdit")}
               </Button>
             </CardContent>
           </Card>
@@ -366,21 +371,21 @@ export default function ClientDashboard() {
               <CardContent className="p-4 text-center">
                 <ClipboardList className="w-5 h-5 text-blue-600 mx-auto mb-1.5" />
                 <p className="text-xl font-black text-foreground">{orders.length}</p>
-                <p className="text-[11px] text-muted-foreground">Заказы</p>
+                <p className="text-[11px] text-muted-foreground">{t("clientStatOrders")}</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-sm bg-rose-50/60">
               <CardContent className="p-4 text-center">
                 <Heart className="w-5 h-5 text-rose-500 mx-auto mb-1.5" />
                 <p className="text-xl font-black text-foreground">{favoritesCount}</p>
-                <p className="text-[11px] text-muted-foreground">Избранное</p>
+                <p className="text-[11px] text-muted-foreground">{t("clientStatFavorites")}</p>
               </CardContent>
             </Card>
             <Card className="border-0 shadow-sm bg-amber-50/60">
               <CardContent className="p-4 text-center">
                 <DollarSign className="w-5 h-5 text-amber-600 mx-auto mb-1.5" />
                 <p className="text-xl font-black text-foreground">{totalSpent.toLocaleString()}</p>
-                <p className="text-[11px] text-muted-foreground">Потрачено, сом.</p>
+                <p className="text-[11px] text-muted-foreground">{t("clientStatSpent")}</p>
               </CardContent>
             </Card>
           </div>
@@ -388,12 +393,12 @@ export default function ClientDashboard() {
           {/* Quick menu */}
           <Card className="border-0 shadow-sm divide-y divide-border/60">
             {[
-              { label: "История заказов", icon: ClipboardList, action: () => setTab("orders") },
-              { label: "Способы оплаты", icon: CreditCard, action: () => setTab("payments") },
-              { label: "Избранное", icon: Heart, action: () => navigate("/dashboard/favorites") },
-              ...(myApplication ? [{ label: "Заявка мастера", icon: FileText, action: () => setTab("application") }] : []),
-              { label: "Уведомления", icon: Bell, action: () => setTab("notifications") },
-              { label: "Поддержка", icon: HelpCircle, action: () => setSupportOpen(true) },
+              { label: t("clientMenuOrderHistory"), icon: ClipboardList, action: () => setTab("orders") },
+              { label: t("clientMenuPaymentMethods"), icon: CreditCard, action: () => setTab("payments") },
+              { label: t("clientMenuFavorites"), icon: Heart, action: () => navigate("/dashboard/favorites") },
+              ...(myApplication ? [{ label: t("clientMenuMasterApplication"), icon: FileText, action: () => setTab("application") }] : []),
+              { label: t("clientMenuNotifications"), icon: Bell, action: () => setTab("notifications") },
+              { label: t("clientMenuSupport"), icon: HelpCircle, action: () => setSupportOpen(true) },
             ].map((item, i) => (
               <button
                 key={i}
@@ -407,6 +412,22 @@ export default function ClientDashboard() {
                 <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
               </button>
             ))}
+          </Card>
+
+          {/* Dark theme toggle */}
+          <Card className="border-0 shadow-sm">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="w-full flex items-center justify-between px-5 py-4 text-left"
+            >
+              <div className="flex items-center gap-3">
+                {theme === "dark" ? <Moon className="w-4.5 h-4.5 text-muted-foreground" /> : <Sun className="w-4.5 h-4.5 text-muted-foreground" />}
+                <span className="text-sm font-medium text-foreground">{t("darkThemeLabel")}</span>
+              </div>
+              <div className={`w-11 h-6 rounded-full transition-colors relative ${theme === "dark" ? "bg-emerald-500" : "bg-slate-200"}`}>
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${theme === "dark" ? "translate-x-5" : "translate-x-0.5"}`} />
+              </div>
+            </button>
           </Card>
         </div>
       ) : tab === "payments" ? (
