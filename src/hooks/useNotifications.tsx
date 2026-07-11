@@ -1,6 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+
+// Уникальный суффикс на каждый вызов хука — на одной странице этот хук может
+// использоваться сразу в нескольких компонентах (например, в DashboardLayout
+// и в самом кабинете), и Supabase Realtime не разрешает создавать два канала
+// с одинаковым именем.
+let instanceCounter = 0;
 
 // Хук уведомлений загружает список, считает непрочитанные и слушает realtime-обновления.
 interface Notification {
@@ -19,6 +25,7 @@ interface Notification {
 export function useNotifications(userId: string | undefined) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const instanceId = useRef(++instanceCounter).current;
 
   // Получаем последние уведомления пользователя из базы.
   const fetchNotifications = async () => {
@@ -52,7 +59,7 @@ export function useNotifications(userId: string | undefined) {
 
     if (!userId) return;
     const channel = supabase
-      .channel(`notifications-${userId}`)
+      .channel(`notifications-${userId}-${instanceId}`)
       .on("postgres_changes", {
         event: "INSERT",
         schema: "public",
