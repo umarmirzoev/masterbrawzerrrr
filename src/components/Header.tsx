@@ -19,7 +19,6 @@ import {
   Languages,
   LogOut,
   Menu,
-  X,
   ChevronRight,
   Phone,
   User,
@@ -168,14 +167,9 @@ export default function Header() {
               <SheetContent side="right" className="w-[300px] p-0">
                 <div className="flex flex-col h-full">
                   <div className="p-6 border-b border-slate-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-500/20">М</div>
-                        <span className="text-lg font-bold text-slate-900 tracking-tight">Мастер ТЧ</span>
-                      </div>
-                      <SheetClose asChild>
-                        <Button variant="ghost" size="icon" className="rounded-xl h-9 w-9"><X className="w-5 h-5" /></Button>
-                      </SheetClose>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-500/20">М</div>
+                      <span className="text-lg font-bold text-slate-900 tracking-tight">Мастер ТЧ</span>
                     </div>
                   </div>
                   <nav className="flex-1 p-4 space-y-1">
