@@ -131,7 +131,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
         {/* Top header */}
         <header className="sticky top-0 z-40 h-14 border-b border-border/50 bg-card/80 backdrop-blur-xl flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
@@ -201,7 +201,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 overflow-auto pb-20 md:pb-6">
+        <main className="flex-1 min-w-0 p-4 md:p-6 overflow-y-auto overflow-x-hidden pb-20 md:pb-6">
           {children}
         </main>
       </div>
