@@ -1,56 +1,83 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { Bot, PhoneCall, Loader2, CheckCircle2, PhoneOff } from "lucide-react";
+import { Bot, Mic, PhoneOff, Loader2, AlertTriangle } from "lucide-react";
+import { getVapi, VAPI_ASSISTANT_ID } from "@/lib/vapiClient";
 
-type Step = "form" | "calling" | "success" | "error";
+type CallState = "idle" | "connecting" | "active" | "ended" | "error";
 
-// Страница запускает реальный телефонный звонок от ИИ-менеджера Master.tj (через Vapi)
-// клиенту на указанный номер — ИИ обсудит заявку прямо по телефону.
+interface TranscriptLine {
+  role: "user" | "assistant";
+  text: string;
+}
+
+// Живой голосовой разговор с ИИ-менеджером Master.tj прямо в браузере (через Vapi Web SDK).
+// Разговор происходит по микрофону устройства, без реального телефонного звонка.
 export default function AiCall() {
-  const { user, profile } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const [phone, setPhone] = useState(profile?.phone || "");
-  const [step, setStep] = useState<Step>("form");
+  const [state, setState] = useState<CallState>("idle");
+  const [assistantSpeaking, setAssistantSpeaking] = useState(false);
+  const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const transcriptEndRef = useRef<HTMLDivElement>(null);
 
-  const handleCall = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      navigate("/auth");
-      return;
+  useEffect(() => {
+    const vapi = getVapi();
+
+    const onCallStart = () => setState("active");
+    const onCallEnd = () => setState("ended");
+    const onSpeechStart = () => setAssistantSpeaking(true);
+    const onSpeechEnd = () => setAssistantSpeaking(false);
+    const onError = (e: any) => {
+      console.error("Vapi error:", e);
+      setErrorMessage("Не удалось подключиться к ИИ-менеджеру. Проверьте разрешение на микрофон и попробуйте снова.");
+      setState("error");
+    };
+    const onMessage = (message: any) => {
+      if (message?.type === "transcript" && message?.transcriptType === "final") {
+        setTranscript((prev) => [...prev, { role: message.role, text: message.transcript }]);
+      }
+    };
+
+    vapi.on("call-start", onCallStart);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("speech-start", onSpeechStart);
+    vapi.on("speech-end", onSpeechEnd);
+    vapi.on("error", onError);
+    vapi.on("message", onMessage);
+
+    return () => {
+      vapi.off("call-start", onCallStart);
+      vapi.off("call-end", onCallEnd);
+      vapi.off("speech-start", onSpeechStart);
+      vapi.off("speech-end", onSpeechEnd);
+      vapi.off("error", onError);
+      vapi.off("message", onMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [transcript]);
+
+  const startCall = async () => {
+    setErrorMessage("");
+    setTranscript([]);
+    setState("connecting");
+    try {
+      await getVapi().start(VAPI_ASSISTANT_ID);
+    } catch (e) {
+      console.error("Failed to start Vapi call:", e);
+      setErrorMessage("Не удалось начать разговор. Разрешите доступ к микрофону в браузере и попробуйте снова.");
+      setState("error");
     }
-    if (!phone.trim()) {
-      toast({ title: "Укажите номер телефона", variant: "destructive" });
-      return;
-    }
+  };
 
-    setStep("calling");
-    const { data, error } = await supabase.functions.invoke("vapi-call", {
-      body: { phone: phone.trim(), name: profile?.full_name || undefined },
-    });
-
-    if (error || !data?.success) {
-      setStep("error");
-      setErrorMessage(
-        data?.error === "too_soon"
-          ? "Вы уже запрашивали звонок недавно. Подождите минуту и попробуйте снова."
-          : "Не удалось запустить звонок. Попробуйте ещё раз чуть позже."
-      );
-      return;
-    }
-
-    setStep("success");
+  const endCall = () => {
+    getVapi().stop();
+    setState("ended");
   };
 
   return (
@@ -63,61 +90,85 @@ export default function AiCall() {
               <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center">
                 <Bot className="w-8 h-8 text-white" />
               </div>
-              <CardTitle className="text-2xl">ИИ-менеджер позвонит вам</CardTitle>
+              <CardTitle className="text-2xl">ИИ-менеджер Master.tj</CardTitle>
               <CardDescription>
-                Укажите номер телефона — наш ИИ-менеджер сразу позвонит и оформит заявку прямо в разговоре
+                Поговорите с голосовым ИИ-менеджером прямо в браузере — он поможет оформить заявку
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {step === "form" && (
-                <form onSubmit={handleCall} className="space-y-4">
-                  <div className="relative">
-                    <PhoneCall className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="+992 900 000 000"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="pl-10 h-12 text-base"
-                      type="tel"
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full rounded-full h-12 text-base gap-2">
-                    <PhoneCall className="w-4 h-4" />
-                    Позвонить мне
+              {(state === "idle" || state === "ended") && (
+                <div className="flex flex-col items-center py-6 gap-4">
+                  <Button onClick={startCall} className="w-full rounded-full h-14 text-base gap-2">
+                    <Mic className="w-5 h-5" />
+                    Начать разговор
                   </Button>
-                  {!user && (
-                    <p className="text-xs text-center text-muted-foreground">
-                      Нужно войти в аккаунт, чтобы запросить звонок
-                    </p>
-                  )}
-                </form>
-              )}
-
-              {step === "calling" && (
-                <div className="flex flex-col items-center py-8 gap-3">
-                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                  <p className="font-medium text-foreground text-center">Запускаем звонок...</p>
-                </div>
-              )}
-
-              {step === "success" && (
-                <div className="flex flex-col items-center py-8 gap-3">
-                  <CheckCircle2 className="w-12 h-12 text-green-500" />
-                  <p className="font-medium text-foreground text-center">
-                    Готово! В течение минуты вам позвонит ИИ-менеджер Master.tj на номер {phone}
+                  <p className="text-xs text-center text-muted-foreground">
+                    Потребуется разрешение на использование микрофона
                   </p>
-                  <Button variant="outline" className="rounded-full mt-2" onClick={() => setStep("form")}>
-                    Запросить ещё звонок
+                  {state === "ended" && transcript.length > 0 && (
+                    <div className="w-full mt-2 max-h-60 overflow-y-auto space-y-2 border-t border-border pt-4">
+                      {transcript.map((line, i) => (
+                        <div key={i} className={`text-sm ${line.role === "assistant" ? "text-foreground" : "text-muted-foreground"}`}>
+                          <span className="font-semibold">{line.role === "assistant" ? "ИИ: " : "Вы: "}</span>
+                          {line.text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {state === "connecting" && (
+                <div className="flex flex-col items-center py-10 gap-3">
+                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                  <p className="font-medium text-foreground text-center">Подключаемся к ИИ-менеджеру...</p>
+                </div>
+              )}
+
+              {state === "active" && (
+                <div className="flex flex-col items-center py-6 gap-4">
+                  <div className="relative w-24 h-24">
+                    <AnimatePresence>
+                      {assistantSpeaking && (
+                        <motion.div
+                          initial={{ opacity: 0.6, scale: 1 }}
+                          animate={{ opacity: 0, scale: 1.6 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                          className="absolute inset-0 rounded-full bg-primary/40"
+                        />
+                      )}
+                    </AnimatePresence>
+                    <div className="absolute inset-2 rounded-full bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center">
+                      <Bot className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+                  <p className="font-medium text-foreground text-center">
+                    {assistantSpeaking ? "ИИ-менеджер говорит..." : "Слушаю вас..."}
+                  </p>
+
+                  <div className="w-full max-h-52 overflow-y-auto space-y-2 border-t border-border pt-4">
+                    {transcript.map((line, i) => (
+                      <div key={i} className={`text-sm ${line.role === "assistant" ? "text-foreground" : "text-muted-foreground"}`}>
+                        <span className="font-semibold">{line.role === "assistant" ? "ИИ: " : "Вы: "}</span>
+                        {line.text}
+                      </div>
+                    ))}
+                    <div ref={transcriptEndRef} />
+                  </div>
+
+                  <Button onClick={endCall} variant="destructive" className="w-full rounded-full h-12 gap-2">
+                    <PhoneOff className="w-4 h-4" />
+                    Завершить разговор
                   </Button>
                 </div>
               )}
 
-              {step === "error" && (
+              {state === "error" && (
                 <div className="flex flex-col items-center py-8 gap-3">
-                  <PhoneOff className="w-12 h-12 text-destructive" />
+                  <AlertTriangle className="w-12 h-12 text-destructive" />
                   <p className="font-medium text-foreground text-center">{errorMessage}</p>
-                  <Button variant="outline" className="rounded-full mt-2" onClick={() => setStep("form")}>
+                  <Button variant="outline" className="rounded-full mt-2" onClick={() => setState("idle")}>
                     Попробовать снова
                   </Button>
                 </div>
