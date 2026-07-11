@@ -455,13 +455,13 @@ function BenefitItem({ icon, title, sub }: { icon: React.ReactNode; title: strin
 
 function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="flex items-center gap-5">
+    <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0">
         {icon}
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-3xl font-black text-slate-900 leading-none mb-2">{value}</p>
-        <p className="text-xs text-slate-500 font-medium uppercase tracking-widest leading-tight">{label}</p>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-widest leading-tight break-words">{label}</p>
       </div>
     </div>
   );
