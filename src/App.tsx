@@ -27,7 +27,6 @@ import MasterDetail from "./pages/MasterDetail";
 import CategoryDetail from "./pages/CategoryDetail";
 import ServiceDetail from "./pages/ServiceDetail";
 import AiCall from "./pages/AiCall";
-import SafetyTraining from "./pages/SafetyTraining";
 import VerifyEmail from "./pages/VerifyEmail";
 import PendingApproval from "./pages/PendingApproval";
 import Shop from "./pages/Shop";
@@ -72,7 +71,6 @@ const AnimatedRoutes = () => {
           <Route path="/service/:id" element={<PageTransition><ServiceDetail /></PageTransition>} />
           <Route path="/contacts" element={<PageTransition><Contacts /></PageTransition>} />
         <Route path="/ai-call" element={<PageTransition><AiCall /></PageTransition>} />
-        <Route path="/safety" element={<PageTransition><SafetyTraining /></PageTransition>} />
           <Route path="/services" element={<PageTransition><NotFound /></PageTransition>} />
           <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
