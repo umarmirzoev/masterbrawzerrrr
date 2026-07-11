@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   BadgeCheck,
   Banknote,
@@ -27,39 +28,40 @@ import {
 } from "lucide-react";
 
 const About = () => {
+  const { t } = useLanguage();
   // Временные стоковые изображения — замени на реальные фото компании.
   const heroImage = "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1200&h=1400&fit=crop";
   const missionImage = "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=1000&h=800&fit=crop";
 
   const topStats = [
-    { icon: Users, value: "1000+", label: "проверенных мастеров" },
-    { icon: BadgeCheck, value: "5000+", label: "выполненных заявок" },
-    { icon: Wrench, value: "120+", label: "видов услуг" },
-    { icon: Star, value: "4.8", label: "средняя оценка" },
-    { icon: Heart, value: "95%", label: "довольных клиентов" },
+    { icon: Users, value: "1000+", label: t("aboutPageStat1") },
+    { icon: BadgeCheck, value: "5000+", label: t("aboutPageStat2") },
+    { icon: Wrench, value: "120+", label: t("aboutPageStat3") },
+    { icon: Star, value: "4.8", label: t("aboutPageStat4") },
+    { icon: Heart, value: "95%", label: t("aboutPageStat5") },
   ];
 
   const clientBenefits = [
-    { icon: Timer, title: "Быстро", desc: "Находим мастера за 30 минут и отправляем к вам в удобное время." },
-    { icon: UserCheck, title: "Надёжно", desc: "Только проверенные специалисты с опытом и реальными отзывами." },
-    { icon: Sparkles, title: "Чисто", desc: "Проводим гарантийный контроль и придерживаемся стандартов сервиса." },
-    { icon: ShieldCheck, title: "С гарантией", desc: "Гарантия на все работы до 30 дней после завершения заказа." },
+    { icon: Timer, title: t("aboutPageBenefit1Title"), desc: t("aboutPageBenefit1Desc") },
+    { icon: UserCheck, title: t("aboutPageBenefit2Title"), desc: t("aboutPageBenefit2Desc") },
+    { icon: Sparkles, title: t("aboutPageBenefit3Title"), desc: t("aboutPageBenefit3Desc") },
+    { icon: ShieldCheck, title: t("aboutPageBenefit4Title"), desc: t("aboutPageBenefit4Desc") },
   ];
 
   const masterAdvantages = [
-    { icon: Banknote, title: "Постоянные заказы", desc: "Стабильный поток заявок каждый день по всему городу." },
-    { icon: Handshake, title: "Свободный график", desc: "Работайте тогда, когда удобно именно вам." },
-    { icon: Shield, title: "Честная система", desc: "Прозрачные условия и понятные выплаты без скрытых комиссий." },
-    { icon: Headphones, title: "Поддержка 24/7", desc: "Администратор всегда на связи и помогает по всем вопросам." },
-    { icon: Clock3, title: "Быстрые выплаты", desc: "Получайте оплату оперативно после выполнения заказов." },
-    { icon: Lock, title: "Безопасные заказы", desc: "Работаем по правилам сервиса и защищаем ваши интересы." },
+    { icon: Banknote, title: t("aboutPageAdv1Title"), desc: t("aboutPageAdv1Desc") },
+    { icon: Handshake, title: t("aboutPageAdv2Title"), desc: t("aboutPageAdv2Desc") },
+    { icon: Shield, title: t("aboutPageAdv3Title"), desc: t("aboutPageAdv3Desc") },
+    { icon: Headphones, title: t("aboutPageAdv4Title"), desc: t("aboutPageAdv4Desc") },
+    { icon: Clock3, title: t("aboutPageAdv5Title"), desc: t("aboutPageAdv5Desc") },
+    { icon: Lock, title: t("aboutPageAdv6Title"), desc: t("aboutPageAdv6Desc") },
   ];
 
   const values = [
-    { icon: ShieldCheck, title: "Надёжность", desc: "Мы работаем на качество и выполняем обещания." },
-    { icon: Gauge, title: "Скорость", desc: "Ценим ваше время и быстро закрываем заявки." },
-    { icon: Target, title: "Качество", desc: "Каждый заказ проходит контроль перед закрытием." },
-    { icon: Heart, title: "Честность", desc: "Прозрачные условия оплаты и открытая коммуникация." },
+    { icon: ShieldCheck, title: t("aboutPageValue1Title"), desc: t("aboutPageValue1Desc") },
+    { icon: Gauge, title: t("aboutPageValue2Title"), desc: t("aboutPageValue2Desc") },
+    { icon: Target, title: t("aboutPageValue3Title"), desc: t("aboutPageValue3Desc") },
+    { icon: Heart, title: t("aboutPageValue4Title"), desc: t("aboutPageValue4Desc") },
   ];
 
   return (
@@ -70,23 +72,22 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">О компании</p>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">{t("aboutPageBadge")}</p>
               <h1 className="mb-5 text-4xl font-extrabold leading-tight text-slate-900 md:text-5xl">
-                Мастер ТЧ — сервис,
+                {t("aboutPageHeroTitle1")}
                 <br />
-                которому доверяют
-                <br />в Душанбе
+                {t("aboutPageHeroTitle2")}
+                <br />{t("aboutPageHeroTitle3")}
               </h1>
               <p className="mb-5 text-sm leading-6 text-slate-600 md:text-base">
-                Мы объединяем клиентов и проверенных мастеров, чтобы любые бытовые задачи решались
-                быстро, безопасно и по прозрачной цене.
+                {t("aboutPageHeroDesc")}
               </p>
               <ul className="mb-7 space-y-2">
                 {[
-                  "Более 1000 проверенных мастеров",
-                  "Честные фиксированные цены",
-                  "Быстрый выезд в течение 30 минут",
-                  "Работаем по всему Душанбе",
+                  t("aboutPageBullet1"),
+                  t("aboutPageBullet2"),
+                  t("aboutPageBullet3"),
+                  t("aboutPageBullet4"),
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
                     <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
@@ -99,14 +100,14 @@ const About = () => {
                   to="/categories"
                   className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
                 >
-                  Выбрать услугу
+                  {t("aboutPageChooseService")}
                 </Link>
                 <Button
                   variant="outline"
                   onClick={() => document.getElementById("about-contacts")?.scrollIntoView({ behavior: "smooth" })}
                   className="rounded-lg border-emerald-200 px-6 py-3 text-sm text-emerald-700 hover:bg-emerald-50"
                 >
-                  Есть вопросы
+                  {t("aboutPageHaveQuestions")}
                 </Button>
               </div>
             </div>
@@ -137,14 +138,14 @@ const About = () => {
                   <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] p-5 md:p-6 border border-white/50 shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex items-center justify-between transition-transform duration-500 group-hover:translate-y-[-4px]">
                     <div>
                       <p className="text-xl font-black text-slate-900 leading-tight mb-1">Мастер ТЧ</p>
-                      <p className="text-sm text-slate-500 font-semibold tracking-wide">Ремонт, уборка, электрика</p>
+                      <p className="text-sm text-slate-500 font-semibold tracking-wide">{t("aboutPageCardTagline")}</p>
                     </div>
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-4 py-2 rounded-2xl text-sm font-black shadow-lg shadow-emerald-200 transition-colors group-hover:bg-emerald-600">
                         <Star className="h-4 w-4 fill-current" />
                         4.8
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-1.5 uppercase tracking-[0.2em] font-bold">рейтинг</p>
+                      <p className="text-[10px] text-slate-400 mt-1.5 uppercase tracking-[0.2em] font-bold">{t("aboutPageRatingLabel")}</p>
                     </div>
                   </div>
                 </div>
@@ -182,7 +183,7 @@ const About = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">Что мы даём клиентам</h2>
+          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">{t("aboutPageClientsTitle")}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {clientBenefits.map((item) => {
               const Icon = item.icon;
@@ -202,7 +203,7 @@ const About = () => {
 
       <section className="bg-white py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">Преимущества для мастеров</h2>
+          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">{t("aboutPageMastersTitle")}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
             {masterAdvantages.map((item) => {
               const Icon = item.icon;
@@ -231,18 +232,18 @@ const About = () => {
               className="group relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-[#f8f8f6] p-8 md:p-10 shadow-sm hover-soft hover-glow min-h-[340px] flex flex-col justify-center"
             >
               <div className="relative z-10 max-w-full md:max-w-[60%]">
-                <h3 className="mb-4 text-3xl font-black text-slate-900">Наша миссия</h3>
+                <h3 className="mb-4 text-3xl font-black text-slate-900">{t("aboutPageMissionTitle")}</h3>
                 <p className="text-base leading-relaxed text-slate-600 mb-3">
-                  Сделать жизнь в Душанбе комфортнее, соединяя людей с надёжными мастерами.
+                  {t("aboutPageMissionDesc1")}
                 </p>
                 <p className="text-base leading-relaxed text-slate-600">
-                  Мы ценим ваше время, доверие и стремимся к лучшему сервису каждый день.
+                  {t("aboutPageMissionDesc2")}
                 </p>
               </div>
               <div className="absolute -bottom-4 -right-4 top-0 hidden w-[60%] md:block">
                 <img
                   src={missionImage}
-                  alt="Машина сервиса"
+                  alt={t("aboutPageMissionImgAlt")}
                   className="h-full w-full object-contain object-right-bottom transition-transform duration-700 group-hover:scale-110 group-hover:-translate-x-4"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#f8f8f6] via-[#f8f8f6]/50 to-transparent pointer-events-none" />
@@ -251,7 +252,7 @@ const About = () => {
                 <div className="relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm">
                   <img
                     src={missionImage}
-                    alt="Машина сервиса"
+                    alt={t("aboutPageMissionImgAlt")}
                     className="h-40 w-full object-contain"
                   />
                 </div>
@@ -266,17 +267,16 @@ const About = () => {
               className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-[#f8f8f6] p-8 md:p-10 shadow-sm hover-soft hover-glow min-h-[340px] flex flex-col justify-center"
             >
               <div className="relative z-10 max-w-full md:max-w-[70%]">
-                <h3 className="mb-4 text-3xl font-black text-slate-900">Безопасность и гарантии</h3>
+                <h3 className="mb-4 text-3xl font-black text-slate-900">{t("aboutPageSafetyTitle")}</h3>
                 <p className="mb-6 text-base leading-relaxed text-slate-600">
-                  Мы заботимся о вашей безопасности и качестве услуг. Каждый мастер проходит проверку, а каждая работа
-                  выполняется с гарантией.
+                  {t("aboutPageSafetyDesc")}
                 </p>
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {[
-                    "Проверка документов",
-                    "Реальные отзывы",
-                    "Гарантия на работы",
-                    "Поддержка 24/7",
+                    t("aboutPageSafety1"),
+                    t("aboutPageSafety2"),
+                    t("aboutPageSafety3"),
+                    t("aboutPageSafety4"),
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                       <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
@@ -304,7 +304,7 @@ const About = () => {
 
       <section className="bg-white py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">Наши ценности</h2>
+          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">{t("aboutPageValuesTitle")}</h2>
           <div className="grid gap-4 md:grid-cols-4">
             {values.map((item) => {
               const Icon = item.icon;
@@ -327,30 +327,30 @@ const About = () => {
           <div className="rounded-2xl bg-emerald-600 p-6 text-white md:p-8">
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
-                Есть вопросы? Мы на связи!
+                {t("aboutPageContactBadge")}
               </p>
               <h2 className="mb-2 text-2xl font-bold md:text-3xl">+992 979 117 007</h2>
-              <p className="mb-5 text-sm text-emerald-50">WhatsApp / Звонки</p>
+              <p className="mb-5 text-sm text-emerald-50">{t("aboutPageWhatsappLabel")}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild className="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-50">
                 <a href="https://wa.me/992979117007" target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="mr-2 h-4 w-4" />
-                  Написать в WhatsApp
+                  {t("aboutPageWhatsappButton")}
                 </a>
               </Button>
               <Link
                 to="/categories"
                 className="inline-flex items-center justify-center rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20"
               >
-                Выбрать услугу
+                {t("aboutPageChooseService")}
               </Link>
               <a
                 href="tel:+992979117007"
                 className="inline-flex items-center justify-center rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
               >
                 <PhoneCall className="mr-2 h-4 w-4" />
-                Позвонить
+                {t("aboutPageCallButton")}
               </a>
             </div>
           </div>

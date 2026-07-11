@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Bot, Mic, PhoneOff, Loader2, AlertTriangle } from "lucide-react";
 import { getVapi, VAPI_ASSISTANT_ID } from "@/lib/vapiClient";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type CallState = "idle" | "connecting" | "active" | "ended" | "error";
 
@@ -17,6 +18,7 @@ interface TranscriptLine {
 // Живой голосовой разговор с ИИ-менеджером Master.tj прямо в браузере (через Vapi Web SDK).
 // Разговор происходит по микрофону устройства, без реального телефонного звонка.
 export default function AiCall() {
+  const { t } = useLanguage();
   const [state, setState] = useState<CallState>("idle");
   const [assistantSpeaking, setAssistantSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
@@ -32,7 +34,7 @@ export default function AiCall() {
     const onSpeechEnd = () => setAssistantSpeaking(false);
     const onError = (e: any) => {
       console.error("Vapi error:", e);
-      setErrorMessage("Не удалось подключиться к ИИ-менеджеру. Проверьте разрешение на микрофон и попробуйте снова.");
+      setErrorMessage(t("aiCallErrorConnect"));
       setState("error");
     };
     const onMessage = (message: any) => {
@@ -70,7 +72,7 @@ export default function AiCall() {
       await getVapi().start(VAPI_ASSISTANT_ID);
     } catch (e) {
       console.error("Failed to start Vapi call:", e);
-      setErrorMessage("Не удалось начать разговор. Разрешите доступ к микрофону в браузере и попробуйте снова.");
+      setErrorMessage(t("aiCallErrorStart"));
       setState("error");
     }
   };
@@ -90,9 +92,9 @@ export default function AiCall() {
               <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center">
                 <Bot className="w-8 h-8 text-white" />
               </div>
-              <CardTitle className="text-2xl">ИИ-менеджер Master.tj</CardTitle>
+              <CardTitle className="text-2xl">{t("aiCallPageTitle")}</CardTitle>
               <CardDescription>
-                Поговорите с голосовым ИИ-менеджером прямо в браузере — он поможет оформить заявку
+                {t("aiCallPageDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -100,16 +102,16 @@ export default function AiCall() {
                 <div className="flex flex-col items-center py-6 gap-4">
                   <Button onClick={startCall} className="w-full rounded-full h-14 text-base gap-2">
                     <Mic className="w-5 h-5" />
-                    Начать разговор
+                    {t("aiCallStartButton")}
                   </Button>
                   <p className="text-xs text-center text-muted-foreground">
-                    Потребуется разрешение на использование микрофона
+                    {t("aiCallMicHint")}
                   </p>
                   {state === "ended" && transcript.length > 0 && (
                     <div className="w-full mt-2 max-h-60 overflow-y-auto space-y-2 border-t border-border pt-4">
                       {transcript.map((line, i) => (
                         <div key={i} className={`text-sm ${line.role === "assistant" ? "text-foreground" : "text-muted-foreground"}`}>
-                          <span className="font-semibold">{line.role === "assistant" ? "ИИ: " : "Вы: "}</span>
+                          <span className="font-semibold">{line.role === "assistant" ? t("aiCallLabelAi") : t("aiCallLabelUser")}</span>
                           {line.text}
                         </div>
                       ))}
@@ -121,7 +123,7 @@ export default function AiCall() {
               {state === "connecting" && (
                 <div className="flex flex-col items-center py-10 gap-3">
                   <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                  <p className="font-medium text-foreground text-center">Подключаемся к ИИ-менеджеру...</p>
+                  <p className="font-medium text-foreground text-center">{t("aiCallConnecting")}</p>
                 </div>
               )}
 
@@ -144,13 +146,13 @@ export default function AiCall() {
                     </div>
                   </div>
                   <p className="font-medium text-foreground text-center">
-                    {assistantSpeaking ? "ИИ-менеджер говорит..." : "Слушаю вас..."}
+                    {assistantSpeaking ? t("aiCallSpeaking") : t("aiCallListening")}
                   </p>
 
                   <div className="w-full max-h-52 overflow-y-auto space-y-2 border-t border-border pt-4">
                     {transcript.map((line, i) => (
                       <div key={i} className={`text-sm ${line.role === "assistant" ? "text-foreground" : "text-muted-foreground"}`}>
-                        <span className="font-semibold">{line.role === "assistant" ? "ИИ: " : "Вы: "}</span>
+                        <span className="font-semibold">{line.role === "assistant" ? t("aiCallLabelAi") : t("aiCallLabelUser")}</span>
                         {line.text}
                       </div>
                     ))}
@@ -159,7 +161,7 @@ export default function AiCall() {
 
                   <Button onClick={endCall} variant="destructive" className="w-full rounded-full h-12 gap-2">
                     <PhoneOff className="w-4 h-4" />
-                    Завершить разговор
+                    {t("aiCallEndButton")}
                   </Button>
                 </div>
               )}
@@ -169,7 +171,7 @@ export default function AiCall() {
                   <AlertTriangle className="w-12 h-12 text-destructive" />
                   <p className="font-medium text-foreground text-center">{errorMessage}</p>
                   <Button variant="outline" className="rounded-full mt-2" onClick={() => setState("idle")}>
-                    Попробовать снова
+                    {t("aiCallTryAgain")}
                   </Button>
                 </div>
               )}

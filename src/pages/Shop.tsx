@@ -31,11 +31,11 @@ export default function Shop() {
   const tilesImg = "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=400&auto=format&fit=crop"; 
 
   const popularProducts = [
-    { id: "1", name: "Дрель-шуруповерт Bosch GSR 120-Li", price: "350", oldPrice: "450", rating: "4.8", reviews: "124", image: drillImg, label: "Скидка -15%", labelColor: "bg-red-500" },
-    { id: "2", name: "Смеситель для кухни Grohe Start", price: "85", oldPrice: null, rating: "4.9", reviews: "86", image: faucetImg, label: "Хит продаж", labelColor: "bg-purple-600" },
-    { id: "3", name: "Водонагреватель Ariston 80 л", price: "750", oldPrice: null, rating: "4.7", reviews: "42", image: waterHeaterImg, label: "Новинка", labelColor: "bg-orange-500" },
-    { id: "4", name: "Унитаз-компакт Cersanit Parva", price: "450", oldPrice: "520", rating: "4.8", reviews: "115", image: toiletImg, label: "Скидка -10%", labelColor: "bg-blue-500" },
-    { id: "5", name: "Керамическая плитка 60х60 см", price: "120", oldPrice: "150", rating: "4.5", reviews: "18", image: tilesImg, label: "Акция", labelColor: "bg-emerald-500" },
+    { id: "1", name: "Дрель-шуруповерт Bosch GSR 120-Li", price: "350", oldPrice: "450", rating: "4.8", reviews: "124", image: drillImg, labelKey: "shopBadgeSale15", labelColor: "bg-red-500" },
+    { id: "2", name: "Смеситель для кухни Grohe Start", price: "85", oldPrice: null, rating: "4.9", reviews: "86", image: faucetImg, labelKey: "shopBadgeBestseller", labelColor: "bg-purple-600" },
+    { id: "3", name: "Водонагреватель Ariston 80 л", price: "750", oldPrice: null, rating: "4.7", reviews: "42", image: waterHeaterImg, labelKey: "shopBadgeNew", labelColor: "bg-orange-500" },
+    { id: "4", name: "Унитаз-компакт Cersanit Parva", price: "450", oldPrice: "520", rating: "4.8", reviews: "115", image: toiletImg, labelKey: "shopBadgeSale10", labelColor: "bg-blue-500" },
+    { id: "5", name: "Керамическая плитка 60х60 см", price: "120", oldPrice: "150", rating: "4.5", reviews: "18", image: tilesImg, labelKey: "shopBadgePromo", labelColor: "bg-emerald-500" },
   ];
 
   return (
@@ -55,32 +55,32 @@ export default function Shop() {
               <div className="max-w-3xl">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 mb-8">
                    <Clock className="w-3.5 h-3.5" />
-                   <span className="text-[11px] font-black uppercase tracking-widest">О магазине</span>
+                   <span className="text-[11px] font-black uppercase tracking-widest">{t("shopAboutBadge")}</span>
                 </div>
-                
+
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 leading-tight">
-                  О магазине <span className="text-emerald-500">Мастер ТЧ</span>
+                  {t("shopAboutTitle")} <span className="text-emerald-500">Мастер ТЧ</span>
                 </h1>
-                
+
                 <div className="space-y-6 mb-12 text-slate-500">
                   <p className="text-base md:text-lg leading-relaxed">
-                    Магазин Мастер ТЧ — это надёжный выбор для дома, ремонта и профессиональных работ в Душанбе и по всему Таджикистану.
+                    {t("shopAboutPara1")}
                   </p>
                   <p className="text-base md:text-lg leading-relaxed">
-                    Мы предлагаем только качественные товары от проверенных производителей и помогаем не только купить, но и установить с помощью наших мастеров.
+                    {t("shopAboutPara2")}
                   </p>
                   <p className="text-base md:text-lg font-bold text-slate-800 leading-relaxed">
-                    Наша цель — сделать ремонт простым, быстрым и доступным для каждого клиента.
+                    {t("shopAboutPara3")}
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-8">
-                  <ShopFeatureItem icon={<Shield />} title="Проверенное качество" desc="Только оригинальные товары" />
-                  <ShopFeatureItem icon={<Truck />} title="Быстрая доставка" desc="Доставим ваш заказ" />
-                  <ShopFeatureItem icon={<Wrench />} title="Установка мастером" desc="С гарантией 1 год" />
-                  <ShopFeatureItem icon={<CreditCard />} title="Удобная оплата" desc="Картой или наличными" />
-                  <ShopFeatureItem icon={<RotateCcw />} title="Возврат товара" desc="В течение 14 дней" />
-                  <ShopFeatureItem icon={<Headset />} title="Поддержка 24/7" desc="Ответим на вопросы" />
+                  <ShopFeatureItem icon={<Shield />} title={t("shopFeatQuality")} desc={t("shopFeatQualityDesc")} />
+                  <ShopFeatureItem icon={<Truck />} title={t("shopFeatDelivery")} desc={t("shopFeatDeliveryDesc")} />
+                  <ShopFeatureItem icon={<Wrench />} title={t("shopFeatInstall")} desc={t("shopFeatInstallDesc")} />
+                  <ShopFeatureItem icon={<CreditCard />} title={t("shopFeatPayment")} desc={t("shopFeatPaymentDesc")} />
+                  <ShopFeatureItem icon={<RotateCcw />} title={t("shopFeatReturn")} desc={t("shopFeatReturnDesc")} />
+                  <ShopFeatureItem icon={<Headset />} title={t("shopFeatSupport")} desc={t("shopFeatSupportDesc")} />
                 </div>
               </div>
             </div>
@@ -105,8 +105,8 @@ export default function Shop() {
                   >
                     <div className="flex items-center justify-between mb-5">
                        <div className="space-y-1">
-                         <p className="text-sm font-bold text-slate-900 leading-tight">Нам доверяют тысячи клиентов</p>
-                         <p className="text-sm font-bold text-slate-900 leading-tight">по всему Таджикистану</p>
+                         <p className="text-sm font-bold text-slate-900 leading-tight">{t("shopTrustLine1")}</p>
+                         <p className="text-sm font-bold text-slate-900 leading-tight">{t("shopTrustLine2")}</p>
                        </div>
                        <div className="text-right">
                          <p className="text-2xl font-black text-slate-900">4.8</p>
@@ -118,7 +118,7 @@ export default function Shop() {
                           <div className="flex gap-0.5">
                             {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
                           </div>
-                          <span className="text-xs font-bold text-slate-400 ml-1">4.8 (1200+ отзывов)</span>
+                          <span className="text-xs font-bold text-slate-400 ml-1">{t("shopTrustReviewsCount")}</span>
                        </div>
                        <div className="flex -space-x-2">
                           {[...Array(4)].map((_, i) => (
@@ -142,10 +142,10 @@ export default function Shop() {
       <section className="py-12 bg-white border-y border-slate-100">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label="довольных клиентов" />
-            <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label="успешных заказов" />
-            <StatItem icon={<Award className="w-8 h-8 text-emerald-500" />} value="50+" label="проверенных брендов" />
-            <StatItem icon={<Trophy className="w-8 h-8 text-emerald-500" />} value="98%" label="положительных отзывов" />
+            <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label={t("shopStatClients")} />
+            <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label={t("shopStatOrders")} />
+            <StatItem icon={<Award className="w-8 h-8 text-emerald-500" />} value="50+" label={t("shopStatBrands")} />
+            <StatItem icon={<Trophy className="w-8 h-8 text-emerald-500" />} value="98%" label={t("shopStatReviews")} />
           </div>
         </div>
       </section>
@@ -155,10 +155,10 @@ export default function Shop() {
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-              Популярные товары 🔥
+              {t("shopPopularProductsTitle")}
             </h2>
             <Link to="#" className="text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-2">
-              Смотреть все товары <ChevronRight className="w-4 h-4" />
+              {t("shopViewAllProducts")} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -177,7 +177,7 @@ export default function Shop() {
                     
                     <div className="absolute top-4 left-4">
                       <Badge className={`${p.labelColor} text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg`}>
-                        {p.label}
+                        {t(p.labelKey)}
                       </Badge>
                     </div>
                   </div>
@@ -220,11 +220,11 @@ export default function Shop() {
       <section className="py-12 bg-emerald-50/30 border-y border-emerald-100/50">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-            <BenefitSmallItem icon={<Truck />} text="Быстрая доставка по Душанбе" />
-            <BenefitSmallItem icon={<Shield />} text="Гарантия качества на все товары" />
-            <BenefitSmallItem icon={<CreditCard />} text="Безопасная оплата любым способом" />
-            <BenefitSmallItem icon={<RotateCcw />} text="Возврат товара в течение 14 дней" />
-            <BenefitSmallItem icon={<Wrench />} text="Установка мастером с гарантией" />
+            <BenefitSmallItem icon={<Truck />} text={t("shopBenefitDelivery")} />
+            <BenefitSmallItem icon={<Shield />} text={t("shopBenefitWarranty")} />
+            <BenefitSmallItem icon={<CreditCard />} text={t("shopBenefitPayment")} />
+            <BenefitSmallItem icon={<RotateCcw />} text={t("shopBenefitReturn")} />
+            <BenefitSmallItem icon={<Wrench />} text={t("shopBenefitInstall")} />
           </div>
         </div>
       </section>
@@ -246,13 +246,13 @@ export default function Shop() {
              </div>
 
              <div className="flex-1 z-10">
-               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">Нужна помощь с выбором?</h2>
-               <p className="text-lg text-slate-600 mb-8 max-w-xl">Наши специалисты помогут подобрать товар и мастера для установки</p>
-               
+               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">{t("shopConsultTitle")}</h2>
+               <p className="text-lg text-slate-600 mb-8 max-w-xl">{t("shopConsultDesc")}</p>
+
                <div className="space-y-4 mb-10">
-                 <CheckPoint text="Проконсультируем и ответим на вопросы" />
-                 <CheckPoint text="Поможем подобрать лучший вариант" />
-                 <CheckPoint text="Подскажем по установке и доставке" />
+                 <CheckPoint text={t("shopCheckPoint1")} />
+                 <CheckPoint text={t("shopCheckPoint2")} />
+                 <CheckPoint text={t("shopCheckPoint3")} />
                </div>
                
                <div className="flex flex-col sm:flex-row items-center gap-8">
@@ -262,12 +262,12 @@ export default function Shop() {
                     </div>
                     <div>
                       <p className="text-2xl font-black">+992 979 117 007</p>
-                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Ежедневно с 8:00 до 22:00</p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("shopWorkHours")}</p>
                     </div>
                  </div>
-                 
+
                  <Button className="bg-[#10B981] hover:bg-[#059669] text-white font-black rounded-2xl px-10 h-16 flex items-center gap-3 shadow-xl shadow-emerald-100 transition-all active:scale-95">
-                   <MessageCircle className="w-6 h-6" /> Написать в WhatsApp
+                   <MessageCircle className="w-6 h-6" /> {t("shopWhatsAppButton")}
                  </Button>
                </div>
              </div>

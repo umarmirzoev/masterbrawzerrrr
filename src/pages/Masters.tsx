@@ -49,7 +49,31 @@ const ALL_CATEGORIES = [
   "Уборка", "Ремонт под ключ", "Аварийные 24/7", "Ремонт техники",
 ];
 
+const CATEGORY_LABEL_KEYS: Record<string, string> = {
+  "Электрика": "mastersCatElectric",
+  "Сантехника": "mastersCatPlumbing",
+  "Отделка": "mastersCatRenovation",
+  "Мебель и двери": "mastersCatFurniture",
+  "Умный дом": "mastersCatSmartHome",
+  "Видеонаблюдение": "mastersCatSecurity",
+  "Сад и двор": "mastersCatGarden",
+  "Сварочные работы": "mastersCatWelding",
+  "Подвалы и гаражи": "mastersCatGarage",
+  "Уборка": "mastersCatCleaning",
+  "Ремонт под ключ": "mastersCatTurnkey",
+  "Аварийные 24/7": "mastersCatEmergency",
+  "Ремонт техники": "mastersCatRepair",
+};
+
 const ALL_DISTRICTS = ["Сино", "Фирдавси", "Шохмансур", "Исмоили Сомони", "Пригород"];
+
+const DISTRICT_LABEL_KEYS: Record<string, string> = {
+  "Сино": "districtSino",
+  "Фирдавси": "districtFirdausi",
+  "Шохмансур": "districtShomansur",
+  "Исмоили Сомони": "districtIsmoili",
+  "Пригород": "districtSuburb",
+};
 
 export default function Masters() {
   // Временные стоковые изображения — замени на реальные фото.
@@ -150,16 +174,6 @@ export default function Masters() {
 
   const activeFilters = [category !== "all", district !== "all", minRating > 0].filter(Boolean).length;
 
-  // Показываем найденную по поиску категорию первой в бейджах карточки — иначе она может
-  // не попасть в первые 2 показанные категории и результат выглядит так, будто фильтр не сработал.
-  const getDisplayCategories = (categories: string[]) => {
-    const q = search.trim().toLowerCase();
-    if (!q) return categories.slice(0, 2);
-    const matched = categories.filter((c) => c.toLowerCase().includes(q));
-    const rest = categories.filter((c) => !c.toLowerCase().includes(q));
-    return [...matched, ...rest].slice(0, 2);
-  };
-
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
@@ -183,23 +197,21 @@ export default function Masters() {
             {/* Center Content */}
             <div className="flex-1 text-center lg:px-4">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2">Наши мастера</h1>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2">{t("mastersHeroTitle")}</h1>
                 <p className="text-lg text-slate-600 mb-8 font-medium">
-                  {masters.length} проверенных специалистов в Душанбе
+                  {t("mastersHeroSubtitle", { count: masters.length })}
                 </p>
 
                 <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl border border-white max-w-2xl mx-auto mb-10 shadow-sm">
                   <p className="text-slate-600 leading-relaxed text-sm md:text-base">
-                    Наши мастера — это команда проверенных специалистов с многолетним стажем работы в Душанбе. 
-                    Каждый из них проходит тщательную проверку документов, навыков и рекомендаций. 
-                    Мы гарантируем качество работы на каждом этапе.
+                    {t("mastersHeroDesc")}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-6 md:gap-10">
-                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} text="Надёжные специалисты" subtext="Все мастера прошли проверку" />
-                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} text="Честные цены" subtext="Прозрачное ценообразование" />
-                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} text="Гарантия качества" subtext="Официальная гарантия работ" />
+                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} text={t("mastersBenefit1Text")} subtext={t("mastersBenefit1Sub")} />
+                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} text={t("mastersBenefit2Text")} subtext={t("mastersBenefit2Sub")} />
+                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} text={t("mastersBenefit3Text")} subtext={t("mastersBenefit3Sub")} />
                 </div>
               </motion.div>
             </div>
@@ -225,15 +237,15 @@ export default function Masters() {
                   </div>
                 </div>
                 <div className="p-7 pt-4 flex flex-col flex-1">
-                  <h3 className="text-xl font-black text-slate-900 mb-2 leading-tight">Нужна помощь?</h3>
+                  <h3 className="text-xl font-black text-slate-900 mb-2 leading-tight">{t("mastersHelpTitle")}</h3>
                   <p className="text-sm text-slate-500 mb-6 leading-relaxed flex-1">
-                    Напишите нам и мы поможем подобрать идеального мастера для вашей задачи!
+                    {t("mastersHelpDesc")}
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => setIsOrderModalOpen(true)}
                     className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-[1.25rem] py-6 h-auto font-black shadow-lg shadow-emerald-100 transition-all active:scale-95"
                   >
-                    Получить консультацию
+                    {t("mastersHelpButton")}
                   </Button>
                 </div>
               </div>
@@ -251,7 +263,7 @@ export default function Masters() {
             <div className="relative flex-1 group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
               <Input
-                placeholder="Поиск мастера или услуги..."
+                placeholder={t("mastersSearchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-12 h-14 bg-white border-slate-200 rounded-2xl shadow-sm focus-visible:ring-emerald-500 focus-visible:border-emerald-500 text-lg"
@@ -263,7 +275,7 @@ export default function Masters() {
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="w-5 h-5" />
-              Фильтры
+              {t("mastersFiltersButton")}
               {activeFilters > 0 && (
                 <Badge className="ml-1 bg-emerald-500 h-6 w-6 p-0 flex items-center justify-center text-xs rounded-full">
                   {activeFilters}
@@ -282,52 +294,52 @@ export default function Masters() {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Категория</label>
+                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("mastersFilterCategory")}</label>
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger className="h-12 rounded-xl border-slate-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Все категории</SelectItem>
+                      <SelectItem value="all">{t("mastersFilterAllCategories")}</SelectItem>
                       {ALL_CATEGORIES.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c} value={c}>{t(CATEGORY_LABEL_KEYS[c] ?? "")}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Район</label>
+                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("mastersFilterDistrict")}</label>
                   <Select value={district} onValueChange={setDistrict}>
                     <SelectTrigger className="h-12 rounded-xl border-slate-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Все районы</SelectItem>
+                      <SelectItem value="all">{t("mastersFilterAllDistricts")}</SelectItem>
                       {ALL_DISTRICTS.map((d) => (
-                        <SelectItem key={d} value={d}>{d}</SelectItem>
+                        <SelectItem key={d} value={d}>{t(DISTRICT_LABEL_KEYS[d] ?? "")}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Сортировка</label>
+                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("mastersFilterSort")}</label>
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="h-12 rounded-xl border-slate-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ranking">По рекомендации</SelectItem>
-                      <SelectItem value="rating">По рейтингу</SelectItem>
-                      <SelectItem value="price_low">Цена: по возрастанию</SelectItem>
-                      <SelectItem value="price_high">Цена: по убыванию</SelectItem>
-                      <SelectItem value="experience">По опыту</SelectItem>
-                      <SelectItem value="reviews">По отзывам</SelectItem>
+                      <SelectItem value="ranking">{t("mastersSortRanking")}</SelectItem>
+                      <SelectItem value="rating">{t("mastersSortRating")}</SelectItem>
+                      <SelectItem value="price_low">{t("mastersSortPriceLow")}</SelectItem>
+                      <SelectItem value="price_high">{t("mastersSortPriceHigh")}</SelectItem>
+                      <SelectItem value="experience">{t("mastersSortExperience")}</SelectItem>
+                      <SelectItem value="reviews">{t("mastersSortReviews")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <label className="text-sm font-semibold text-slate-700 mb-2 block">
-                    Мин. рейтинг: {minRating > 0 ? minRating.toFixed(1) : "Любой"}
+                    {t("mastersMinRatingLabel")} {minRating > 0 ? minRating.toFixed(1) : t("mastersAny")}
                   </label>
                   <div className="pt-4">
                     <Slider
@@ -347,7 +359,7 @@ export default function Masters() {
                   className="mt-6 text-slate-400 hover:text-red-500 transition-colors"
                   onClick={() => { setCategory("all"); setDistrict("all"); setMinRating(0); }}
                 >
-                  <X className="w-4 h-4 mr-2" /> Сбросить все фильтры
+                  <X className="w-4 h-4 mr-2" /> {t("mastersResetFilters")}
                 </Button>
               )}
             </motion.div>
@@ -358,22 +370,22 @@ export default function Masters() {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <p className="text-sm font-semibold text-slate-700">
-                Найдено {filtered.length} мастеров
+                {t("mastersFoundCount", { count: filtered.length })}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium whitespace-nowrap">Сортировка:</span>
+              <span className="text-xs text-slate-400 font-medium whitespace-nowrap">{t("mastersSortShortLabel")}</span>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="h-8 border-none bg-transparent p-0 font-bold text-slate-700 shadow-none focus:ring-0 w-[140px] gap-1 hover:text-emerald-500 transition-colors">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="end">
-                  <SelectItem value="ranking">По рекомендации</SelectItem>
-                  <SelectItem value="rating">По рейтингу</SelectItem>
-                  <SelectItem value="price_low">Цена: по возрастанию</SelectItem>
-                  <SelectItem value="price_high">Цена: по убыванию</SelectItem>
-                  <SelectItem value="experience">По опыту</SelectItem>
-                  <SelectItem value="reviews">По отзывам</SelectItem>
+                  <SelectItem value="ranking">{t("mastersSortRanking")}</SelectItem>
+                  <SelectItem value="rating">{t("mastersSortRating")}</SelectItem>
+                  <SelectItem value="price_low">{t("mastersSortPriceLow")}</SelectItem>
+                  <SelectItem value="price_high">{t("mastersSortPriceHigh")}</SelectItem>
+                  <SelectItem value="experience">{t("mastersSortExperience")}</SelectItem>
+                  <SelectItem value="reviews">{t("mastersSortReviews")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -389,19 +401,20 @@ export default function Masters() {
           ) : filtered.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
               <Users className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Мастера не найдены</h3>
-              <p className="text-slate-500">Попробуйте изменить параметры поиска или фильтры</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">{t("mastersEmptyTitle")}</h3>
+              <p className="text-slate-500">{t("mastersEmptyDesc")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filtered.map((master, index) => (
-                <MasterCard 
-                  key={master.id} 
-                  master={master} 
-                  index={index} 
-                  isComparing={isComparing(master.id)} 
-                  onToggleCompare={() => toggleCompare(master.id)} 
-                  compareDisabled={compareIds.length >= 3 && !isComparing(master.id)} 
+                <MasterCard
+                  key={master.id}
+                  master={master}
+                  index={index}
+                  search={search}
+                  isComparing={isComparing(master.id)}
+                  onToggleCompare={() => toggleCompare(master.id)}
+                  compareDisabled={compareIds.length >= 3 && !isComparing(master.id)}
                 />
               ))}
             </div>
@@ -409,10 +422,10 @@ export default function Masters() {
 
           {/* Bottom Features Row */}
           <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard icon={<Zap className="w-6 h-6 text-emerald-500" />} title="Быстрый отклик" desc="Мастер ответит в течение 15 минут" />
-            <FeatureCard icon={<Trophy className="w-6 h-6 text-emerald-500" />} title="Профессионалы" desc="Проверенные специалисты" />
-            <FeatureCard icon={<Shield className="w-6 h-6 text-emerald-500" />} title="Безопасность" desc="Гарантия на выполненные работы" />
-            <FeatureCard icon={<Headset className="w-6 h-6 text-emerald-500" />} title="Поддержка 24/7" desc="Всегда на связи" />
+            <FeatureCard icon={<Zap className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature1Title")} desc={t("mastersFeature1Desc")} />
+            <FeatureCard icon={<Trophy className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature2Title")} desc={t("mastersFeature2Desc")} />
+            <FeatureCard icon={<Shield className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature3Title")} desc={t("mastersFeature3Desc")} />
+            <FeatureCard icon={<Headset className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature4Title")} desc={t("mastersFeature4Desc")} />
           </div>
         </div>
       </section>
@@ -424,7 +437,7 @@ export default function Masters() {
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
         category="other"
-        initialServiceName="Консультация по выбору мастера"
+        initialServiceName={t("mastersConsultationService")}
       />
       <QuickBooking open={quickBookOpen} onOpenChange={setQuickBookOpen} />
       <AiMasterMatch open={aiMatchOpen} onOpenChange={setAiMatchOpen} />
@@ -458,7 +471,18 @@ function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: stri
   );
 }
 
-function MasterCard({ master, index, isComparing, onToggleCompare, compareDisabled }: { master: MasterListing; index: number; isComparing: boolean; onToggleCompare: () => void; compareDisabled: boolean }) {
+// Показываем найденную по поиску категорию первой в бейджах карточки — иначе она может
+// не попасть в первые 2 показанные категории и результат выглядит так, будто фильтр не сработал.
+function getDisplayCategories(categories: string[], search: string) {
+  const q = search.trim().toLowerCase();
+  if (!q) return categories.slice(0, 2);
+  const matched = categories.filter((c) => c.toLowerCase().includes(q));
+  const rest = categories.filter((c) => !c.toLowerCase().includes(q));
+  return [...matched, ...rest].slice(0, 2);
+}
+
+function MasterCard({ master, index, search, isComparing, onToggleCompare, compareDisabled }: { master: MasterListing; index: number; search: string; isComparing: boolean; onToggleCompare: () => void; compareDisabled: boolean }) {
+  const { t } = useLanguage();
   const initials = master.full_name
     .split(" ")
     .map((w) => w[0])
@@ -504,16 +528,16 @@ function MasterCard({ master, index, isComparing, onToggleCompare, compareDisabl
                 <div className="flex items-center gap-1.5">
                   <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-bold text-slate-800">{master.average_rating}</span>
-                  <span className="text-[11px] text-slate-400">({master.total_reviews} отзывов)</span>
+                  <span className="text-[11px] text-slate-400">{t("mastersReviewsCount", { count: master.total_reviews })}</span>
                 </div>
               </div>
             </div>
 
             {/* Badges */}
             <div className="flex flex-wrap gap-1.5 mb-5">
-              {getDisplayCategories(master.service_categories).map((cat) => (
+              {getDisplayCategories(master.service_categories, search).map((cat) => (
                 <span key={cat} className="px-2.5 py-1 bg-slate-50 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                  {cat}
+                  {t(CATEGORY_LABEL_KEYS[cat] ?? "") || cat}
                 </span>
               ))}
             </div>
@@ -522,22 +546,22 @@ function MasterCard({ master, index, isComparing, onToggleCompare, compareDisabl
             <div className="space-y-2 mb-6 flex-1">
               <div className="flex items-center gap-2 text-[11px] text-slate-500">
                 <Clock className="w-3.5 h-3.5 text-slate-300" />
-                <span>{master.experience_years} лет опыта</span>
+                <span>{t("mastersYearsExp", { years: master.experience_years })}</span>
                 <span className="text-slate-200">•</span>
-                <span>{master.completed_orders} работ</span>
+                <span>{t("mastersJobsCount", { count: master.completed_orders })}</span>
               </div>
               <div className="flex items-center gap-2 text-[11px] text-slate-500">
                 <MapPin className="w-3.5 h-3.5 text-slate-300" />
-                <span className="truncate">Душанбе, {master.working_districts.join(", ")}</span>
+                <span className="truncate">{t("mastersCityDistricts", { districts: master.working_districts.map((d) => t(DISTRICT_LABEL_KEYS[d] ?? "") || d).join(", ") })}</span>
               </div>
             </div>
 
             {/* Footer: Price + Actions */}
             <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
               <div>
-                <p className="text-[10px] text-slate-400 font-medium">от</p>
+                <p className="text-[10px] text-slate-400 font-medium">{t("fromPrice")}</p>
                 <p className="text-lg font-black text-slate-900 leading-none">
-                  {master.price_min} <span className="text-xs font-normal text-slate-400">смн</span>
+                  {master.price_min} <span className="text-xs font-normal text-slate-400">{t("mastersCurrencyShort")}</span>
                 </p>
               </div>
               <div className="flex gap-2">
@@ -554,7 +578,7 @@ function MasterCard({ master, index, isComparing, onToggleCompare, compareDisabl
                   <MessageCircle className="w-4 h-4" />
                 </button>
                 <button className="h-9 px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-100 hover-soft">
-                  Подробнее
+                  {t("mastersMoreButton")}
                 </button>
               </div>
             </div>

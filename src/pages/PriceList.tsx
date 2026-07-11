@@ -105,12 +105,12 @@ export default function PriceList() {
   }, [services]);
 
   const popularServicesData = [
-    { name: "Ремонт и отделка", price: "200", icon: LayoutGrid, color: "bg-blue-500" },
-    { name: "Установка и монтаж", price: "150", icon: Settings, color: "bg-amber-500" },
-    { name: "Чистка и уборка", price: "120", icon: Sparkles, color: "bg-purple-500" },
-    { name: "Сантехнические работы", price: "150", icon: Droplets, color: "bg-emerald-500" },
-    { name: "Электромонтажные работы", price: "150", icon: Zap, color: "bg-orange-500" },
-    { name: "Мастер на час", price: "100", icon: Clock, color: "bg-blue-700" },
+    { name: t("priceListPopular1"), price: "200", icon: LayoutGrid, color: "bg-blue-500" },
+    { name: t("priceListPopular2"), price: "150", icon: Settings, color: "bg-amber-500" },
+    { name: t("priceListPopular3"), price: "120", icon: Sparkles, color: "bg-purple-500" },
+    { name: t("priceListPopular4"), price: "150", icon: Droplets, color: "bg-emerald-500" },
+    { name: t("priceListPopular5"), price: "150", icon: Zap, color: "bg-orange-500" },
+    { name: t("priceListPopular6"), price: "100", icon: Clock, color: "bg-blue-700" },
   ];
 
   if (loading) {
@@ -120,7 +120,7 @@ export default function PriceList() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-500 rounded-full animate-spin" />
-            <p className="text-slate-400 font-medium animate-pulse">Загрузка услуг...</p>
+            <p className="text-slate-400 font-medium animate-pulse">{t("priceListLoading")}</p>
           </div>
         </div>
       </div>
@@ -140,10 +140,10 @@ export default function PriceList() {
             <div className="flex-1 text-left z-10">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4 leading-tight">
-                  Найдите нужную услугу <br /> и мастера в <span className="text-emerald-600">Душанбе</span>
+                  {t("priceListHeroTitle1")} <br /> {t("priceListHeroTitle2")} <span className="text-emerald-600">{t("priceListHeroCity")}</span>
                 </h1>
                 <p className="text-lg text-slate-600 mb-10 max-w-xl font-medium">
-                  Более 1000 проверенных мастеров готовы помочь вам с любой задачей
+                  {t("priceListHeroDesc")}
                 </p>
 
                 <div className="relative max-w-2xl group mb-10">
@@ -152,23 +152,23 @@ export default function PriceList() {
                     <div className="relative flex-1">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <Input
-                        placeholder="Поиск услуги (например: сантехник, электрик, уборка)"
+                        placeholder={t("priceListSearchPlaceholder")}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="pl-12 h-14 border-none shadow-none text-base focus-visible:ring-0"
                       />
                     </div>
                     <Button className="h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95">
-                      Найти мастера
+                      {t("priceListSearchButton")}
                     </Button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <BenefitItem icon={<Clock className="w-5 h-5 text-emerald-500" />} title="Быстрый выезд" sub="от 30 минут" />
-                  <BenefitItem icon={<Users className="w-5 h-5 text-emerald-500" />} title="Проверенные мастера" sub="Рейтинг и отзывы" />
-                  <BenefitItem icon={<Shield className="w-5 h-5 text-emerald-500" />} title="Честные цены" sub="Без скрытых платежей" />
-                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} title="Гарантия на работу" sub="Поддержка после заказа" />
+                  <BenefitItem icon={<Clock className="w-5 h-5 text-emerald-500" />} title={t("priceListBenefit1Title")} sub={t("priceListBenefit1Sub")} />
+                  <BenefitItem icon={<Users className="w-5 h-5 text-emerald-500" />} title={t("priceListBenefit2Title")} sub={t("priceListBenefit2Sub")} />
+                  <BenefitItem icon={<Shield className="w-5 h-5 text-emerald-500" />} title={t("priceListBenefit3Title")} sub={t("priceListBenefit3Sub")} />
+                  <BenefitItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} title={t("priceListBenefit4Title")} sub={t("priceListBenefit4Sub")} />
                 </div>
               </motion.div>
             </div>
@@ -191,10 +191,10 @@ export default function PriceList() {
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
               <TrendingUp className="w-6 h-6 text-emerald-500" />
-              Популярные услуги
+              {t("priceListPopularTitle")}
             </h2>
             <Link to="#" className="text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-1">
-              Смотреть все услуги <ChevronRight className="w-4 h-4" />
+              {t("priceListViewAll")} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -213,9 +213,9 @@ export default function PriceList() {
                       <s.icon className="w-6 h-6" />
                     </div>
                     <h3 className="font-bold text-slate-900 text-sm mb-1 leading-tight">{s.name}</h3>
-                    <p className="text-xs text-slate-400 mb-4">от {s.price} сомони</p>
+                    <p className="text-xs text-slate-400 mb-4">{t("fromPrice")} {s.price} {t("currencySomoni")}</p>
                     <Button variant="ghost" className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-emerald-500 transition-colors">
-                      Заказать
+                      {t("priceListOrderButton")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -228,7 +228,7 @@ export default function PriceList() {
       {/* All Services with Sidebar */}
       <section className="py-16 bg-[#F8FAFC]">
         <div className="container px-4 mx-auto max-w-7xl">
-          <h2 className="text-3xl font-black text-slate-900 mb-10">Все услуги по категориям</h2>
+          <h2 className="text-3xl font-black text-slate-900 mb-10">{t("priceListAllCategoriesTitle")}</h2>
           
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
@@ -251,7 +251,7 @@ export default function PriceList() {
                       <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400 group-hover:text-emerald-500"}`} />
                       <span className="flex-1 font-bold text-sm">{getName(cat)}</span>
                       <span className={`text-[10px] font-bold ${isActive ? "text-emerald-100" : "text-slate-400"}`}>
-                        {count} мастеров
+                        {t("priceListMastersCount", { count })}
                       </span>
                     </button>
                   );
@@ -279,7 +279,7 @@ export default function PriceList() {
                         <h3 className="text-2xl font-black text-slate-900">
                           {getName(currentCategory)}
                         </h3>
-                        <p className="text-sm text-slate-500">Монтаж, замена и ремонт</p>
+                        <p className="text-sm text-slate-500">{t("priceListCategoryDefaultDesc")}</p>
                       </div>
                     </div>
 
@@ -294,25 +294,25 @@ export default function PriceList() {
                           </div>
                           <div className="flex-1 text-center sm:text-left">
                             <h4 className="font-bold text-slate-900 mb-0.5">{getName(s)}</h4>
-                            <p className="text-xs text-slate-400 leading-relaxed">{s.note || "Профессиональное выполнение работ любой сложности"}</p>
+                            <p className="text-xs text-slate-400 leading-relaxed">{s.note || t("priceListServiceDefaultNote")}</p>
                           </div>
                           <div className="text-center sm:text-right min-w-[120px]">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">от</p>
-                            <p className="text-lg font-black text-slate-900">{s.price_min} <span className="text-xs font-normal text-slate-400">сомони</span></p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t("fromPrice")}</p>
+                            <p className="text-lg font-black text-slate-900">{s.price_min} <span className="text-xs font-normal text-slate-400">{t("currencySomoni")}</span></p>
                           </div>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className="rounded-xl px-6 border-slate-200 font-bold hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shrink-0"
                             onClick={() => setOrderModal({ open: true, serviceId: s.id, name: getName(s) })}
                           >
-                            Выбрать
+                            {t("priceListChooseButton")}
                           </Button>
                         </div>
                       ))}
                     </div>
                     
                     <button className="w-full mt-8 py-4 text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 border-t border-slate-50">
-                      Показать больше услуг <ChevronDown className="w-4 h-4" />
+                      {t("priceListShowMore")} <ChevronDown className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}
@@ -326,10 +326,10 @@ export default function PriceList() {
       <section className="py-12 bg-white border-y border-slate-100">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label="проверенных мастеров" />
-            <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label="выполненных заказов" />
-            <StatItem icon={<Star className="w-8 h-8 text-emerald-500" />} value="4.8" label="средний рейтинг сервиса" />
-            <StatItem icon={<Trophy className="w-8 h-8 text-emerald-500" />} value="95%" label="довольных клиентов" />
+            <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label={t("priceListStat1")} />
+            <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label={t("priceListStat2")} />
+            <StatItem icon={<Star className="w-8 h-8 text-emerald-500" />} value="4.8" label={t("priceListStat3")} />
+            <StatItem icon={<Trophy className="w-8 h-8 text-emerald-500" />} value="95%" label={t("priceListStat4")} />
           </div>
         </div>
       </section>
@@ -340,36 +340,36 @@ export default function PriceList() {
           <div className="grid lg:grid-cols-3 gap-12">
             {/* How it works */}
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-8">Как это работает</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-8">{t("priceListHowItWorks")}</h3>
               <div className="space-y-8">
-                <StepItem num="1" title="Выберите услугу" desc="Выберите нужную услугу и опишите задачу" />
-                <StepItem num="2" title="Оставьте заявку" desc="Мы подберём подходящего мастера и свяжемся с вами" />
-                <StepItem num="3" title="Мастер приезжает" desc="Мастер приезжает в удобное для вас время" />
-                <StepItem num="4" title="Оплата по факту" desc="Вы оплачиваете только после выполнения работы" />
+                <StepItem num="1" title={t("priceListStep1Title")} desc={t("priceListStep1Desc")} />
+                <StepItem num="2" title={t("priceListStep2Title")} desc={t("priceListStep2Desc")} />
+                <StepItem num="3" title={t("priceListStep3Title")} desc={t("priceListStep3Desc")} />
+                <StepItem num="4" title={t("priceListStep4Title")} desc={t("priceListStep4Desc")} />
               </div>
             </div>
 
             {/* Price Formation */}
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-8">Как формируется цена</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-8">{t("priceListPriceFormationTitle")}</h3>
               <div className="space-y-6">
-                <PriceFactor icon={<LayoutGrid />} title="Сложность работы" desc="Чем сложнее задача, тем выше стоимость" />
-                <PriceFactor icon={<MapPin />} title="Расстояние" desc="Удалённость объекта может влиять на цену" />
-                <PriceFactor icon={<Clock />} title="Срочность" desc="Срочные заказы выполняются в приоритетном порядке" />
-                <PriceFactor icon={<Wrench />} title="Материалы" desc="Стоимость материалов обсуждается отдельно с мастером" />
+                <PriceFactor icon={<LayoutGrid />} title={t("priceListFactor1Title")} desc={t("priceListFactor1Desc")} />
+                <PriceFactor icon={<MapPin />} title={t("priceListFactor2Title")} desc={t("priceListFactor2Desc")} />
+                <PriceFactor icon={<Clock />} title={t("priceListFactor3Title")} desc={t("priceListFactor3Desc")} />
+                <PriceFactor icon={<Wrench />} title={t("priceListFactor4Title")} desc={t("priceListFactor4Desc")} />
               </div>
             </div>
 
             {/* FAQ */}
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-8">Часто задаваемые вопросы</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-8">{t("priceListFaqTitle")}</h3>
               <Accordion type="single" collapsible className="space-y-3">
                 {[
-                  { q: "Сколько стоит вызов мастера?", a: "Вызов мастера бесплатный при условии выполнения работ. В случае отказа стоимость выезда составляет 30 сомони." },
-                  { q: "Как быстро приедет мастер?", a: "Обычно мастер приезжает в течение 1 часа по Душанбе. Для срочных заказов — от 30 минут." },
-                  { q: "Можно ли выбрать конкретного мастера?", a: "Да, вы можете просмотреть профили мастеров, их рейтинг и отзывы перед выбором." },
-                  { q: "Есть ли гарантия на работу?", a: "Да, мы предоставляем официальную гарантию на все виды выполненных работ." },
-                  { q: "Как происходит оплата?", a: "Оплата производится наличными или переводом после завершения и проверки всех работ." },
+                  { q: t("priceListFaq1Q"), a: t("priceListFaq1A") },
+                  { q: t("priceListFaq2Q"), a: t("priceListFaq2A") },
+                  { q: t("priceListFaq3Q"), a: t("priceListFaq3A") },
+                  { q: t("priceListFaq4Q"), a: t("priceListFaq4A") },
+                  { q: t("priceListFaq5Q"), a: t("priceListFaq5A") },
                 ].map((faq, i) => (
                   <AccordionItem key={i} value={`faq-${i}`} className="border rounded-2xl px-5 bg-slate-50/50 border-transparent hover:border-slate-200 transition-all">
                     <AccordionTrigger className="py-4 hover:no-underline font-bold text-slate-700 text-sm text-left leading-tight">
@@ -382,7 +382,7 @@ export default function PriceList() {
                 ))}
               </Accordion>
               <Link to="#" className="inline-block mt-6 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
-                Смотреть все вопросы →
+                {t("priceListFaqViewAll")} →
               </Link>
             </div>
           </div>
@@ -400,8 +400,8 @@ export default function PriceList() {
                   <Headset className="w-10 h-10" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white mb-2">Не нашли нужную услугу?</h3>
-                  <p className="text-emerald-50/80 font-medium">Оставьте заявку, и мы подберём мастера под вашу задачу в Душанбе</p>
+                  <h3 className="text-2xl font-black text-white mb-2">{t("priceListCtaTitle")}</h3>
+                  <p className="text-emerald-50/80 font-medium">{t("priceListCtaDesc")}</p>
                 </div>
               </div>
               
@@ -412,15 +412,15 @@ export default function PriceList() {
                   </div>
                   <div>
                     <p className="text-2xl font-black">+992 979 117 007</p>
-                    <p className="text-xs text-emerald-100 font-medium">WhatsApp / Звонок</p>
+                    <p className="text-xs text-emerald-100 font-medium">{t("priceListCtaWhatsapp")}</p>
                   </div>
                 </div>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-white text-emerald-600 hover:bg-emerald-50 font-black rounded-2xl px-10 h-16 shadow-xl active:scale-95 transition-all"
                   onClick={() => setOrderModal({ open: true })}
                 >
-                  Оставить заявку
+                  {t("priceListCtaButton")}
                 </Button>
               </div>
             </div>

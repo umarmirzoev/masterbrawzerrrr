@@ -33,7 +33,7 @@ interface TopMasterCard {
   name: string;
   rating: number;
   reviews: number;
-  exp: string;
+  expYears: number;
   color: string;
   initials: string;
 }
@@ -57,18 +57,18 @@ const Index = () => {
   };
 
   const services = [
-    { icon: <Zap className="text-amber-500" />, name: "Электрика", price: "от 100 сомони", color: "bg-amber-50" },
-    { icon: <Droplets className="text-blue-500" />, name: "Сантехника", price: "от 100 сомони", color: "bg-blue-50" },
-    { icon: <Hammer className="text-emerald-500" />, name: "Отделка и ремонт", price: "от 120 сомони", color: "bg-emerald-50" },
-    { icon: <Sofa className="text-orange-500" />, name: "Мебель и двери", price: "от 80 сомони", color: "bg-orange-50" },
-    { icon: <Cpu className="text-violet-500" />, name: "Умный дом", price: "от 200 сомони", color: "bg-violet-50" },
-    { icon: <Waves className="text-sky-500" />, name: "Водоснабжение", price: "от 120 сомони", color: "bg-sky-50" },
-    { icon: <Trash2 className="text-green-500" />, name: "Уборка", price: "от 80 сомони", color: "bg-green-50" },
-    { icon: <Snowflake className="text-cyan-500" />, name: "Кондиционеры", price: "от 150 сомони", color: "bg-cyan-50" },
-    { icon: <Thermometer className="text-red-500" />, name: "Отопление", price: "от 150 сомони", color: "bg-red-50" },
-    { icon: <Construction className="text-pink-500" />, name: "Мелкие работы", price: "от 60 сомони", color: "bg-pink-50" },
-    { icon: <Layers className="text-orange-600" />, name: "Полы и ламинат", price: "от 100 сомони", color: "bg-orange-50" },
-    { icon: <Grid className="text-slate-500" />, name: "Другие услуги", price: "уточняйте", color: "bg-slate-50" },
+    { icon: <Zap className="text-amber-500" />, name: "Электрика", nameKey: "catElectric", priceKey: "catElectricPrice", color: "bg-amber-50" },
+    { icon: <Droplets className="text-blue-500" />, name: "Сантехника", nameKey: "catPlumbing", priceKey: "catPlumbingPrice", color: "bg-blue-50" },
+    { icon: <Hammer className="text-emerald-500" />, name: "Отделка и ремонт", nameKey: "catRenovation", priceKey: "catRenovationPrice", color: "bg-emerald-50" },
+    { icon: <Sofa className="text-orange-500" />, name: "Мебель и двери", nameKey: "catFurniture", priceKey: "catFurniturePrice", color: "bg-orange-50" },
+    { icon: <Cpu className="text-violet-500" />, name: "Умный дом", nameKey: "catSmartHome", priceKey: "catSmartHomePrice", color: "bg-violet-50" },
+    { icon: <Waves className="text-sky-500" />, name: "Водоснабжение", nameKey: "catWaterSupply", priceKey: "catWaterSupplyPrice", color: "bg-sky-50" },
+    { icon: <Trash2 className="text-green-500" />, name: "Уборка", nameKey: "catCleaning", priceKey: "catCleaningPrice", color: "bg-green-50" },
+    { icon: <Snowflake className="text-cyan-500" />, name: "Кондиционеры", nameKey: "catAirConditioners", priceKey: "catAirConditionersPrice", color: "bg-cyan-50" },
+    { icon: <Thermometer className="text-red-500" />, name: "Отопление", nameKey: "catHeating", priceKey: "catHeatingPrice", color: "bg-red-50" },
+    { icon: <Construction className="text-pink-500" />, name: "Мелкие работы", nameKey: "catSmallJobs", priceKey: "catSmallJobsPrice", color: "bg-pink-50" },
+    { icon: <Layers className="text-orange-600" />, name: "Полы и ламинат", nameKey: "catFloors", priceKey: "catFloorsPrice", color: "bg-orange-50" },
+    { icon: <Grid className="text-slate-500" />, name: "Другие услуги", nameKey: "catOtherServices", priceKey: "catOtherServicesPrice", color: "bg-slate-50" },
   ];
 
   const [topMasters, setTopMasters] = useState<TopMasterCard[]>([]);
@@ -97,7 +97,7 @@ const Index = () => {
           name: m.full_name ?? "",
           rating: m.average_rating ?? 0,
           reviews: m.total_reviews ?? 0,
-          exp: `Опыт ${m.experience_years ?? 0} лет`,
+          expYears: m.experience_years ?? 0,
           color: AVATAR_COLORS[idx % AVATAR_COLORS.length],
           initials: getInitials(m.full_name ?? ""),
         })),
@@ -244,16 +244,16 @@ const Index = () => {
                      <div className="flex items-center justify-between mb-5">
                         <p className="text-4xl font-black text-slate-900 tracking-tighter">4.8</p>
                         <div className="text-right">
-                           <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Рейтинг</p>
+                           <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("floatingCardRating")}</p>
                            <div className="flex gap-0.5 justify-end">
                               {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
                            </div>
                         </div>
                      </div>
                      <ul className="space-y-4">
-                        <FloatingCardItem text="Быстрый выезд" />
-                        <FloatingCardItem text="Честные цены" />
-                        <FloatingCardItem text="Гарантия на работы" />
+                        <FloatingCardItem text={t("homeFastArrival")} />
+                        <FloatingCardItem text={t("homeFairPrices")} />
+                        <FloatingCardItem text={t("homeWorkGuarantee")} />
                      </ul>
                   </motion.div>
                </motion.div>
@@ -272,10 +272,10 @@ const Index = () => {
              viewport={{ once: true }}
              className="grid grid-cols-2 lg:grid-cols-4 gap-10 md:gap-16"
            >
-              <FeatureItem icon={<Clock />} title="Быстрый выезд" sub="от 30 минут" />
-              <FeatureItem icon={<ShieldCheck />} title="Гарантия на все работы" sub="до 12 месяцев" />
-              <FeatureItem icon={<Wallet />} title="Оплата после работы" sub="удобным способом" />
-              <FeatureItem icon={<Users />} title="Проверенные мастера" sub="с опытом от 3 лет" />
+              <FeatureItem icon={<Clock />} title={t("homeFastArrival")} sub={t("homeFastArrivalSub")} />
+              <FeatureItem icon={<ShieldCheck />} title={t("homeGuaranteeAllWorks")} sub={t("homeGuarantee12Months")} />
+              <FeatureItem icon={<Wallet />} title={t("homePaymentAfter")} sub={t("homeConvenientPayment")} />
+              <FeatureItem icon={<Users />} title={t("homeVerifiedMasters")} sub={t("homeExperience3Years")} />
            </motion.div>
         </div>
       </section>
@@ -321,8 +321,8 @@ const Index = () => {
                   <div className={`w-14 h-14 rounded-2xl ${service.color} flex items-center justify-center mb-6 mx-auto md:mx-0 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500`}>
                      {React.cloneElement(service.icon as React.ReactElement, { className: "w-7 h-7" })}
                   </div>
-                  <h3 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-600 transition-colors">{service.name}</h3>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{service.price}</p>
+                  <h3 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-600 transition-colors">{t(service.nameKey)}</h3>
+                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t(service.priceKey)}</p>
                 </motion.div>
               ))}
            </motion.div>
@@ -340,11 +340,11 @@ const Index = () => {
              className="flex flex-col md:flex-row items-start md:items-center justify-between mb-16 gap-6"
            >
               <div>
-                <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Лучшие мастера недели</h2>
-                <p className="text-lg text-slate-500 font-medium">Мастера с лучшими оценками и большим опытом работы</p>
+                <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">{t("homeBestMastersTitle")}</h2>
+                <p className="text-lg text-slate-500 font-medium">{t("homeBestMastersSubtitle")}</p>
               </div>
               <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
-                 Все мастера <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                 {t("homeAllMastersButton")} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
               </Button>
            </motion.div>
 
@@ -385,7 +385,7 @@ const Index = () => {
                       </div>
                       <div className="flex items-center gap-2 text-[10px] text-slate-500 font-black uppercase tracking-widest bg-slate-50 py-2 px-3 rounded-xl w-fit">
                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                         {master.exp}
+                         {t("homeExperienceYears", { years: master.expYears })}
                       </div>
                     </CardContent>
                   </Card>
@@ -457,18 +457,18 @@ const Index = () => {
              viewport={{ once: true }}
              className="grid grid-cols-1 md:grid-cols-3 gap-10"
            >
-              <ReviewCard 
-                text="Отличный мастер! Приехал вовремя, быстро устранил проблему с розеткой. Очень вежливый и аккуратный."
+              <ReviewCard
+                text={t("homeReview1Text")}
                 author="Малика Р."
                 index={0}
               />
-              <ReviewCard 
-                text="Заказывал установку кондиционера. Работа выполнена идеально, чисто и профессионально."
+              <ReviewCard
+                text={t("homeReview2Text")}
                 author="Фирдавс К."
                 index={1}
               />
-              <ReviewCard 
-                text="Очень удобно, что можно оплатить после работы. Сервис на высшем уровне. Рекомендую!"
+              <ReviewCard
+                text={t("homeReview3Text")}
                 author="Шахноза М."
                 index={2}
               />
@@ -490,8 +490,8 @@ const Index = () => {
               <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
               
               <div className="relative z-10 text-center lg:text-left max-w-2xl">
-                 <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">Нужна помощь прямо сейчас?</h2>
-                 <p className="text-xl text-emerald-50 font-medium opacity-90 leading-relaxed">Позвоните нам или оставьте заявку — мы подберем мастера и перезвоним вам в течение 5 минут.</p>
+                 <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">{t("homeCtaTitle")}</h2>
+                 <p className="text-xl text-emerald-50 font-medium opacity-90 leading-relaxed">{t("homeCtaDesc")}</p>
               </div>
 
               <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
@@ -504,14 +504,14 @@ const Index = () => {
                     </div>
                     <div>
                        <p className="text-2xl font-black text-white tracking-tight">+992 979 117 007</p>
-                       <p className="text-[11px] text-white/60 font-black uppercase tracking-widest">Круглосуточно 24/7</p>
+                       <p className="text-[11px] text-white/60 font-black uppercase tracking-widest">{t("homeCta247")}</p>
                     </div>
                  </motion.div>
                  <Button 
                    onClick={() => setIsOrderModalOpen(true)}
                    className="w-full sm:w-auto bg-white text-emerald-700 hover:bg-emerald-50 font-black h-20 px-12 rounded-[2rem] text-xl shadow-2xl shadow-black/10 transition-all active:scale-95"
                  >
-                    Оставить заявку
+                    {t("homeCtaButton")}
                  </Button>
               </div>
            </motion.div>
