@@ -76,9 +76,9 @@ const DISTRICT_LABEL_KEYS: Record<string, string> = {
 };
 
 export default function Masters() {
-  // Временные стоковые изображения — замени на реальные фото.
-  const heroImage = "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1000&h=800&fit=crop";
-  const consultantImage = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=600&fit=crop";
+  // Реальные фото из фирменной фотосессии (public/images).
+  const heroImage = "/images/master-dushanbe.jpg";
+  const consultantImage = "/images/consultant-support.jpg";
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [masters, setMasters] = useState<MasterListing[]>(SAMPLE_MASTERS);
@@ -190,7 +190,7 @@ export default function Masters() {
               className="hidden lg:block w-1/4"
             >
               <div className="hover-image-zoom hover-soft overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-lg">
-                <img src={heroImage} alt="Master" className="h-[360px] w-full scale-[1.12] object-cover object-[78%_center]" />
+                <img src={heroImage} alt="Master" className="h-[360px] w-full object-cover object-center" />
               </div>
             </motion.div>
 
