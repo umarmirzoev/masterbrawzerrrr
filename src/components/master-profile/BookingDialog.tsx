@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const districts = ["Сино", "Фирдавси", "Шохмансур", "Исмоили Сомони", "Пригород"];
 
@@ -21,6 +22,7 @@ interface Props {
 
 // Диалог бронирования мастера собирает контакты клиента и создаёт заказ прямо из профиля.
 export default function MasterBookingDialog({ open, onOpenChange, master }: Props) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -97,7 +99,7 @@ export default function MasterBookingDialog({ open, onOpenChange, master }: Prop
             <Textarea placeholder="Тавсифи мушкилӣ..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-base min-h-[80px]" />
             <Button type="submit" className="w-full rounded-full h-12 text-base bg-gradient-to-r from-primary to-emerald-500" disabled={submitting}>
               {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-              Фиристодани фармоиш
+              {t("mpSendOrder")}
             </Button>
           </form>
         )}

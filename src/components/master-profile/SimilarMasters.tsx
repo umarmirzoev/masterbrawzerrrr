@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Clock, MapPin } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   masters: any[];
@@ -15,6 +16,7 @@ const gradients = [
 ];
 
 export default function SimilarMasters({ masters }: Props) {
+  const { t } = useLanguage();
   // Блок похожих мастеров помогает быстро сравнить альтернативных специалистов.
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-8">
@@ -42,7 +44,7 @@ export default function SimilarMasters({ masters }: Props) {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm font-semibold text-primary">аз {m.price_min || 50} сомонӣ</p>
+                  <p className="text-sm font-semibold text-primary">{t("mpPriceFrom")} {m.price_min || 50} {t("mpCurrency")}</p>
                 </CardContent>
               </Card>
             </Link>

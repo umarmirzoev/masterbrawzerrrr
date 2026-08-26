@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,9 +105,9 @@ export default function MasterProfile() {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-16 text-center">
-          <p className="text-lg text-muted-foreground">Мастер не найден</p>
+          <p className="text-lg text-muted-foreground">{t("mpNotFound")}</p>
           <Button onClick={() => navigate("/masters")} variant="outline" className="mt-4 rounded-full">
-            <ArrowLeft className="w-4 h-4 mr-2" /> К списку мастеров
+            <ArrowLeft className="w-4 h-4 mr-2" /> {t("mpBackToList")}
           </Button>
         </div>
       </div>
@@ -115,6 +115,8 @@ export default function MasterProfile() {
   }
 
   const completedOrders = Math.round((master.total_reviews || 0) * 2.5 + (master.experience_years || 0) * 15);
+  // Считаем один раз, иначе число прыгает при каждом ререндере.
+  const orderedToday = useMemo(() => Math.floor(Math.random() * 5 + 3), [master?.id]);
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -122,13 +124,13 @@ export default function MasterProfile() {
 
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-5xl">
         <Button variant="ghost" className="mb-4 rounded-full text-muted-foreground hover:text-foreground" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Назад
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t("mpBack")}
         </Button>
 
         {/* Введение о мастерах */}
         <div className="mb-6 p-6 bg-gradient-to-r from-primary/5 to-emerald-500/5 rounded-2xl border border-primary/10 hover-soft hover-glow">
           <p className="text-base text-muted-foreground leading-relaxed">
-            {t("masterProfileIntro")}
+            {t("mpIntro")}
           </p>
         </div>
 
@@ -157,20 +159,20 @@ export default function MasterProfile() {
                 <div className="h-1.5 bg-gradient-to-r from-primary to-emerald-400" />
                 <CardContent className="p-6">
                   <div className="text-center mb-5">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Нархи хизмат</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{t("mpServicePrice")}</p>
                     <div className="flex items-baseline justify-center gap-1 mt-2">
-                      <span className="text-sm text-muted-foreground">аз</span>
+                      <span className="text-sm text-muted-foreground">{t("mpPriceFrom")}</span>
                       <span className="text-4xl font-bold text-foreground tracking-tight">{master.price_min || 50}</span>
-                      <span className="text-lg text-muted-foreground">сомонӣ</span>
+                      <span className="text-lg text-muted-foreground">{t("mpCurrency")}</span>
                     </div>
                   </div>
 
                   {/* Короткие показатели помогают быстро оценить мастера до чтения полного профиля. */}
                   <div className="space-y-3 mb-5">
                     {[
-                      { icon: Star, label: "Рейтинг", value: master.average_rating || "5.0", iconClass: "fill-yellow-400 text-yellow-400" },
-                      { icon: Zap, label: "Вақти ҷавоб", value: "~30 дақиқа", iconClass: "text-primary" },
-                      { icon: CheckCircle, label: "Фармоишҳо", value: String(completedOrders), iconClass: "text-primary" },
+                      { icon: Star, label: t("mpRating"), value: master.average_rating || "5.0", iconClass: "fill-yellow-400 text-yellow-400" },
+                      { icon: Zap, label: t("mpResponseTime"), value: t("mpResponseValue"), iconClass: "text-primary" },
+                      { icon: CheckCircle, label: t("mpOrdersLabel"), value: String(completedOrders), iconClass: "text-primary" },
                     ].map((item) => (
                       <div key={item.label} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
                         <span className="text-sm text-muted-foreground flex items-center gap-2">
@@ -187,7 +189,7 @@ export default function MasterProfile() {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                     </span>
-                    Онлайн
+                    {t("mpOnline")}
                   </div>
 
                   <Button
@@ -195,7 +197,7 @@ export default function MasterProfile() {
                     className="w-full rounded-full h-13 text-base font-semibold shadow-lg bg-gradient-to-r from-primary to-emerald-500 hover:shadow-xl transition-all hover:scale-[1.02] hover-soft"
                     onClick={() => setBookingOpen(true)}
                   >
-                    Заказать мастера
+                    {t("mpBookMaster")}
                   </Button>
 
                   <div className="flex gap-2 mt-3">
@@ -203,7 +205,7 @@ export default function MasterProfile() {
                       <>
                         <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5 h-10 hover-soft" asChild>
                           <a href={`tel:${master.phone}`}>
-                            <Phone className="w-3.5 h-3.5" /> Звонок
+                            <Phone className="w-3.5 h-3.5" /> {t("mpCall")}
                           </a>
                         </Button>
                         <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5 h-10 hover-soft" asChild>
@@ -221,9 +223,9 @@ export default function MasterProfile() {
               <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-emerald-500/5 hover-soft hover-glow">
                 <CardContent className="p-4 text-center">
                   <p className="text-sm font-medium text-foreground">
-                    🔥 {Math.floor(Math.random() * 5 + 3)} нафар имрӯз фармоиш доданд
+                    🔥 {t("mpOrderedToday", { count: orderedToday })}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">Зудтар фармоиш диҳед!</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t("mpOrderSooner")}</p>
                 </CardContent>
               </Card>
             </div>

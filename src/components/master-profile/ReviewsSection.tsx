@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Star, Quote } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   reviews: any[];
@@ -20,6 +21,7 @@ const clientNames = [
 
 // Секция отзывов собирает средний рейтинг, распределение оценок и клиентские комментарии.
 export default function MasterReviews({ reviews, master }: Props) {
+  const { t } = useLanguage();
   const [showCount, setShowCount] = useState(PER_PAGE);
 
   const avgRating = reviews.length > 0
@@ -53,7 +55,7 @@ export default function MasterReviews({ reviews, master }: Props) {
                     <Star key={i} className={`w-5 h-5 ${i <= Math.round(avgRating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"}`} />
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground mt-1.5 font-medium">{totalReviews} отзывов</p>
+                <p className="text-sm text-muted-foreground mt-1.5 font-medium">{t("mpReviewsShort", { count: totalReviews })}</p>
               </div>
 
               <div className="flex-1 space-y-2">

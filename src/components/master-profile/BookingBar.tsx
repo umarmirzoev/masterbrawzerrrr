@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Star, Phone, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   master: any;
@@ -9,6 +10,8 @@ interface Props {
 
 // Нижняя мобильная панель постоянно показывает цену, рейтинг и быстрые действия по мастеру.
 export default function MasterBookingBar({ master, onBook }: Props) {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       initial={{ y: 100 }}
@@ -19,14 +22,14 @@ export default function MasterBookingBar({ master, onBook }: Props) {
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1">
-            <span className="text-xs text-muted-foreground">аз</span>
+            <span className="text-xs text-muted-foreground">{t("mpPriceFrom")}</span>
             <span className="text-xl font-bold text-foreground">{master.price_min || 50}</span>
-            <span className="text-sm text-muted-foreground">сомонӣ</span>
+            <span className="text-sm text-muted-foreground">{t("mpCurrency")}</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
             <span className="font-semibold text-foreground">{master.average_rating || "5.0"}</span>
-            <span>· {master.total_reviews || 0} отзывов</span>
+            <span>· {t("mpReviewsShort", { count: master.total_reviews || 0 })}</span>
           </div>
         </div>
 
@@ -46,7 +49,7 @@ export default function MasterBookingBar({ master, onBook }: Props) {
           className="rounded-full h-11 px-7 font-semibold bg-gradient-to-r from-primary to-emerald-500 shadow-lg text-base"
           onClick={onBook}
         >
-          Заказать
+          {t("mpBookShort")}
         </Button>
       </div>
     </motion.div>

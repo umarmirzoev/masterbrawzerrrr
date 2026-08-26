@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Wrench } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   master: any;
@@ -55,6 +56,7 @@ const servicesByCategory: Record<string, { name: string; price: number }[]> = {
 
 // Секция услуг раскладывает специализации мастера по готовым примерам работ и ценам.
 export default function MasterServices({ master }: Props) {
+  const { t } = useLanguage();
   const categories = master.service_categories || [];
   
   const services: { name: string; price: number }[] = [];
@@ -90,7 +92,7 @@ export default function MasterServices({ master }: Props) {
               >
                 <span className="text-sm font-medium text-foreground">{svc.name}</span>
                 <span className="text-sm font-semibold text-primary whitespace-nowrap ml-3">
-                  аз {svc.price} сомонӣ
+                  {t("mpPriceFrom")} {svc.price} {t("mpCurrency")}
                 </span>
               </div>
             ))}

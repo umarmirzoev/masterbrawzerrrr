@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Star, MapPin, Clock, Phone, MessageCircle, CheckCircle, Briefcase, TrendingUp } from "lucide-react";
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export default function MasterProfileCard({ master, reviews, completedOrders, onBook }: Props) {
+  const { t } = useLanguage();
+
   const avgRating = reviews.length > 0
     ? (reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length).toFixed(1)
     : master.average_rating || "5.0";
@@ -23,7 +26,7 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="overflow-hidden border-0 shadow-xl hover-lift hover-glow">
-        {/* Gradient header band */}
+        {/* Цветная полоса-шапка. Ниже неё контент уже не заезжает — наезжает только аватар. */}
         <div className="h-28 sm:h-32 bg-gradient-to-br from-primary via-primary to-emerald-400 relative">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.15),transparent_60%)]" />
           {isTopRated && (
@@ -34,37 +37,39 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
               className="absolute top-4 right-4"
             >
               <Badge className="bg-card/95 text-foreground border-0 shadow-lg px-3 py-1.5 text-xs font-semibold backdrop-blur-sm">
-                <TrendingUp className="w-3.5 h-3.5 mr-1 text-primary" /> ТОП мастер
+                <TrendingUp className="w-3.5 h-3.5 mr-1 text-primary" /> {t("mpTopMaster")}
               </Badge>
             </motion.div>
           )}
         </div>
 
-        <CardContent className="p-5 sm:p-8 -mt-16 sm:-mt-20 relative">
-          <div className="flex flex-col sm:flex-row items-start gap-5">
-            {/* Avatar - overlapping the gradient */}
+        <CardContent className="px-5 pb-5 pt-0 sm:px-8 sm:pb-8 relative">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+            {/* Только аватар поднимается на полосу — имя всегда остаётся под ней. */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.15, type: "spring", stiffness: 200 }}
-              className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground text-4xl sm:text-5xl font-bold shadow-2xl shrink-0 ring-4 ring-card hover-soft"
+              className="-mt-14 sm:-mt-16 w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground text-4xl sm:text-5xl font-bold shadow-2xl shrink-0 ring-4 ring-card hover-soft"
             >
               {initials}
             </motion.div>
 
-            <div className="flex-1 pt-2 sm:pt-6">
-              <div className="flex items-start gap-2 flex-wrap">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{master.full_name}</h1>
-                <Badge className="bg-primary/10 text-primary border-primary/20 mt-1">
-                  <CheckCircle className="w-3 h-3 mr-1" /> Проверен
+            <div className="flex-1 min-w-0 pt-3 sm:pt-5">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight break-words">
+                  {master.full_name}
+                </h1>
+                <Badge className="bg-primary/10 text-primary border-primary/20 shrink-0">
+                  <CheckCircle className="w-3 h-3 mr-1" /> {t("mpVerified")}
                 </Badge>
               </div>
 
               {master.service_categories?.length > 0 && (
-                <p className="text-base text-muted-foreground mt-1 font-medium">{master.service_categories[0]}</p>
+                <p className="text-base text-muted-foreground mt-1.5 font-medium">{master.service_categories[0]}</p>
               )}
 
-              {/* Rating - prominent */}
+              {/* Рейтинг */}
               <div className="flex items-center gap-3 mt-3 flex-wrap">
                 <div className="flex items-center gap-1.5 bg-accent px-3 py-1.5 rounded-full">
                   <div className="flex gap-0.5">
@@ -77,15 +82,15 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
                 </div>
               </div>
 
-              {/* Stats chips */}
+              {/* Короткие показатели */}
               <div className="flex flex-wrap gap-2 mt-4">
                 {master.experience_years > 0 && (
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-sm font-medium text-foreground">
-                    <Clock className="w-3.5 h-3.5 text-muted-foreground" /> {master.experience_years} сол таҷриба
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" /> {t("mpExperience", { count: master.experience_years })}
                   </div>
                 )}
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-sm font-medium text-foreground">
-                  <Briefcase className="w-3.5 h-3.5 text-muted-foreground" /> {completedOrders} фармоишҳо
+                  <Briefcase className="w-3.5 h-3.5 text-muted-foreground" /> {t("mpOrdersChip", { count: completedOrders })}
                 </div>
                 {master.working_districts?.length > 0 && (
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-sm font-medium text-foreground">
@@ -94,16 +99,16 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
                 )}
               </div>
 
-              {/* Price highlight */}
-              <div className="mt-5 inline-flex items-baseline gap-1 px-5 py-3 rounded-2xl bg-primary/5 border border-primary/15">
-                <span className="text-sm text-muted-foreground">аз</span>
+              {/* Цена — только там, где нет боковой колонки с той же ценой. */}
+              <div className="mt-5 inline-flex items-baseline gap-1 px-5 py-3 rounded-2xl bg-primary/5 border border-primary/15 lg:hidden">
+                <span className="text-sm text-muted-foreground">{t("mpPriceFrom")}</span>
                 <span className="text-3xl font-bold text-foreground">{master.price_min || 50}</span>
-                <span className="text-base text-muted-foreground">сомонӣ</span>
+                <span className="text-base text-muted-foreground">{t("mpCurrency")}</span>
               </div>
             </div>
           </div>
 
-          {/* Categories */}
+          {/* Категории */}
           {master.service_categories?.length > 1 && (
             <div className="flex flex-wrap gap-2 mt-6">
               {master.service_categories.map((cat: string) => (
@@ -112,33 +117,33 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
             </div>
           )}
 
-          {/* Urgency / availability nudge */}
+          {/* Доступность */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             className="mt-5 flex items-center gap-2 text-sm"
           >
-            <span className="relative flex h-2.5 w-2.5">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
             </span>
-            <span className="text-muted-foreground">Онлайн — одатан дар 30 дақиқа ҷавоб медиҳад</span>
+            <span className="text-muted-foreground">{t("mpOnlineNote")}</span>
           </motion.div>
 
-          {/* Action buttons (mobile/tablet) */}
+          {/* Кнопки для мобильных и планшетов */}
           <div className="flex flex-col sm:flex-row gap-3 mt-6 lg:hidden">
             <Button
               size="lg"
               className="flex-1 rounded-full h-13 text-base font-semibold shadow-lg bg-gradient-to-r from-primary to-emerald-500 hover:shadow-xl transition-shadow hover-soft"
               onClick={onBook}
             >
-              Заказать мастера
+              {t("mpBookMaster")}
             </Button>
             {master.phone && (
               <div className="flex gap-2">
                 <Button size="lg" variant="outline" className="flex-1 rounded-full h-12 gap-2 hover-soft" asChild>
-                  <a href={`tel:${master.phone}`}><Phone className="w-4 h-4" /> Позвонить</a>
+                  <a href={`tel:${master.phone}`}><Phone className="w-4 h-4" /> {t("mpCall")}</a>
                 </Button>
                 <Button size="lg" variant="outline" className="flex-1 rounded-full h-12 gap-2 hover-soft" asChild>
                   <a href={`https://wa.me/${master.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
