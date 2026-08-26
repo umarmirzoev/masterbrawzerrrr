@@ -296,9 +296,11 @@ export default function PriceList() {
                             <h4 className="font-bold text-slate-900 mb-0.5">{getName(s)}</h4>
                             <p className="text-xs text-slate-400 leading-relaxed">{s.note || t("priceListServiceDefaultNote")}</p>
                           </div>
-                          <div className="text-center sm:text-right min-w-[120px]">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t("fromPrice")}</p>
-                            <p className="text-lg font-black text-slate-900">{s.price_min} <span className="text-xs font-normal text-slate-400">{t("currencySomoni")}</span></p>
+                          {/* Цена одной строкой: «от 30 сомони», всё по общей базовой линии. */}
+                          <div className="flex min-w-[130px] shrink-0 items-baseline justify-center gap-1.5 whitespace-nowrap sm:justify-end">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t("fromPrice")}</span>
+                            <span className="text-lg font-black text-slate-900">{s.price_min}</span>
+                            <span className="text-xs font-normal text-slate-400">{t("currencySomoni")}</span>
                           </div>
                           <Button
                             variant="outline"
