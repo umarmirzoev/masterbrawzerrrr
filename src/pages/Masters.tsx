@@ -422,10 +422,22 @@ export default function Masters() {
 
           {/* Bottom Features Row */}
           <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard icon={<Zap className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature1Title")} desc={t("mastersFeature1Desc")} />
-            <FeatureCard icon={<Trophy className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature2Title")} desc={t("mastersFeature2Desc")} />
-            <FeatureCard icon={<Shield className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature3Title")} desc={t("mastersFeature3Desc")} />
-            <FeatureCard icon={<Headset className="w-6 h-6 text-emerald-500" />} title={t("mastersFeature4Title")} desc={t("mastersFeature4Desc")} />
+            {[
+              { icon: <Zap className="w-6 h-6 text-emerald-500" />, title: t("mastersFeature1Title"), desc: t("mastersFeature1Desc") },
+              { icon: <Trophy className="w-6 h-6 text-emerald-500" />, title: t("mastersFeature2Title"), desc: t("mastersFeature2Desc") },
+              { icon: <Shield className="w-6 h-6 text-emerald-500" />, title: t("mastersFeature3Title"), desc: t("mastersFeature3Desc") },
+              { icon: <Headset className="w-6 h-6 text-emerald-500" />, title: t("mastersFeature4Title"), desc: t("mastersFeature4Desc") },
+            ].map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <FeatureCard icon={f.icon} title={f.title} desc={f.desc} />
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -449,8 +461,8 @@ export default function Masters() {
 
 function BenefitItem({ icon, text, subtext }: { icon: React.ReactNode; text: string; subtext: string }) {
   return (
-    <div className="flex items-center gap-3 text-left">
-      <div className="bg-emerald-50 p-2 rounded-full border border-emerald-100">{icon}</div>
+    <div className="group flex items-center gap-3 text-left cursor-default transition-transform duration-300 hover:translate-x-1">
+      <div className="bg-emerald-50 p-2 rounded-full border border-emerald-100 transition-colors duration-300 group-hover:bg-emerald-500 [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">{icon}</div>
       <div>
         <p className="text-sm font-bold text-slate-900 leading-tight">{text}</p>
         <p className="text-[11px] text-slate-500">{subtext}</p>
@@ -461,8 +473,8 @@ function BenefitItem({ icon, text, subtext }: { icon: React.ReactNode; text: str
 
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center text-center gap-3 hover-soft hover-glow">
-      <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1">
+    <div className="group bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center text-center gap-3 hover-soft hover-glow hover:border-emerald-200 transition-colors">
+      <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110 [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">
         {icon}
       </div>
       <h4 className="font-bold text-slate-900">{title}</h4>

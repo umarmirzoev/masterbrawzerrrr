@@ -27,6 +27,7 @@ import {
   Bot,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
+import HeaderNav from "@/components/HeaderNav";
 
 export default function Header() {
   const { languageShortLabel, setLanguage, t } = useLanguage();
@@ -62,44 +63,29 @@ export default function Header() {
           : "bg-white border-b border-slate-50"
       }`}
     >
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1440px]">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
               М
             </div>
-            <span className="text-xl font-bold text-slate-900 tracking-tight hidden sm:block">
+            <span className="text-xl font-bold text-slate-900 tracking-tight hidden sm:block whitespace-nowrap">
               Мастер ТЧ
             </span>
           </Link>
 
           {/* Center Navigation */}
-          <nav className="hidden lg:flex items-center gap-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 relative group ${
-                  isActive(item.path)
-                    ? "text-emerald-500"
-                    : "text-slate-500 hover:text-slate-900"
-                }`}
-              >
-                {t(item.labelKey)}
-                <span className={`absolute bottom-1 left-4 right-4 h-0.5 bg-emerald-500 rounded-full transition-all duration-300 transform origin-left ${isActive(item.path) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`} />
-              </Link>
-            ))}
-          </nav>
+          <HeaderNav items={navItems} />
 
           {/* Right Actions */}
-          <div className="flex items-center gap-4">
-            <div className="hidden xl:flex items-center gap-4 mr-2">
+          <div className="flex items-center gap-2 lg:gap-3">
+            <div className="hidden 2xl:flex items-center gap-2 mr-1">
                <a href="tel:+992979117007" className="flex items-center gap-2 text-slate-600 hover:text-emerald-500 transition-colors">
                   <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center">
                     <Phone className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-sm font-black tracking-tight">+992 979 117 007</span>
+                  <span className="text-sm font-black tracking-tight whitespace-nowrap">+992 979 117 007</span>
                </a>
             </div>
 
@@ -160,7 +146,7 @@ export default function Header() {
             {/* Mobile Menu Trigger */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-xl h-10 w-10 bg-slate-50">
+                <Button variant="ghost" size="icon" className="xl:hidden rounded-xl h-10 w-10 bg-slate-50">
                   <Menu className="w-5 h-5 text-slate-600" />
                 </Button>
               </SheetTrigger>

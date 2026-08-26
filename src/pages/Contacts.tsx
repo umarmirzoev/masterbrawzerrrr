@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Phone, Mail, Clock, MapPin, MessageCircle, Send, 
   HelpCircle, Paperclip, CheckCircle2, Zap, Trophy, Shield, Headset,
-  Map as MapIcon, ChevronRight
+  Map as MapIcon, ChevronRight, Star, Users
 } from "lucide-react";
 
 const Contacts = () => {
@@ -34,12 +34,12 @@ const Contacts = () => {
   };
 
   const contactCards = [
-    { icon: <Phone className="w-5 h-5 text-emerald-500" />, label: "Телефон", value: "+992 979 117 007", sub: "Звоните в любое время", color: "bg-emerald-50", href: "tel:+992979117007" },
-    { icon: <Mail className="w-5 h-5 text-blue-500" />, label: "Почта", value: "support@masterchas.tj", sub: "Ответим в течение часа", color: "bg-blue-50", href: "mailto:support@masterchas.tj" },
-    { icon: <MapPin className="w-5 h-5 text-purple-500" />, label: "Адрес", value: "Душанбе, Тоҷикистон", sub: "Работаем по всему городу", color: "bg-purple-50", href: "https://www.google.com/maps/search/?api=1&query=Dushanbe" },
-    { icon: <Clock className="w-5 h-5 text-amber-500" />, label: "Режим работы", value: "24/7 — круглосуточно", sub: "Без выходных", color: "bg-amber-50", href: null },
-    { icon: <MessageCircle className="w-5 h-5 text-green-500" />, label: "WhatsApp", value: "+992 979 117 007", sub: "Быстрый ответ", color: "bg-green-50", href: "https://wa.me/992979117007" },
-    { icon: <Send className="w-5 h-5 text-sky-500" />, label: "Telegram", value: "@masterchas_tj", sub: "Напишите нам", color: "bg-sky-50", href: "https://t.me/masterchas_tj" },
+    { icon: <Phone className="w-6 h-6 text-emerald-500 transition-colors duration-300 group-hover:text-white" />, label: "Телефон", value: "+992 979 117 007", sub: "Звоните в любое время", color: "bg-emerald-50", hoverBg: "group-hover:bg-emerald-500", href: "tel:+992979117007" },
+    { icon: <Mail className="w-6 h-6 text-blue-500 transition-colors duration-300 group-hover:text-white" />, label: "Почта", value: "support@masterchas.tj", sub: "Ответим в течение часа", color: "bg-blue-50", hoverBg: "group-hover:bg-blue-500", href: "mailto:support@masterchas.tj" },
+    { icon: <MapPin className="w-6 h-6 text-purple-500 transition-colors duration-300 group-hover:text-white" />, label: "Адрес", value: "Душанбе, Тоҷикистон", sub: "Работаем по всему городу", color: "bg-purple-50", hoverBg: "group-hover:bg-purple-500", href: "https://www.google.com/maps/search/?api=1&query=Dushanbe" },
+    { icon: <Clock className="w-6 h-6 text-amber-500 transition-colors duration-300 group-hover:text-white" />, label: "Режим работы", value: "24/7 — круглосуточно", sub: "Без выходных", color: "bg-amber-50", hoverBg: "group-hover:bg-amber-500", href: null },
+    { icon: <MessageCircle className="w-6 h-6 text-green-500 transition-colors duration-300 group-hover:text-white" />, label: "WhatsApp", value: "+992 979 117 007", sub: "Быстрый ответ", color: "bg-green-50", hoverBg: "group-hover:bg-green-500", href: "https://wa.me/992979117007" },
+    { icon: <Send className="w-6 h-6 text-sky-500 transition-colors duration-300 group-hover:text-white" />, label: "Telegram", value: "@masterchas_tj", sub: "Напишите нам", color: "bg-sky-50", hoverBg: "group-hover:bg-sky-500", href: "https://t.me/masterchas_tj" },
   ];
 
   const faqs = [
@@ -61,7 +61,7 @@ const Contacts = () => {
         <div className="absolute -left-16 top-10 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" />
         <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" />
         <div className="container px-4 mx-auto max-w-7xl">
-          <div className="relative flex flex-col lg:flex-row items-center gap-12">
+          <div className="relative flex flex-col lg:flex-row items-start gap-10">
             
             {/* Left Content */}
             <div className="flex-1 text-left">
@@ -73,12 +73,12 @@ const Contacts = () => {
                 <p className="text-lg text-slate-600 mb-8 max-w-xl font-medium">
                   Звоните, пишите в WhatsApp или Telegram — мы на связи 24/7.
                 </p>
-                <div className="hidden lg:block relative max-w-[500px] lg:ml-auto group">
+                <div className="hidden lg:block relative max-w-[440px] lg:ml-auto group">
                   {/* Background glow effects */}
                   <div className="absolute -inset-10 bg-emerald-500/10 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                   
                   <div className="relative overflow-hidden rounded-[2.5rem] border border-white bg-white shadow-[0_32px_80px_-16px_rgba(15,23,42,0.15)] hover-lift transition-all duration-700">
-                    <div className="relative h-[480px] overflow-hidden">
+                    <div className="relative h-[360px] overflow-hidden">
                       <img
                         src={contactHeroImage}
                         alt="Мастер ТЧ"
@@ -113,23 +113,80 @@ const Contacts = () => {
             </div>
 
             {/* Right Contact Grid */}
-            <div className="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {contactCards.map((card, i) => (
-                <motion.div 
-                  key={i} 
-                  initial={{ opacity: 0, scale: 0.9 }} 
-                  animate={{ opacity: 1, scale: 1 }} 
-                  transition={{ delay: i * 0.05 }}
-                >
-                  {card.href ? (
-                    <a href={card.href} target="_blank" rel="noopener noreferrer" className="block">
+            <div className="w-full lg:w-2/3">
+              <div className="hidden lg:block mb-[66px]">
+                <div className="mb-3 inline-flex rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 shadow-sm backdrop-blur">
+                  Все способы связи
+                </div>
+                <h2 className="text-xl font-extrabold text-slate-900 mb-1 tracking-tight">Выберите удобный способ</h2>
+                <p className="text-sm font-medium text-slate-500">Отвечаем быстро в любом канале</p>
+              </div>
+              <div className="rounded-[2.5rem] border border-white/60 bg-white/50 backdrop-blur-sm p-4 sm:p-6 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {contactCards.map((card, i) => (
+                  <motion.div 
+                    key={i} 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    {card.href ? (
+                      <a href={card.href} target="_blank" rel="noopener noreferrer" className="block">
+                        <ContactCard card={card} />
+                      </a>
+                    ) : (
                       <ContactCard card={card} />
-                    </a>
-                  ) : (
-                    <ContactCard card={card} />
-                  )}
-                </motion.div>
-              ))}
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-4 rounded-[1.75rem] bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6 text-white shadow-lg shadow-emerald-200/50"
+              >
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                      <Zap className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-black leading-none">~5 мин</p>
+                      <p className="text-[11px] text-emerald-50/80 font-medium mt-1">средний ответ</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                      <Star className="w-5 h-5 fill-current" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-black leading-none">4.9 / 5</p>
+                      <p className="text-[11px] text-emerald-50/80 font-medium mt-1">320+ отзывов</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-black leading-none">3000+</p>
+                      <p className="text-[11px] text-emerald-50/80 font-medium mt-1">клиентов</p>
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href="https://wa.me/992979117007"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover-soft w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-black text-emerald-700 shadow-lg transition-all hover:bg-emerald-50 active:scale-95"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Написать сейчас
+                </a>
+              </motion.div>
+              </div>
             </div>
           </div>
         </div>
@@ -245,7 +302,7 @@ const Contacts = () => {
               </div>
 
               <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-2">
-                <Button size="sm" className="rounded-xl bg-white text-slate-900 hover:bg-slate-50 shadow-lg border border-slate-100 h-10 px-4 font-bold text-xs gap-2">
+                <Button size="sm" className="hover-soft rounded-xl bg-white text-slate-900 hover:bg-slate-50 shadow-lg border border-slate-100 h-10 px-4 font-bold text-xs gap-2 active:scale-95">
                   <MapIcon className="w-4 h-4 text-emerald-500" />
                   Построить маршрут
                 </Button>
@@ -256,14 +313,26 @@ const Contacts = () => {
       </section>
 
       {/* Features Row */}
-      <section className="py-10 border-y border-slate-100 bg-white">
+      <section className="py-12 border-y border-slate-100 bg-white">
         <div className="container px-4 mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-            <FeatureItem icon={<Zap className="w-5 h-5 text-emerald-500" />} title="Быстрый ответ" sub="Ответим в течение 15 минут" />
-            <FeatureItem icon={<Trophy className="w-5 h-5 text-emerald-500" />} title="Профессиональная помощь" sub="Опытные специалисты" />
-            <FeatureItem icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />} title="Гарантия качества" sub="На все виды работ" />
-            <FeatureItem icon={<Shield className="w-5 h-5 text-emerald-500" />} title="Честные цены" sub="Фиксированная стоимость" />
-            <FeatureItem icon={<Headset className="w-5 h-5 text-emerald-500" />} title="Поддержка 24/7" sub="Всегда на связи" />
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+            {[
+              { icon: <Zap className="w-6 h-6 text-emerald-500" />, title: "Быстрый ответ", sub: "Ответим в течение 15 минут" },
+              { icon: <Trophy className="w-6 h-6 text-emerald-500" />, title: "Профессиональная помощь", sub: "Опытные специалисты" },
+              { icon: <CheckCircle2 className="w-6 h-6 text-emerald-500" />, title: "Гарантия качества", sub: "На все виды работ" },
+              { icon: <Shield className="w-6 h-6 text-emerald-500" />, title: "Честные цены", sub: "Фиксированная стоимость" },
+              { icon: <Headset className="w-6 h-6 text-emerald-500" />, title: "Поддержка 24/7", sub: "Всегда на связи" },
+            ].map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <FeatureItem icon={f.icon} title={f.title} sub={f.sub} />
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -271,15 +340,25 @@ const Contacts = () => {
       {/* FAQ Section */}
       <section className="py-20">
         <div className="container px-4 mx-auto max-w-5xl">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
             <div className="w-16 h-16 rounded-3xl bg-emerald-50 flex items-center justify-center mx-auto mb-4">
               <HelpCircle className="w-8 h-8 text-emerald-500" />
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Часто задаваемые вопросы</h2>
             <p className="text-slate-500">Ответы на популярные вопросы наших клиентов</p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
             <Accordion type="single" collapsible className="w-full space-y-4">
               {faqs.slice(0, 3).map((faq, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="border-none bg-white rounded-[2rem] px-6 shadow-sm">
@@ -292,6 +371,12 @@ const Contacts = () => {
                 </AccordionItem>
               ))}
             </Accordion>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
             <Accordion type="single" collapsible className="w-full space-y-4">
               {faqs.slice(3).map((faq, i) => (
                 <AccordionItem key={i+3} value={`faq-${i+3}`} className="border-none bg-white rounded-[2rem] px-6 shadow-sm">
@@ -304,6 +389,7 @@ const Contacts = () => {
                 </AccordionItem>
               ))}
             </Accordion>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -315,15 +401,15 @@ const Contacts = () => {
 
 function ContactCard({ card }: { card: any }) {
   return (
-    <Card className="border-none shadow-sm rounded-3xl overflow-hidden hover:shadow-md transition-all cursor-pointer h-full">
-      <CardContent className="p-5 flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-2xl ${card.color} flex items-center justify-center shrink-0`}>
+    <Card className="group border-none shadow-sm rounded-[1.75rem] overflow-hidden hover-soft hover:shadow-md transition-all cursor-pointer h-full">
+      <CardContent className="p-6 flex items-center gap-4">
+        <div className={`w-14 h-14 rounded-2xl ${card.color} ${card.hoverBg} flex items-center justify-center shrink-0 transition-colors duration-300`}>
           {card.icon}
         </div>
         <div className="min-w-0">
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">{card.label}</p>
-          <p className="text-sm font-bold text-slate-900 truncate">{card.value}</p>
-          <p className="text-[10px] text-slate-400">{card.sub}</p>
+          <p className="text-base font-bold text-slate-900 truncate">{card.value}</p>
+          <p className="text-xs text-slate-400">{card.sub}</p>
         </div>
       </CardContent>
     </Card>
@@ -332,12 +418,12 @@ function ContactCard({ card }: { card: any }) {
 
 function FeatureItem({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="flex flex-col items-center text-center gap-2">
-      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-1">
+    <div className="group flex flex-col items-center text-center gap-2.5 cursor-default">
+      <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:bg-emerald-100">
         {icon}
       </div>
-      <h4 className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">{title}</h4>
-      <p className="text-[10px] text-slate-400">{sub}</p>
+      <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">{title}</h4>
+      <p className="text-xs text-slate-400">{sub}</p>
     </div>
   );
 }

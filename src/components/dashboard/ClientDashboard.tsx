@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -289,15 +290,22 @@ export default function ClientDashboard() {
       {tab !== "profile" && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {stats.map((s, i) => (
-            <Card key={i} className={`bg-gradient-to-br ${s.gradient} border-0 shadow-sm`}>
-              <CardContent className="p-4">
-                <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2`}>
-                  <s.icon className={`w-5 h-5 ${s.iconColor}`} />
-                </div>
-                <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-              </CardContent>
-            </Card>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+            >
+              <Card className={`group bg-gradient-to-br ${s.gradient} border-0 shadow-sm hover-soft transition-shadow`}>
+                <CardContent className="p-4">
+                  <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2 transition-transform duration-300 group-hover:scale-110`}>
+                    <s.icon className={`w-5 h-5 ${s.iconColor}`} />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">{s.value}</p>
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       )}
@@ -307,7 +315,7 @@ export default function ClientDashboard() {
         {tabs.map((tb) => {
           const Icon = tb.icon;
           return (
-            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => setTab(tb.key)} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs">
+            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => setTab(tb.key)} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs transition-transform hover:scale-105 active:scale-95">
               <Icon className="w-3.5 h-3.5" />
               {tb.label}
               {tb.count !== undefined && tb.count > 0 && (
@@ -320,14 +328,14 @@ export default function ClientDashboard() {
 
       {/* Content */}
       {tab === "profile" ? (
-        <div className="space-y-4 -mt-2">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 -mt-2">
           {/* Profile header card */}
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 pt-10 pb-16 px-5">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]" />
           </div>
           <Card className="-mt-14 border-0 shadow-md">
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 border-4 border-white shadow flex items-center justify-center shrink-0 -mt-10">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 border-4 border-white shadow flex items-center justify-center shrink-0 -mt-10 ring-2 ring-emerald-100">
                 <span className="text-xl font-black text-emerald-600">{initials}</span>
               </div>
               <div className="min-w-0 flex-1">
@@ -367,23 +375,23 @@ export default function ClientDashboard() {
 
           {/* Real stats */}
           <div className="grid grid-cols-3 gap-3">
-            <Card className="border-0 shadow-sm bg-blue-50/60">
+            <Card className="group border-0 shadow-sm bg-blue-50/60 hover-soft transition-shadow cursor-default">
               <CardContent className="p-4 text-center">
-                <ClipboardList className="w-5 h-5 text-blue-600 mx-auto mb-1.5" />
+                <ClipboardList className="w-5 h-5 text-blue-600 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
                 <p className="text-xl font-black text-foreground">{orders.length}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatOrders")}</p>
               </CardContent>
             </Card>
-            <Card className="border-0 shadow-sm bg-rose-50/60">
+            <Card className="group border-0 shadow-sm bg-rose-50/60 hover-soft transition-shadow cursor-default">
               <CardContent className="p-4 text-center">
-                <Heart className="w-5 h-5 text-rose-500 mx-auto mb-1.5" />
+                <Heart className="w-5 h-5 text-rose-500 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
                 <p className="text-xl font-black text-foreground">{favoritesCount}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatFavorites")}</p>
               </CardContent>
             </Card>
-            <Card className="border-0 shadow-sm bg-amber-50/60">
+            <Card className="group border-0 shadow-sm bg-amber-50/60 hover-soft transition-shadow cursor-default">
               <CardContent className="p-4 text-center">
-                <DollarSign className="w-5 h-5 text-amber-600 mx-auto mb-1.5" />
+                <DollarSign className="w-5 h-5 text-amber-600 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
                 <p className="text-xl font-black text-foreground">{totalSpent.toLocaleString()}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatSpent")}</p>
               </CardContent>
@@ -403,13 +411,13 @@ export default function ClientDashboard() {
               <button
                 key={i}
                 onClick={item.action}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/50 transition-colors text-left"
+                className="group w-full flex items-center justify-between px-5 py-4 hover:bg-accent/50 transition-colors text-left"
               >
                 <div className="flex items-center gap-3">
-                  <item.icon className="w-4.5 h-4.5 text-muted-foreground" />
+                  <item.icon className="w-4.5 h-4.5 text-muted-foreground transition-colors duration-300 group-hover:text-emerald-500" />
                   <span className="text-sm font-medium text-foreground">{item.label}</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 transition-transform duration-300 group-hover:translate-x-0.5" />
               </button>
             ))}
           </Card>
@@ -429,7 +437,7 @@ export default function ClientDashboard() {
               </div>
             </button>
           </Card>
-        </div>
+        </motion.div>
       ) : tab === "payments" ? (
         <div className="space-y-3">
           <h3 className="text-base font-semibold mb-2">История оплат</h3>

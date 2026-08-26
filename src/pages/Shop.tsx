@@ -100,8 +100,9 @@ export default function Shop() {
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }} 
                     animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -4 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 w-[400px]"
+                    className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 w-[400px] transition-shadow duration-300 hover:shadow-[0_30px_60px_-15px_rgba(16,185,129,0.25)]"
                   >
                     <div className="flex items-center justify-between mb-5">
                        <div className="space-y-1">
@@ -142,10 +143,18 @@ export default function Shop() {
       <section className="py-12 bg-white border-y border-slate-100">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label={t("shopStatClients")} />
-            <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label={t("shopStatOrders")} />
-            <StatItem icon={<Award className="w-8 h-8 text-emerald-500" />} value="50+" label={t("shopStatBrands")} />
-            <StatItem icon={<Trophy className="w-8 h-8 text-emerald-500" />} value="98%" label={t("shopStatReviews")} />
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }}>
+              <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label={t("shopStatClients")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
+              <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label={t("shopStatOrders")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
+              <StatItem icon={<Award className="w-8 h-8 text-emerald-500" />} value="50+" label={t("shopStatBrands")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
+              <StatItem icon={<Trophy className="w-8 h-8 text-emerald-500" />} value="98%" label={t("shopStatReviews")} />
+            </motion.div>
           </div>
         </div>
       </section>
@@ -157,8 +166,8 @@ export default function Shop() {
             <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">
               {t("shopPopularProductsTitle")}
             </h2>
-            <Link to="#" className="text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-2">
-              {t("shopViewAllProducts")} <ChevronRight className="w-4 h-4" />
+            <Link to="#" className="group text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-2">
+              {t("shopViewAllProducts")} <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>
 
@@ -183,7 +192,7 @@ export default function Shop() {
                   </div>
                   
                   <CardContent className="p-3 sm:p-5 flex flex-col flex-1">
-                    <h3 className="text-sm font-bold text-slate-900 mb-2 line-clamp-2 leading-snug h-10">
+                    <h3 className="text-sm font-bold text-slate-900 mb-2 line-clamp-2 leading-snug h-10 transition-colors duration-300 group-hover:text-emerald-600">
                       {p.name}
                     </h3>
                     
@@ -200,10 +209,10 @@ export default function Shop() {
                       </div>
 
                       <div className="flex gap-1 shrink-0">
-                        <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full text-slate-400 hover:text-red-500 transition-colors shrink-0">
+                        <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-300 hover:scale-110 active:scale-90 shrink-0">
                           <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
-                        <Button size="icon" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100 shrink-0" onClick={() => addToCart(p.id)}>
+                        <Button size="icon" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100 shrink-0 transition-transform duration-300 hover:scale-110 active:scale-90" onClick={() => addToCart(p.id)}>
                           <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
                       </div>
@@ -217,14 +226,24 @@ export default function Shop() {
       </section>
 
       {/* Benefits Row */}
-      <section className="py-12 bg-emerald-50/30 border-y border-emerald-100/50">
+      <section className="py-14 bg-emerald-50/30 border-y border-emerald-100/50">
         <div className="container px-4 mx-auto max-w-7xl">
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-            <BenefitSmallItem icon={<Truck />} text={t("shopBenefitDelivery")} />
-            <BenefitSmallItem icon={<Shield />} text={t("shopBenefitWarranty")} />
-            <BenefitSmallItem icon={<CreditCard />} text={t("shopBenefitPayment")} />
-            <BenefitSmallItem icon={<RotateCcw />} text={t("shopBenefitReturn")} />
-            <BenefitSmallItem icon={<Wrench />} text={t("shopBenefitInstall")} />
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }}>
+              <BenefitSmallItem icon={<Truck />} text={t("shopBenefitDelivery")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08 }}>
+              <BenefitSmallItem icon={<Shield />} text={t("shopBenefitWarranty")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.16 }}>
+              <BenefitSmallItem icon={<CreditCard />} text={t("shopBenefitPayment")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.24 }}>
+              <BenefitSmallItem icon={<RotateCcw />} text={t("shopBenefitReturn")} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.32 }}>
+              <BenefitSmallItem icon={<Wrench />} text={t("shopBenefitInstall")} />
+            </motion.div>
           </div>
         </div>
       </section>
@@ -232,20 +251,37 @@ export default function Shop() {
       {/* Consultation Banner */}
       <section className="py-24 bg-white">
         <div className="container px-4 mx-auto max-w-7xl">
-          <div className="bg-[#F1F5F9] rounded-[3rem] p-8 md:p-16 relative overflow-hidden flex flex-col lg:flex-row items-center gap-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-[#F1F5F9] rounded-[3rem] p-8 md:p-16 relative overflow-hidden flex flex-col lg:flex-row items-center gap-12"
+          >
              <div className="absolute top-0 right-0 w-1/3 h-full bg-emerald-500/5 blur-3xl rounded-full" />
              
-             <div className="w-full lg:w-1/3 flex justify-center lg:justify-start">
-               <div className="relative">
-                 <div className="absolute -inset-4 bg-emerald-500/10 blur-2xl rounded-full" />
-                 <img src={specialistImage} alt="Specialist" className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full border-8 border-white shadow-2xl relative z-10" />
-                 <div className="absolute bottom-4 right-4 bg-white p-4 rounded-3xl shadow-xl z-20">
-                   <Wrench className="w-8 h-8 text-emerald-500" />
+             <motion.div
+               initial={{ opacity: 0, x: -30 }}
+               whileInView={{ opacity: 1, x: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.1 }}
+               className="w-full lg:w-1/3 flex justify-center lg:justify-start"
+             >
+               <div className="group relative">
+                 <div className="absolute -inset-4 bg-emerald-500/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                 <img src={specialistImage} alt="Specialist" className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full border-8 border-white shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                 <div className="absolute bottom-4 right-4 bg-white p-4 rounded-3xl shadow-xl z-20 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
+                   <Wrench className="w-8 h-8 text-emerald-500 transition-colors duration-300 group-hover:text-white" />
                  </div>
                </div>
-             </div>
+             </motion.div>
 
-             <div className="flex-1 z-10">
+             <motion.div
+               initial={{ opacity: 0, x: 30 }}
+               whileInView={{ opacity: 1, x: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.2 }}
+               className="flex-1 z-10"
+             >
                <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">{t("shopConsultTitle")}</h2>
                <p className="text-lg text-slate-600 mb-8 max-w-xl">{t("shopConsultDesc")}</p>
 
@@ -256,22 +292,22 @@ export default function Shop() {
                </div>
                
                <div className="flex flex-col sm:flex-row items-center gap-8">
-                 <div className="flex items-center gap-4 text-slate-900">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-100">
+                 <a href="tel:+992979117007" className="group flex items-center gap-4 text-slate-900 hover-soft rounded-2xl">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-100 transition-transform duration-300 group-hover:scale-110">
                       <Phone className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="text-2xl font-black">+992 979 117 007</p>
                       <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("shopWorkHours")}</p>
                     </div>
-                 </div>
+                 </a>
 
-                 <Button className="bg-[#10B981] hover:bg-[#059669] text-white font-black rounded-2xl px-10 h-16 flex items-center gap-3 shadow-xl shadow-emerald-100 transition-all active:scale-95">
+                 <Button className="hover-soft bg-[#10B981] hover:bg-[#059669] text-white font-black rounded-2xl px-10 h-16 flex items-center gap-3 shadow-xl shadow-emerald-100 transition-all active:scale-95">
                    <MessageCircle className="w-6 h-6" /> {t("shopWhatsAppButton")}
                  </Button>
                </div>
-             </div>
-          </div>
+             </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -282,8 +318,8 @@ export default function Shop() {
 
 function ShopFeatureItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="flex gap-3 transition-all group">
-      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+    <div className="group flex gap-3 cursor-default transition-transform duration-300 hover:translate-x-1">
+      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
         {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
       </div>
       <div>
@@ -296,9 +332,9 @@ function ShopFeatureItem({ icon, title, desc }: { icon: React.ReactNode; title: 
 
 function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-      <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0">
-        {React.cloneElement(icon as React.ReactElement, { className: "w-8 h-8 text-emerald-500" })}
+    <div className="group flex items-center gap-3 sm:gap-5 min-w-0 cursor-default">
+      <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
+        {React.cloneElement(icon as React.ReactElement, { className: "w-8 h-8 text-emerald-500 transition-colors duration-300 group-hover:text-white" })}
       </div>
       <div className="min-w-0">
         <p className="text-3xl font-black text-slate-900 leading-none mb-2">{value}</p>
@@ -310,20 +346,20 @@ function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string
 
 function BenefitSmallItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-5 h-5 text-emerald-500">
-        {React.cloneElement(icon as React.ReactElement, { className: "w-full h-full" })}
+    <div className="group rounded-[1.75rem] border border-slate-200 bg-[#fbfcfb] p-6 sm:p-7 text-center hover-soft hover:border-emerald-200 hover:bg-white transition-colors">
+      <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
+        {React.cloneElement(icon as React.ReactElement, { className: "h-7 w-7" })}
       </div>
-      <span className="text-xs font-bold text-slate-600">{text}</span>
+      <p className="text-sm sm:text-base font-semibold text-slate-900 leading-snug">{text}</p>
     </div>
   );
 }
 
 function CheckPoint({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
-        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+    <div className="group flex items-center gap-3 cursor-default transition-transform duration-300 hover:translate-x-1">
+      <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
+        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 transition-colors duration-300 group-hover:text-white" />
       </div>
       <span className="text-sm font-bold text-slate-700">{text}</span>
     </div>

@@ -71,8 +71,9 @@ const Categories = () => {
               {categories.map((cat, index) => (
                 <motion.div
                   key={cat.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.9, y: 16 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.4) }}
                 >
                   <Link to={`/category/${cat.id}`}>
@@ -85,11 +86,11 @@ const Categories = () => {
                         <h3 className="font-bold text-foreground text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
                           {getName(cat)}
                         </h3>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs transition-colors duration-300 group-hover:bg-primary/10 group-hover:text-primary">
                           {serviceCounts[cat.id] || 0} {language === "en" ? "services" : "услуг"}
                         </Badge>
                         <div className="flex items-center justify-center gap-1 mt-3 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                          Открыть <ArrowRight className="w-3 h-3" />
+                          Открыть <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
                         </div>
                       </CardContent>
                     </Card>

@@ -230,7 +230,7 @@ const Index = () => {
                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                     src="/shop/specialist.png" 
                     alt="Master" 
-                    className="relative z-10 w-full h-auto drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
+                    className="relative z-10 w-full h-auto rounded-[2rem] sm:rounded-[2.5rem] drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)]"
                   />
                   
                   {/* Floating Rating Card */}
@@ -238,19 +238,19 @@ const Index = () => {
                     initial={{ opacity: 0, x: 40 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.8, duration: 0.8 }}
-                    whileHover={{ scale: 1.05, rotate: 2 }}
-                    className="absolute bottom-2 right-0 md:-right-2 z-20 bg-white/80 backdrop-blur-xl p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/50 w-48 sm:w-64 cursor-default"
+                    whileHover={{ scale: 1.03 }}
+                    className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-20 bg-white/80 backdrop-blur-xl p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[1.75rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/50 w-max max-w-[calc(100%-2rem)] cursor-default"
                   >
-                     <div className="flex items-center justify-between mb-5">
-                        <p className="text-4xl font-black text-slate-900 tracking-tighter">4.8</p>
+                     <div className="flex items-center justify-between mb-3">
+                        <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter">4.8</p>
                         <div className="text-right">
-                           <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("floatingCardRating")}</p>
+                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("floatingCardRating")}</p>
                            <div className="flex gap-0.5 justify-end">
                               {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
                            </div>
                         </div>
                      </div>
-                     <ul className="space-y-4">
+                     <ul className="space-y-2.5">
                         <FloatingCardItem text={t("homeFastArrival")} />
                         <FloatingCardItem text={t("homeFairPrices")} />
                         <FloatingCardItem text={t("homeWorkGuarantee")} />
@@ -494,22 +494,23 @@ const Index = () => {
                  <p className="text-xl text-emerald-50 font-medium opacity-90 leading-relaxed">{t("homeCtaDesc")}</p>
               </div>
 
-              <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
-                 <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    className="flex items-center gap-5 bg-white/10 backdrop-blur-xl px-10 py-6 rounded-3xl border border-white/20 w-full sm:w-auto"
+              <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                 <motion.a
+                    href="tel:+992979117007"
+                    whileHover={{ scale: 1.03 }}
+                    className="flex items-center gap-3.5 bg-white/15 backdrop-blur-xl px-5 md:px-6 h-20 rounded-[1.75rem] border border-white/25 w-full sm:w-auto shrink-0"
                  >
-                    <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white">
-                       <Phone className="w-6 h-6" />
+                    <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center text-white shrink-0">
+                       <Phone className="w-5 h-5" />
                     </div>
-                    <div>
-                       <p className="text-2xl font-black text-white tracking-tight">+992 979 117 007</p>
-                       <p className="text-[11px] text-white/60 font-black uppercase tracking-widest">{t("homeCta247")}</p>
+                    <div className="min-w-0">
+                       <p className="text-lg md:text-xl font-black text-white tracking-tight whitespace-nowrap">+992 979 117 007</p>
+                       <p className="text-[10px] text-white/70 font-black uppercase tracking-widest whitespace-nowrap">{t("homeCta247")}</p>
                     </div>
-                 </motion.div>
+                 </motion.a>
                  <Button 
                    onClick={() => setIsOrderModalOpen(true)}
-                   className="w-full sm:w-auto bg-white text-emerald-700 hover:bg-emerald-50 font-black h-20 px-12 rounded-[2rem] text-xl shadow-2xl shadow-black/10 transition-all active:scale-95"
+                   className="w-full sm:w-auto shrink-0 bg-white text-emerald-700 hover:bg-emerald-50 font-black h-20 px-10 rounded-[1.75rem] text-lg md:text-xl shadow-2xl shadow-black/10 transition-all active:scale-95 whitespace-nowrap"
                  >
                     {t("homeCtaButton")}
                  </Button>
@@ -534,13 +535,13 @@ const Index = () => {
 // Sub-components
 const FloatingCardItem = ({ text }: { text: string }) => (
   <motion.li 
-    whileHover={{ x: 10 }}
-    className="flex items-center gap-3 group cursor-default"
+    whileHover={{ x: 4 }}
+    className="flex items-center gap-2 group cursor-default"
   >
-    <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors duration-300">
-      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 group-hover:text-white transition-colors duration-300" />
+    <div className="w-5 h-5 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500 transition-colors duration-300">
+      <CheckCircle2 className="w-3 h-3 text-emerald-500 group-hover:text-white transition-colors duration-300" />
     </div>
-    <span className="text-sm font-bold text-slate-700 group-hover:text-emerald-600 transition-colors duration-300">{text}</span>
+    <span className="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-emerald-600 transition-colors duration-300 whitespace-nowrap">{text}</span>
   </motion.li>
 );
 

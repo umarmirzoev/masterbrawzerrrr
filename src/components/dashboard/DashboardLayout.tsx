@@ -1,5 +1,6 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -31,6 +32,19 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
   const [open, setOpen] = useState(false);
   const { notifications, unreadCount, markAllRead } = useNotifications(user?.id);
   const [showNotifs, setShowNotifs] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  // Закрываем панель уведомлений при клике вне неё.
+  useEffect(() => {
+    if (!showNotifs) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotifs(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNotifs]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -38,8 +52,8 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="p-5 border-b border-border/50">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg">
+        <Link to="/" className="group flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
             М
           </div>
           <div>
@@ -53,7 +67,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       {profile?.full_name && (
         <div className="px-5 py-3 border-b border-border/50">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/10">
               <span className="text-sm font-bold text-primary">
                 {profile.full_name.split(" ").map(w => w[0]).join("").slice(0, 2)}
               </span>
@@ -70,9 +84,9 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       <nav className="flex-1 p-3 space-y-0.5 overflow-auto">
         <Link
           to="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-accent transition-colors text-sm"
+          className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground transition-all text-sm"
         >
-          <Home className="w-4 h-4" />
+          <Home className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
           <span>{t("dashboardHomeLabel")}</span>
         </Link>
 
@@ -93,11 +107,11 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
               className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-sm group ${
                 active
                   ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-muted-foreground hover:bg-accent"
+                  : "text-muted-foreground hover:bg-accent hover:translate-x-0.5"
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
                 <span className="font-medium">{item.label}</span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -115,8 +129,8 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
 
       {/* Sign out */}
       <div className="p-3 border-t border-border/50">
-        <Button variant="ghost" onClick={signOut} className="w-full justify-start gap-3 text-muted-foreground rounded-xl hover:text-destructive hover:bg-destructive/10">
-          <LogOut className="w-4 h-4" />
+        <Button variant="ghost" onClick={signOut} className="group w-full justify-start gap-3 text-muted-foreground rounded-xl transition-colors hover:text-destructive hover:bg-destructive/10">
+          <LogOut className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
           {t("logout")}
         </Button>
       </div>
@@ -158,13 +172,24 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[9px] flex items-center justify-center font-bold">
-                    {unreadCount > 9 ? "9+" : unreadCount}
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive/60" />
+                    <span className="relative inline-flex w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[9px] items-center justify-center font-bold">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
                   </span>
                 )}
               </Button>
+              <AnimatePresence>
               {showNotifs && (
-                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-card border border-border rounded-xl shadow-xl z-50">
+                <motion.div
+                  ref={notifRef}
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-card border border-border rounded-2xl shadow-xl z-50"
+                >
                   <div className="p-3 border-b border-border flex items-center justify-between">
                     <span className="font-semibold text-sm">{t("notifTitle")}</span>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowNotifs(false)}>
@@ -195,8 +220,9 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
                       })}
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
+              </AnimatePresence>
             </div>
           </div>
         </header>

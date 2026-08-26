@@ -394,30 +394,33 @@ export default function PriceList() {
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="bg-emerald-600 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-emerald-100">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/50 to-transparent pointer-events-none" />
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
-                  <Headset className="w-10 h-10" />
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-7">
+              <div className="flex items-center gap-5 min-w-0">
+                <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
+                  <Headset className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white mb-2">{t("priceListCtaTitle")}</h3>
-                  <p className="text-emerald-50/80 font-medium">{t("priceListCtaDesc")}</p>
+                  <h3 className="text-xl md:text-2xl font-black text-white mb-1.5">{t("priceListCtaTitle")}</h3>
+                  <p className="text-emerald-50/80 font-medium text-sm md:text-base">{t("priceListCtaDesc")}</p>
                 </div>
               </div>
               
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="flex items-center gap-4 text-white">
-                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
-                    <Phone className="w-6 h-6" />
+              <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
+                <a
+                  href="tel:+992979117007"
+                  className="flex items-center gap-3 text-white bg-white/10 rounded-[1.25rem] px-4 py-2.5"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-black">+992 979 117 007</p>
-                    <p className="text-xs text-emerald-100 font-medium">{t("priceListCtaWhatsapp")}</p>
+                  <div className="min-w-0">
+                    <p className="text-lg font-black whitespace-nowrap">+992 979 117 007</p>
+                    <p className="text-[10px] text-emerald-100 font-bold uppercase tracking-wider whitespace-nowrap">{t("priceListCtaWhatsapp")}</p>
                   </div>
-                </div>
+                </a>
                 <Button
                   size="lg"
-                  className="bg-white text-emerald-600 hover:bg-emerald-50 font-black rounded-2xl px-10 h-16 shadow-xl active:scale-95 transition-all"
+                  className="bg-white text-emerald-600 hover:bg-emerald-50 font-black rounded-[1.25rem] px-8 h-16 shadow-xl active:scale-95 transition-all whitespace-nowrap shrink-0"
                   onClick={() => setOrderModal({ open: true })}
                 >
                   {t("priceListCtaButton")}

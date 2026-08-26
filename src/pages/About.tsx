@@ -68,7 +68,7 @@ const About = () => {
     <div className="min-h-screen bg-[#f7f9f8]">
       <Header />
 
-      <section className="bg-white pb-8 pt-10 md:pt-14">
+      <section className="overflow-hidden bg-white pb-8 pt-10 md:pt-14">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
@@ -98,14 +98,14 @@ const About = () => {
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/categories"
-                  className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+                  className="hover-soft inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 active:scale-95"
                 >
                   {t("aboutPageChooseService")}
                 </Link>
                 <Button
                   variant="outline"
                   onClick={() => document.getElementById("about-contacts")?.scrollIntoView({ behavior: "smooth" })}
-                  className="rounded-lg border-emerald-200 px-6 py-3 text-sm text-emerald-700 hover:bg-emerald-50"
+                  className="hover-soft rounded-lg border-emerald-200 px-6 py-3 text-sm text-emerald-700 transition-colors hover:bg-emerald-50 active:scale-95"
                 >
                   {t("aboutPageHaveQuestions")}
                 </Button>
@@ -167,14 +167,21 @@ const About = () => {
       <section className="bg-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {topStats.map((item) => {
+            {topStats.map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={item.label} className="rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
-                  <Icon className="mx-auto mb-2 h-5 w-5 text-emerald-600" />
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
+                  className="group rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm hover-soft hover:border-emerald-200"
+                >
+                  <Icon className="mx-auto mb-2 h-5 w-5 text-emerald-600 transition-transform duration-300 group-hover:scale-110" />
                   <p className="text-2xl font-extrabold text-slate-900">{item.value}</p>
                   <p className="text-xs text-slate-500">{item.label}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -183,18 +190,32 @@ const About = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">{t("aboutPageClientsTitle")}</h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl"
+          >
+            {t("aboutPageClientsTitle")}
+          </motion.h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {clientBenefits.map((item) => {
+            {clientBenefits.map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover-soft hover:border-emerald-200"
+                >
+                  <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="mb-2 text-sm font-semibold text-slate-900">{item.title}</h3>
                   <p className="text-xs leading-5 text-slate-500">{item.desc}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -203,18 +224,32 @@ const About = () => {
 
       <section className="bg-white py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">{t("aboutPageMastersTitle")}</h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl"
+          >
+            {t("aboutPageMastersTitle")}
+          </motion.h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-            {masterAdvantages.map((item) => {
+            {masterAdvantages.map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="rounded-xl border border-slate-200 bg-[#fbfcfb] p-4 text-center">
-                  <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
+                  className="group rounded-2xl border border-slate-200 bg-[#fbfcfb] p-4 text-center hover-soft hover:border-emerald-200 hover:bg-white"
+                >
+                  <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="mb-1 text-sm font-semibold text-slate-900">{item.title}</h3>
                   <p className="text-xs leading-5 text-slate-500">{item.desc}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -240,7 +275,7 @@ const About = () => {
                   {t("aboutPageMissionDesc2")}
                 </p>
               </div>
-              <div className="absolute -bottom-4 -right-4 top-0 hidden w-[60%] md:block">
+              <div className="absolute -bottom-4 -right-4 top-0 hidden w-[60%] overflow-hidden rounded-[2.5rem] md:block">
                 <img
                   src={missionImage}
                   alt={t("aboutPageMissionImgAlt")}
@@ -304,18 +339,32 @@ const About = () => {
 
       <section className="bg-white py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl">{t("aboutPageValuesTitle")}</h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl"
+          >
+            {t("aboutPageValuesTitle")}
+          </motion.h2>
           <div className="grid gap-4 md:grid-cols-4">
-            {values.map((item) => {
+            {values.map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="rounded-xl border border-slate-200 bg-[#fbfcfb] p-5 text-center">
-                  <div className="mx-auto mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  viewport={{ once: true }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className="group rounded-2xl border border-slate-200 bg-[#fbfcfb] p-5 text-center hover-soft hover:border-emerald-200 hover:bg-white"
+                >
+                  <div className="mx-auto mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="mb-2 text-sm font-semibold text-slate-900">{item.title}</h3>
                   <p className="text-xs leading-5 text-slate-500">{item.desc}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -324,7 +373,12 @@ const About = () => {
 
       <section id="about-contacts" className="py-10">
         <div className="container mx-auto px-4">
-          <div className="rounded-2xl bg-emerald-600 p-6 text-white md:p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-[2rem] bg-emerald-600 p-6 text-white md:p-8"
+          >
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
                 {t("aboutPageContactBadge")}
@@ -333,7 +387,7 @@ const About = () => {
               <p className="mb-5 text-sm text-emerald-50">{t("aboutPageWhatsappLabel")}</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button asChild className="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-50">
+              <Button asChild className="hover-soft rounded-xl bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 active:scale-95">
                 <a href="https://wa.me/992979117007" target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {t("aboutPageWhatsappButton")}
@@ -341,19 +395,19 @@ const About = () => {
               </Button>
               <Link
                 to="/categories"
-                className="inline-flex items-center justify-center rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20"
+                className="hover-soft inline-flex items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20 active:scale-95"
               >
                 {t("aboutPageChooseService")}
               </Link>
               <a
                 href="tel:+992979117007"
-                className="inline-flex items-center justify-center rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                className="hover-soft inline-flex items-center justify-center rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 active:scale-95"
               >
                 <PhoneCall className="mr-2 h-4 w-4" />
                 {t("aboutPageCallButton")}
               </a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
