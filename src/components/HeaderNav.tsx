@@ -11,10 +11,10 @@ const COPIES = 5;
 /** С какой копии стартуем — остаётся запас в обе стороны. */
 const START_COPY = 2;
 /** Сколько пунктов видно одновременно. */
-const VISIBLE_ITEMS = 4;
+const VISIBLE_ITEMS = 5;
 
 /** Классы, определяющие натуральную ширину пункта (нужны и для скрытого измерителя). */
-const ITEM_METRIC_CLASS = "px-3 2xl:px-4 py-2 text-sm font-bold whitespace-nowrap";
+const ITEM_METRIC_CLASS = "px-1 py-2 text-sm font-bold whitespace-nowrap";
 
 /**
  * Горизонтальное бесконечное меню шапки — карусель со snap по одному пункту.
@@ -181,11 +181,11 @@ export default function HeaderNav({ items }: HeaderNavProps) {
         ))}
       </div>
 
-      <div ref={trackRef} className="flex items-center gap-0.5 2xl:gap-1.5 w-max shrink-0">
+      <div ref={trackRef} className="flex items-center gap-0.5 w-max shrink-0">
         {Array.from({ length: COPIES }).map((_, copy) => (
           <div
             key={copy}
-            className="flex items-center gap-0.5 2xl:gap-1.5 shrink-0"
+            className="flex items-center gap-0.5 shrink-0"
             aria-hidden={copy !== START_COPY}
           >
             {items.map((item) => (
@@ -196,7 +196,7 @@ export default function HeaderNav({ items }: HeaderNavProps) {
                 tabIndex={copy === START_COPY ? undefined : -1}
                 onClick={handleLinkClick}
                 style={itemStyle}
-                className={`snap-start snap-always shrink-0 flex items-center justify-center px-3 2xl:px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 group whitespace-nowrap ${
+                className={`snap-start snap-always shrink-0 flex items-center justify-center px-1 py-2 rounded-xl text-sm font-bold transition-all duration-300 group whitespace-nowrap ${
                   isActive(item.path)
                     ? "text-emerald-500"
                     : "text-slate-500 hover:text-slate-900"
