@@ -158,16 +158,17 @@ export default function MasterProfile() {
           <div className="hidden lg:block">
             <div className="sticky top-6 space-y-4">
               <Card className="overflow-hidden shadow-xl border-0 ring-1 ring-primary/10 hover-lift hover-glow">
-                <div className="h-1.5 bg-gradient-to-r from-primary to-emerald-400" />
-                <CardContent className="p-6">
-                  <div className="text-center mb-5">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{t("mpServicePrice")}</p>
-                    <div className="flex items-baseline justify-center gap-1 mt-2">
-                      <span className="text-sm text-muted-foreground">{t("mpPriceFrom")}</span>
-                      <span className="text-4xl font-bold text-foreground tracking-tight">{master.price_min || 50}</span>
-                      <span className="text-lg text-muted-foreground">{t("mpCurrency")}</span>
-                    </div>
+                {/* Высота 210px совпадает с зелёной шапкой карточки мастера — полосы идут вровень. */}
+                <div className="h-[210px] bg-gradient-to-br from-primary via-primary to-emerald-400 relative flex flex-col items-center justify-center text-primary-foreground">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.15),transparent_60%)]" />
+                  <p className="relative text-xs uppercase tracking-wider font-medium text-primary-foreground/80">{t("mpServicePrice")}</p>
+                  <div className="relative flex items-baseline gap-1 mt-1.5">
+                    <span className="text-sm text-primary-foreground/80">{t("mpPriceFrom")}</span>
+                    <span className="text-4xl font-bold tracking-tight">{master.price_min || 50}</span>
+                    <span className="text-lg text-primary-foreground/80">{t("mpCurrency")}</span>
                   </div>
+                </div>
+                <CardContent className="p-6">
 
                   {/* Короткие показатели помогают быстро оценить мастера до чтения полного профиля. */}
                   <div className="space-y-3 mb-5">
