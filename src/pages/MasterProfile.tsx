@@ -89,6 +89,10 @@ export default function MasterProfile() {
     load();
   }, [id]);
 
+  // Хук обязан вызываться до любых ранних return, иначе React ругается
+  // на разное количество хуков между рендерами.
+  const orderedToday = useMemo(() => Math.floor(Math.random() * 5 + 3), [master?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -115,8 +119,6 @@ export default function MasterProfile() {
   }
 
   const completedOrders = Math.round((master.total_reviews || 0) * 2.5 + (master.experience_years || 0) * 15);
-  // Считаем один раз, иначе число прыгает при каждом ререндере.
-  const orderedToday = useMemo(() => Math.floor(Math.random() * 5 + 3), [master?.id]);
 
   return (
     <div className="min-h-screen bg-muted/30">
