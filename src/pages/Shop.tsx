@@ -36,27 +36,14 @@ export default function Shop() {
   useEffect(() => {
     let cancelled = false;
 
-    // Эти 3 товара раньше показывались в "Популярные товары" (ещё в старой
-    // захардкоженной версии блока) — пользователь попросил вернуть их. Теперь
-    // это настоящие товары из каталога (см. shopFallback.ts), поэтому просто
-    // закрепляем их первыми, а остальные слоты заполняем обычной сортировкой.
-    const FEATURED_PRODUCT_NAMES = new Set([
-      "Смеситель для кухни Grohe Start",
-      "Водонагреватель Ariston 80 л",
-      "Унитаз-компакт Cersanit Parva",
-    ]);
-
-    const pickTop = (list: any[]) => {
-      const featured = list.filter((item) => FEATURED_PRODUCT_NAMES.has(item.name));
-      const rest = [...list]
-        .filter((item) => !FEATURED_PRODUCT_NAMES.has(item.name))
+    const pickTop = (list: any[]) =>
+      [...list]
         .sort(
           (a, b) =>
             (b.is_popular ? 1 : 0) - (a.is_popular ? 1 : 0) ||
             (b.rating || 0) - (a.rating || 0),
-        );
-      return [...featured, ...rest].slice(0, 8);
-    };
+        )
+        .slice(0, 5);
 
     // Эти 4 демо-товара (плейсхолдеры со стоковыми фото) убраны из блока
     // "Популярные товары" по просьбе — реальных карточек это не касается.

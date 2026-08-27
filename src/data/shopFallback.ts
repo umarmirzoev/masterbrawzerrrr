@@ -110,84 +110,6 @@ export const fallbackShopCategories: FallbackShopCategory[] = uniqueCategoryKeys
 
 const categoryIdByKey = new Map(fallbackShopCategories.map((category, index) => [uniqueCategoryKeys[index], category.id]));
 
-// Вручную добавленные товары для блока "Популярные товары" на Shop.tsx —
-// раньше там был захардкоженный список (id "1".."5"), из-за которого корзина
-// падала с "invalid input syntax for uuid". Эти 3 товара — те же самые, что
-// видел пользователь раньше (смеситель, водонагреватель, унитаз), но теперь
-// это настоящие каталожные товары с рабочим id (корзина/избранное/заказы
-// прекрасно с ними работают, как и с остальным fallback-каталогом).
-const santehnikaCategoryId = categoryIdByKey.get("САНТЕХНИКА") || "";
-const santehnikaCategoryName = CATEGORY_META["САНТЕХНИКА"]?.name ?? "Сантехника";
-
-const manualFeaturedProducts: FallbackShopProduct[] = [
-  {
-    id: "fallback-manual-grohe-start",
-    name: "Смеситель для кухни Grohe Start",
-    description: "Смеситель для кухни Grohe Start высокого качества с гарантией.",
-    price: 85,
-    old_price: null,
-    image_url: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&h=600&fit=crop",
-    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=800&fit=crop"],
-    category_id: santehnikaCategoryId,
-    shop_categories: { name: santehnikaCategoryName },
-    rating: 4.9,
-    reviews_count: 34,
-    in_stock: true,
-    is_popular: true,
-    is_discounted: false,
-    is_approved: true,
-    installation_price: 50,
-    seller_type: "platform",
-    master_id: null,
-    promotion_end: null,
-    created_at: "2026-03-01T10:00:00.000Z",
-  },
-  {
-    id: "fallback-manual-ariston-wh80",
-    name: "Водонагреватель Ariston 80 л",
-    description: "Водонагреватель Ariston 80 л высокого качества с гарантией.",
-    price: 750,
-    old_price: null,
-    image_url: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&h=600&fit=crop",
-    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=800&fit=crop"],
-    category_id: santehnikaCategoryId,
-    shop_categories: { name: santehnikaCategoryName },
-    rating: 4.7,
-    reviews_count: 5,
-    in_stock: true,
-    is_popular: false,
-    is_discounted: false,
-    is_approved: true,
-    installation_price: 80,
-    seller_type: "platform",
-    master_id: null,
-    promotion_end: null,
-    created_at: "2026-07-20T10:00:00.000Z",
-  },
-  {
-    id: "fallback-manual-cersanit-parva",
-    name: "Унитаз-компакт Cersanit Parva",
-    description: "Унитаз-компакт Cersanit Parva высокого качества с гарантией.",
-    price: 450,
-    old_price: 520,
-    image_url: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&h=600&fit=crop",
-    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=800&fit=crop"],
-    category_id: santehnikaCategoryId,
-    shop_categories: { name: santehnikaCategoryName },
-    rating: 4.8,
-    reviews_count: 21,
-    in_stock: true,
-    is_popular: false,
-    is_discounted: true,
-    is_approved: true,
-    installation_price: 60,
-    seller_type: "platform",
-    master_id: null,
-    promotion_end: "2026-12-31T23:59:59.000Z",
-    created_at: "2026-02-10T10:00:00.000Z",
-  },
-];
-
 export const fallbackShopProducts: FallbackShopProduct[] = rawProducts.map((product, index) => {
   const categoryIndex = uniqueCategoryKeys.indexOf(product.category);
   const itemIndex = rawProducts.filter((item) => item.category === product.category).findIndex((item) => item.id === product.id);
@@ -221,8 +143,7 @@ export const fallbackShopProducts: FallbackShopProduct[] = rawProducts.map((prod
     promotion_end: isDiscounted && index < 12 ? "2026-12-31T23:59:59.000Z" : null,
     created_at: `2026-01-${String((index % 28) + 1).padStart(2, "0")}T10:00:00.000Z`,
   };
-}).concat(manualFeaturedProducts);
-
+});
 
 export const isFallbackCategoryId = (id?: string | null) => !!id && id.startsWith("fallback-category-");
 export const isFallbackProductId = (id?: string | null) => !!id && id.startsWith("fallback-");
