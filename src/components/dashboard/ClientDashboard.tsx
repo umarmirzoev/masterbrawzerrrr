@@ -24,7 +24,7 @@ import ReviewModal from "./ReviewModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
 import { PaymentDialog, PaymentStatusBadge, PriceBreakdown, ReceiptDialog } from "@/components/payment/PaymentComponents";
-import FavoritesSection from "@/components/favorites/FavoritesSection";
+import FavoritesSection, { getLocalFavorites } from "@/components/favorites/FavoritesSection";
 import SupportTicketDialog from "@/components/SupportTicketDialog";
 import LanguagePreferenceSelect from "@/components/LanguagePreferenceSelect";
 import { getLanguageLocale } from "@/lib/i18n";
@@ -111,7 +111,10 @@ export default function ClientDashboard() {
       .from("favorites")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id);
-    setFavoritesCount(count || 0);
+    // Товары без настоящего UUID в базе (fallback-*) хранятся в этом браузере —
+    // прибавляем их, иначе счётчик избранного в кабинете расходится с реальностью.
+    const localCount = getLocalFavorites().filter((f: any) => f.user_id === user.id).length;
+    setFavoritesCount((count || 0) + localCount);
   };
 
   const fetchApplication = async () => {

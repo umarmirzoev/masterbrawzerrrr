@@ -9,6 +9,25 @@ import { Heart, Star, MapPin, Trash2, ExternalLink, Package, Wrench } from "luci
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
+import { getFallbackProductById, isFallbackProductId } from "@/data/shopFallback";
+
+// В избранном добавляем товары "fallback-*" (их не завели в таблице shop_products
+// как настоящие UUID) — вставить такой id в колонку favorites.item_id (тип uuid)
+// напрямую нельзя, база отвечает "invalid input syntax for type uuid". Поэтому
+// такие избранные храним локально в этом браузере, а настоящие товары/мастера — в базе.
+const LOCAL_FAVORITES_KEY = "mc_fallback_favorites";
+
+export const getLocalFavorites = (): FavoriteItem[] => {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_FAVORITES_KEY) || "[]");
+  } catch {
+    return [];
+  }
+};
+
+const saveLocalFavorites = (list: FavoriteItem[]) => {
+  localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(list));
+};
 
 interface FavoriteItem {
   id: string;
@@ -29,7 +48,8 @@ export function useFavorites(userId?: string) {
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
-    setFavorites((data as any[]) || []);
+    const local = getLocalFavorites().filter(f => f.item_id && f.item_type && (f as any).user_id === userId);
+    setFavorites([...local, ...((data as any[]) || [])]);
   };
 
   useEffect(() => { loadFavorites(); }, [userId]);
@@ -38,9 +58,24 @@ export function useFavorites(userId?: string) {
     if (!userId) return false;
     const existing = favorites.find(f => f.item_type === itemType && f.item_id === itemId);
     if (existing) {
-      await supabase.from("favorites").delete().eq("id", existing.id);
+      if (isFallbackProductId(itemId)) {
+        saveLocalFavorites(getLocalFavorites().filter(f => f.id !== existing.id));
+      } else {
+        await supabase.from("favorites").delete().eq("id", existing.id);
+      }
       setFavorites(prev => prev.filter(f => f.id !== existing.id));
       return false;
+    } else if (isFallbackProductId(itemId)) {
+      const entry: FavoriteItem & { user_id: string } = {
+        id: `local-fav-${crypto.randomUUID()}`,
+        user_id: userId,
+        item_type: itemType,
+        item_id: itemId,
+        created_at: new Date().toISOString(),
+      };
+      saveLocalFavorites([entry, ...getLocalFavorites()]);
+      setFavorites(prev => [entry, ...prev]);
+      return true;
     } else {
       const { data } = await supabase.from("favorites").insert({
         user_id: userId, item_type: itemType, item_id: itemId,
@@ -123,11 +158,14 @@ export default function FavoritesSection() {
     if (!user) return;
     setLoading(true);
     const { data } = await supabase.from("favorites").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
-    const favs = (data as any[]) || [];
+    const local = getLocalFavorites().filter(f => (f as any).user_id === user.id);
+    const favs = [...local, ...((data as any[]) || [])];
     setFavorites(favs);
 
     const masterIds = favs.filter(f => f.item_type === "master").map(f => f.item_id);
     const productIds = favs.filter(f => f.item_type === "product").map(f => f.item_id);
+    const realProductIds = productIds.filter(id => !isFallbackProductId(id));
+    const fallbackProductIds = productIds.filter(id => isFallbackProductId(id));
 
     if (masterIds.length > 0) {
       const { data: ms } = await supabase.from("master_listings").select("id, full_name, average_rating, total_reviews, service_categories, working_districts, price_min").in("id", masterIds);
@@ -135,10 +173,16 @@ export default function FavoritesSection() {
       (ms || []).forEach(m => { map[m.id] = m; });
       setMasterDetails(map);
     }
-    if (productIds.length > 0) {
-      const { data: ps } = await supabase.from("shop_products").select("id, name, price, old_price, image_url, rating").in("id", productIds);
+    if (realProductIds.length > 0 || fallbackProductIds.length > 0) {
       const map: Record<string, any> = {};
-      (ps || []).forEach(p => { map[p.id] = p; });
+      if (realProductIds.length > 0) {
+        const { data: ps } = await supabase.from("shop_products").select("id, name, price, old_price, image_url, rating").in("id", realProductIds);
+        (ps || []).forEach(p => { map[p.id] = p; });
+      }
+      fallbackProductIds.forEach(id => {
+        const fb = getFallbackProductById(id);
+        if (fb) map[id] = fb;
+      });
       setProductDetails(map);
     }
     setLoading(false);
@@ -147,7 +191,11 @@ export default function FavoritesSection() {
   useEffect(() => { loadFavorites(); }, [user]);
 
   const removeFavorite = async (id: string) => {
-    await supabase.from("favorites").delete().eq("id", id);
+    if (id.startsWith("local-fav-")) {
+      saveLocalFavorites(getLocalFavorites().filter(f => f.id !== id));
+    } else {
+      await supabase.from("favorites").delete().eq("id", id);
+    }
     setFavorites(prev => prev.filter(f => f.id !== id));
     toast({ title: t("favRemoved") });
   };
