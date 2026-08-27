@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -28,11 +29,13 @@ import {
   PackageCheck,
   Phone,
   Plus,
+  RotateCcw,
   ShieldCheck,
   ShoppingCart,
   Tag,
   TicketPercent,
   Trash2,
+  Truck,
   Wrench,
 } from "lucide-react";
 
@@ -386,107 +389,146 @@ export default function CartPage() {
             </div>
           </div>
         ) : !checkout ? (
-          <div className="space-y-4">
-            {items.map((item) => {
-              const product = (item as any).product;
-              if (!product) return null;
+          <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+            <motion.div
+              className="space-y-4"
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}
+            >
+              {items.map((item) => {
+                const product = (item as any).product;
+                if (!product) return null;
+                const atStockLimit = typeof product.stock_qty === "number" && item.quantity >= product.stock_qty;
 
-              return (
-                <Card key={item.id} className="border-border">
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-muted/30">
-                        <SmartProductImage
-                          product={product}
-                          alt={product.name}
-                          className="h-full w-full rounded-xl object-contain"
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <Link to={`/shop/product/${product.id}`}>
-                          <h3 className="line-clamp-2 text-sm font-medium text-foreground hover:text-primary">
-                            {product.name}
-                          </h3>
-                        </Link>
-                        <p className="mt-1 text-lg font-bold text-foreground">
-                          {product.price} {t("som")}{" "}
-                          <span className="text-xs font-normal text-muted-foreground">x {item.quantity}</span>
-                        </p>
-                        {product.installation_price && (
-                          <label className="mt-2 flex cursor-pointer items-center gap-2">
-                            <Checkbox
-                              checked={item.include_installation}
-                              onCheckedChange={() => toggleInstallation(item.product_id)}
-                            />
-                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Wrench className="h-3 w-3" />
-                              {t("cartInstallation")} +{product.installation_price} {t("som")}
-                            </span>
-                          </label>
-                        )}
-                      </div>
-
-                      <div className="flex flex-col items-end justify-between">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => removeFromCart(item.product_id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center rounded-full border border-border">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 rounded-none"
-                            onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-6 text-center text-sm">{item.quantity}</span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 rounded-none"
-                            onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-
-            <Card className="border-primary/30">
-              <CardContent className="p-5">
-                <div className="flex justify-between text-lg font-bold">
-                  <span>{t("shopTotal")}</span>
-                  <span className="text-primary">{totalPrice} {t("somoni")}</span>
-                </div>
-                <div className="mt-4 grid gap-3">
-                  <Button
-                    className="h-12 rounded-full text-base"
-                    onClick={() => (user ? setCheckout(true) : navigate("/auth"))}
+                return (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                    exit={{ opacity: 0, x: -12 }}
                   >
-                    {t("cartCheckout")}
-                  </Button>
-                  {user && (
-                    <Button variant="outline" className="rounded-full" onClick={() => navigate("/shop/orders")}>
-                      <PackageCheck className="h-4 w-4" />
-                      Мои заказы
+                    <Card className="border-border hover-soft transition-shadow hover:shadow-md">
+                      <CardContent className="p-4">
+                        <div className="flex gap-4">
+                          <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-muted/30">
+                            <SmartProductImage
+                              product={product}
+                              alt={product.name}
+                              className="h-full w-full rounded-xl object-contain"
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <Link to={`/shop/product/${product.id}`}>
+                              <h3 className="line-clamp-2 text-sm font-medium text-foreground hover:text-primary">
+                                {product.name}
+                              </h3>
+                            </Link>
+                            <p className="mt-1 text-lg font-bold text-foreground">
+                              {product.price} {t("som")}{" "}
+                              <span className="text-xs font-normal text-muted-foreground">x {item.quantity}</span>
+                            </p>
+                            {product.installation_price && (
+                              <label className="mt-2 flex cursor-pointer items-center gap-2">
+                                <Checkbox
+                                  checked={item.include_installation}
+                                  onCheckedChange={() => toggleInstallation(item.product_id)}
+                                />
+                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Wrench className="h-3 w-3" />
+                                  {t("cartInstallation")} +{product.installation_price} {t("som")}
+                                </span>
+                              </label>
+                            )}
+                            {atStockLimit && (
+                              <p className="mt-1.5 text-xs text-amber-600">На складе осталось {product.stock_qty} шт.</p>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col items-end justify-between">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive transition-transform hover:scale-110 active:scale-90"
+                              onClick={() => removeFromCart(item.product_id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <div className="flex items-center rounded-full border border-border">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 rounded-none"
+                                onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="w-6 text-center text-sm">{item.quantity}</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 rounded-none"
+                                onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                                disabled={atStockLimit}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+
+            <div className="space-y-4 lg:sticky lg:top-24">
+              <Card className="border-primary/30 shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>{t("shopTotal")}</span>
+                    <span className="text-primary">{totalPrice} {t("somoni")}</span>
+                  </div>
+                  <div className="mt-4 grid gap-3">
+                    <Button
+                      className="h-12 rounded-full text-base transition-transform active:scale-95"
+                      onClick={() => (user ? setCheckout(true) : navigate("/auth"))}
+                    >
+                      {t("cartCheckout")}
                     </Button>
-                  )}
-                </div>
-                <Link to="/shop" className="mt-3 block text-center text-sm text-muted-foreground hover:text-primary">
-                  ← {t("cartContinueShopping")}
-                </Link>
-              </CardContent>
-            </Card>
+                    {user && (
+                      <Button variant="outline" className="rounded-full" onClick={() => navigate("/shop/orders")}>
+                        <PackageCheck className="h-4 w-4" />
+                        Мои заказы
+                      </Button>
+                    )}
+                  </div>
+                  <Link to="/shop" className="mt-3 block text-center text-sm text-muted-foreground hover:text-primary">
+                    ← {t("cartContinueShopping")}
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="border-dashed border-border/70 bg-muted/20">
+                <CardContent className="grid grid-cols-3 gap-2 p-4 text-center">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <Truck className="h-4 w-4 text-primary" />
+                    <span className="text-[11px] leading-tight text-muted-foreground">Доставка по Душанбе</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    <span className="text-[11px] leading-tight text-muted-foreground">Гарантия качества</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1.5">
+                    <RotateCcw className="h-4 w-4 text-primary" />
+                    <span className="text-[11px] leading-tight text-muted-foreground">Лёгкий возврат</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">

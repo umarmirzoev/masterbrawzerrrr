@@ -16,6 +16,7 @@ import BecomeMaster from "./pages/BecomeMaster";
 import InstallApp from "./pages/InstallApp";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import ClientOrderDetail from "./pages/ClientOrderDetail";
 import MasterDashboardPage from "./pages/MasterDashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import SuperAdminDashboardPage from "./pages/SuperAdminDashboardPage";
@@ -95,6 +96,7 @@ const AnimatedRoutes = () => {
         <Route path="/shop/thank-you/:id" element={<PageTransition><ShopThankYou /></PageTransition>} />
         <Route path="/master-store/:masterId" element={<PageTransition><MasterStore /></PageTransition>} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/orders/:id" element={<PageTransition><ClientOrderDetail /></PageTransition>} />
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/master-dashboard" element={<MasterDashboardPage />} />
         <Route path="/master-dashboard/*" element={<MasterDashboardPage />} />

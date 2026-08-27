@@ -31,40 +31,7 @@ import { getLanguageLocale } from "@/lib/i18n";
 import { resolveNotificationText } from "@/lib/notifications";
 import { getLocalShopOrdersByUser, mergeShopOrders } from "@/lib/localShopOrders";
 
-const allStatuses = [
-  { key: "new", label: "Новый заказ", icon: ClipboardList, color: "bg-blue-500" },
-  { key: "accepted", label: "Принят админом", icon: CheckCircle, color: "bg-yellow-500" },
-  { key: "assigned", label: "Назначен мастер", icon: User, color: "bg-indigo-500" },
-  { key: "on_the_way", label: "Мастер в пути", icon: MapPin, color: "bg-cyan-500" },
-  { key: "arrived", label: "Мастер прибыл", icon: MapPin, color: "bg-teal-500" },
-  { key: "in_progress", label: "Работа выполняется", icon: Clock, color: "bg-purple-500" },
-  { key: "completed", label: "Завершён", icon: CheckCircle, color: "bg-green-500" },
-  { key: "cancelled", label: "Отменён", icon: XCircle, color: "bg-red-500" },
-];
-
-const statusColors: Record<string, string> = {
-  new: "bg-blue-100 text-blue-800",
-  accepted: "bg-yellow-100 text-yellow-800",
-  assigned: "bg-indigo-100 text-indigo-800",
-  on_the_way: "bg-cyan-100 text-cyan-800",
-  arrived: "bg-teal-100 text-teal-800",
-  in_progress: "bg-purple-100 text-purple-800",
-  completed: "bg-green-100 text-green-800",
-  reviewed: "bg-emerald-100 text-emerald-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusLabels: Record<string, string> = {
-  new: "Новый",
-  accepted: "Принят",
-  assigned: "Назначен",
-  on_the_way: "В пути",
-  arrived: "Прибыл",
-  in_progress: "В работе",
-  completed: "Завершён",
-  reviewed: "Оценён",
-  cancelled: "Отменён",
-};
+import { allStatuses, statusColors, statusLabels, OrderTimeline } from "./OrderStatusShared";
 
 type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application" | "favorites";
 
@@ -82,11 +49,9 @@ export default function ClientDashboard() {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [shopSpent, setShopSpent] = useState(0);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [masterInfo, setMasterInfo] = useState<any>(null);
+
   const [myApplication, setMyApplication] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
-  const [chatOrderId, setChatOrderId] = useState<string | null>(null);
   const [payOrder, setPayOrder] = useState<any>(null);
   const [receiptOrder, setReceiptOrder] = useState<any>(null);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -231,20 +196,6 @@ export default function ClientDashboard() {
     toast({ title: t("profileUpdated") });
   };
 
-  const openOrderDetail = async (order: any) => {
-    setSelectedOrder(order);
-    setMasterInfo(null);
-    if (order.master_id) {
-      const { data } = await supabase.from("master_listings").select("*").eq("user_id", order.master_id).maybeSingle();
-      if (!data) {
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("user_id", order.master_id).maybeSingle();
-        setMasterInfo(profileData);
-      } else {
-        setMasterInfo(data);
-      }
-    }
-  };
-
   const activeOrders = orders.filter(o => !["completed", "cancelled", "reviewed"].includes(o.status));
   const completedOrders = orders.filter(o => ["completed", "reviewed"].includes(o.status));
   const clientReviews = orders.filter(o => o.status === "reviewed");
@@ -280,54 +231,6 @@ export default function ClientDashboard() {
   ];
 
   const displayOrders = tab === "active" ? activeOrders : tab === "completed" ? completedOrders : orders;
-
-  // Order timeline component
-  const OrderTimeline = ({ order }: { order: any }) => {
-    const statusFlow = allStatuses.filter(s => s.key !== "cancelled");
-    const currentIdx = statusFlow.findIndex(s => s.key === order.status);
-    const isCancelled = order.status === "cancelled";
-
-    return (
-      <div className="relative py-2">
-        {isCancelled ? (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-950/20">
-            <XCircle className="w-6 h-6 text-red-500" />
-            <span className="font-medium text-red-700 dark:text-red-400">Заказ отменён</span>
-          </div>
-        ) : (
-          <div className="space-y-0">
-            {statusFlow.map((s, i) => {
-              const isCompleted = i <= currentIdx;
-              const isCurrent = i === currentIdx;
-              const Icon = s.icon;
-              return (
-                <div key={s.key} className="flex items-start gap-3 relative">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
-                      isCompleted
-                        ? isCurrent ? `${s.color} text-white shadow-md` : "bg-green-500 text-white"
-                        : "bg-muted text-muted-foreground"
-                    }`}>
-                      {isCompleted && !isCurrent ? <CheckCircle className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                    </div>
-                    {i < statusFlow.length - 1 && (
-                      <div className={`w-0.5 h-6 ${i < currentIdx ? "bg-green-500" : "bg-muted"}`} />
-                    )}
-                  </div>
-                  <div className={`pb-4 ${isCurrent ? "font-medium text-foreground" : isCompleted ? "text-muted-foreground" : "text-muted-foreground/50"}`}>
-                    <p className="text-sm leading-none pt-1.5">{s.label}</p>
-                    {isCurrent && (
-                      <p className="text-xs text-primary mt-1 animate-pulse">← Текущий статус</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <DashboardLayout title={t("clientCabinet")} navItems={navItems}>
@@ -622,7 +525,7 @@ export default function ClientDashboard() {
                 };
 
                 return (
-                  <Card key={order.id} className="hover:shadow-md transition-all cursor-pointer" onClick={() => openOrderDetail(order)}>
+                  <Card key={order.id} className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/dashboard/orders/${order.id}`)}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1 min-w-0">
@@ -673,120 +576,6 @@ export default function ClientDashboard() {
         </>
       )}
 
-      {/* Order detail dialog */}
-      <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Детали заказа</DialogTitle>
-          </DialogHeader>
-          {selectedOrder && (
-            <div className="space-y-4">
-              <div>
-                <p className="font-semibold text-foreground text-lg">
-                  {selectedOrder.services?.name_ru || selectedOrder.service_categories?.name_ru || "Заказ"}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">{selectedOrder.description}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-muted-foreground">Адрес:</span><p className="font-medium">{selectedOrder.address}</p></div>
-                <div><span className="text-muted-foreground">Телефон:</span><p className="font-medium">{selectedOrder.phone}</p></div>
-                <div><span className="text-muted-foreground">Дата:</span><p className="font-medium">{new Date(selectedOrder.created_at).toLocaleDateString("ru-RU")}</p></div>
-                {selectedOrder.budget > 0 && <div><span className="text-muted-foreground">Бюджет:</span><p className="font-medium">{selectedOrder.budget} сомонӣ</p></div>}
-              </div>
-
-              {/* Master info */}
-              {masterInfo && (
-                <Card className="bg-primary/5 border-primary/20">
-                  <CardContent className="p-4">
-                    <p className="text-xs font-semibold text-primary mb-2">Назначенный мастер</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">
-                        {masterInfo.full_name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">{masterInfo.full_name}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          {masterInfo.average_rating && (
-                            <span className="flex items-center gap-0.5"><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />{masterInfo.average_rating}</span>
-                          )}
-                          {masterInfo.experience_years && <span>{masterInfo.experience_years} лет</span>}
-                          {masterInfo.phone && (
-                            <a href={`tel:${masterInfo.phone}`} className="text-primary hover:underline flex items-center gap-0.5">
-                              <Phone className="w-3 h-3" /> Позвонить
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Timeline */}
-              <div>
-                <p className="text-sm font-semibold text-foreground mb-2">Статус заказа</p>
-                <OrderTimeline order={selectedOrder} />
-              </div>
-
-              {/* Payment section */}
-              {["completed", "reviewed"].includes(selectedOrder.status) && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold">Оплата</span>
-                    <PaymentStatusBadge status={(selectedOrder as any).payment_status || "unpaid"} />
-                  </div>
-                  {(selectedOrder as any).total_amount > 0 && (
-                    <PriceBreakdown
-                      servicePrice={(selectedOrder as any).service_price || (selectedOrder as any).total_amount || selectedOrder.budget}
-                      materialsCost={(selectedOrder as any).materials_cost || 0}
-                      urgencySurcharge={(selectedOrder as any).urgency_surcharge || 0}
-                      totalAmount={(selectedOrder as any).total_amount || selectedOrder.budget || 0}
-                      compact
-                    />
-                  )}
-                  <div className="flex gap-2">
-                    {(!(selectedOrder as any).payment_status || (selectedOrder as any).payment_status === "unpaid" || (selectedOrder as any).payment_status === "failed") && (
-                      <Button className="flex-1 rounded-xl gap-1.5" onClick={() => setPayOrder(selectedOrder)}>
-                        <CreditCard className="w-4 h-4" /> Оплатить сейчас
-                      </Button>
-                    )}
-                    {(selectedOrder as any).payment_status === "paid" && (
-                      <Button variant="outline" className="flex-1 rounded-xl gap-1.5" onClick={() => setReceiptOrder(selectedOrder)}>
-                        <FileText className="w-4 h-4" /> Скачать чек
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Chat button */}
-              {selectedOrder.master_id && !["cancelled"].includes(selectedOrder.status) && (
-                <Button
-                  variant="outline"
-                  className="w-full rounded-xl gap-2"
-                  onClick={() => setChatOrderId(selectedOrder.id)}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Чат с мастером
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Inline chat */}
-          {chatOrderId === selectedOrder?.id && (
-            <div className="h-80 mt-2 -mx-6 -mb-6 border-t border-border">
-              <OrderChat
-                orderId={chatOrderId}
-                isOpen={true}
-                onClose={() => setChatOrderId(null)}
-              />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
       {reviewOrder && (
         <ReviewModal
           isOpen={!!reviewOrder}
@@ -810,7 +599,6 @@ export default function ClientDashboard() {
       <ReceiptDialog
         order={receiptOrder}
         clientName={profile?.full_name}
-        masterName={masterInfo?.full_name}
         open={!!receiptOrder}
         onOpenChange={(open) => { if (!open) setReceiptOrder(null); }}
       />
