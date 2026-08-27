@@ -115,12 +115,12 @@ export default function PriceList() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-500 rounded-full animate-spin" />
-            <p className="text-slate-400 font-medium animate-pulse">{t("priceListLoading")}</p>
+            <p className="text-slate-400 dark:text-slate-500 font-medium animate-pulse">{t("priceListLoading")}</p>
           </div>
         </div>
       </div>
@@ -130,27 +130,27 @@ export default function PriceList() {
   const currentCategory = categories.find(c => c.id === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-[#F0FDF4] pt-12 pb-20 overflow-hidden border-b border-green-100">
+      <section className="relative bg-[#F0FDF4] dark:bg-emerald-950/20 pt-12 pb-20 overflow-hidden border-b border-green-100 dark:border-emerald-900/30">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-left z-10">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4 leading-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
                   {t("priceListHeroTitle1")} <br /> {t("priceListHeroTitle2")} <span className="text-emerald-600">{t("priceListHeroCity")}</span>
                 </h1>
-                <p className="text-lg text-slate-600 mb-10 max-w-xl font-medium">
+                <p className="text-lg text-slate-600 dark:text-slate-300 mb-10 max-w-xl font-medium">
                   {t("priceListHeroDesc")}
                 </p>
 
                 <div className="relative max-w-2xl group mb-10">
                   <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                  <div className="relative flex flex-col sm:flex-row gap-2 bg-white p-2 rounded-2xl shadow-xl border border-slate-100">
+                  <div className="relative flex flex-col sm:flex-row gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
                     <div className="relative flex-1">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                       <Input
                         placeholder={t("priceListSearchPlaceholder")}
                         value={search}
@@ -176,7 +176,7 @@ export default function PriceList() {
             <div className="hidden lg:block w-1/3">
               <div className="relative">
                 <div className="absolute -inset-4 bg-emerald-500/10 blur-3xl rounded-full" />
-                <div className="relative hover-lift hover-glow overflow-hidden rounded-[2.5rem] border border-white bg-white shadow-2xl">
+                <div className="relative hover-lift hover-glow overflow-hidden rounded-[2.5rem] border border-white bg-white dark:bg-slate-900 shadow-2xl">
                    <img src={heroImage} alt="Master" className="h-[420px] w-full object-cover object-[78%_center]" />
                 </div>
               </div>
@@ -186,14 +186,14 @@ export default function PriceList() {
       </section>
 
       {/* Popular Services */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
               <TrendingUp className="w-6 h-6 text-emerald-500" />
               {t("priceListPopularTitle")}
             </h2>
-            <Link to="#" className="text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-1">
+            <Link to="#" className="text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1">
               {t("priceListViewAll")} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -207,14 +207,14 @@ export default function PriceList() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="group h-full border-slate-100 hover:border-emerald-100 hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer hover-lift">
+                <Card className="group h-full border-slate-100 dark:border-slate-800 hover:border-emerald-100 hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer hover-lift">
                   <CardContent className="p-5 flex flex-col items-center text-center">
                     <div className={`w-12 h-12 rounded-2xl ${s.color} flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform`}>
                       <s.icon className="w-6 h-6" />
                     </div>
-                    <h3 className="font-bold text-slate-900 text-sm mb-1 leading-tight">{s.name}</h3>
-                    <p className="text-xs text-slate-400 mb-4">{t("fromPrice")} {s.price} {t("currencySomoni")}</p>
-                    <Button variant="ghost" className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-emerald-500 transition-colors">
+                    <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1 leading-tight">{s.name}</h3>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">{t("fromPrice")} {s.price} {t("currencySomoni")}</p>
+                    <Button variant="ghost" className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 group-hover:text-emerald-500 transition-colors">
                       {t("priceListOrderButton")}
                     </Button>
                   </CardContent>
@@ -226,14 +226,14 @@ export default function PriceList() {
       </section>
 
       {/* All Services with Sidebar */}
-      <section className="py-16 bg-[#F8FAFC]">
+      <section className="py-16 bg-background">
         <div className="container px-4 mx-auto max-w-7xl">
-          <h2 className="text-3xl font-black text-slate-900 mb-10">{t("priceListAllCategoriesTitle")}</h2>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-10">{t("priceListAllCategoriesTitle")}</h2>
           
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
             <div className="w-full lg:w-1/4 space-y-2">
-              <div className="bg-white rounded-3xl p-3 shadow-sm border border-slate-100 sticky top-24">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-3 shadow-sm border border-slate-100 dark:border-slate-800 sticky top-24">
                 {categories.map((cat) => {
                   const Icon = iconMap[cat.name_ru] || Wrench;
                   const isActive = activeCategory === cat.id;
@@ -245,12 +245,12 @@ export default function PriceList() {
                       className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all text-left group ${
                         isActive 
                         ? "bg-emerald-500 text-white shadow-lg shadow-emerald-100" 
-                        : "hover:bg-slate-50 text-slate-600"
+                        : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                       }`}
                     >
-                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400 group-hover:text-emerald-500"}`} />
+                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-500"}`} />
                       <span className="flex-1 font-bold text-sm">{getName(cat)}</span>
-                      <span className={`text-[10px] font-bold ${isActive ? "text-emerald-100" : "text-slate-400"}`}>
+                      <span className={`text-[10px] font-bold ${isActive ? "text-emerald-100" : "text-slate-400 dark:text-slate-500"}`}>
                         {t("priceListMastersCount", { count })}
                       </span>
                     </button>
@@ -261,7 +261,7 @@ export default function PriceList() {
 
             {/* Main Content */}
             <div className="flex-1">
-              <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-sm border border-slate-100 min-h-[600px]">
+              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800 min-h-[600px]">
                 {activeCategory && (
                   <motion.div
                     key={activeCategory}
@@ -276,35 +276,35 @@ export default function PriceList() {
                         })()}
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black text-slate-900">
+                        <h3 className="text-2xl font-black text-slate-900 dark:text-white">
                           {getName(currentCategory)}
                         </h3>
-                        <p className="text-sm text-slate-500">{t("priceListCategoryDefaultDesc")}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t("priceListCategoryDefaultDesc")}</p>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       {(groupedByCategory.get(activeCategory) || []).map((s) => (
-                        <div key={s.id} className="group flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl border border-transparent hover:border-slate-100 hover:bg-slate-50/50 transition-all">
-                          <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-50 group-hover:scale-110 transition-transform">
+                        <div key={s.id} className="group flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl border border-transparent hover:border-slate-100 dark:hover:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-all">
+                          <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0 border border-slate-50 dark:border-slate-800 group-hover:scale-110 transition-transform">
                              {(() => {
                                const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
-                               return <Icon className="w-5 h-5 text-slate-400 group-hover:text-emerald-500" />;
+                               return <Icon className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-emerald-500" />;
                              })()}
                           </div>
                           <div className="flex-1 text-center sm:text-left">
-                            <h4 className="font-bold text-slate-900 mb-0.5">{getName(s)}</h4>
-                            <p className="text-xs text-slate-400 leading-relaxed">{s.note || t("priceListServiceDefaultNote")}</p>
+                            <h4 className="font-bold text-slate-900 dark:text-white mb-0.5">{getName(s)}</h4>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">{s.note || t("priceListServiceDefaultNote")}</p>
                           </div>
                           {/* Цена одной строкой: «от 30 сомони», всё по общей базовой линии. */}
                           <div className="flex min-w-[130px] shrink-0 items-baseline justify-center gap-1.5 whitespace-nowrap sm:justify-end">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t("fromPrice")}</span>
-                            <span className="text-lg font-black text-slate-900">{s.price_min}</span>
-                            <span className="text-xs font-normal text-slate-400">{t("currencySomoni")}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">{t("fromPrice")}</span>
+                            <span className="text-lg font-black text-slate-900 dark:text-white">{s.price_min}</span>
+                            <span className="text-xs font-normal text-slate-400 dark:text-slate-500">{t("currencySomoni")}</span>
                           </div>
                           <Button
                             variant="outline"
-                            className="rounded-xl px-6 border-slate-200 font-bold hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shrink-0"
+                            className="rounded-xl px-6 border-slate-200 dark:border-slate-700 font-bold hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shrink-0"
                             onClick={() => setOrderModal({ open: true, serviceId: s.id, name: getName(s) })}
                           >
                             {t("priceListChooseButton")}
@@ -313,7 +313,7 @@ export default function PriceList() {
                       ))}
                     </div>
                     
-                    <button className="w-full mt-8 py-4 text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 border-t border-slate-50">
+                    <button className="w-full mt-8 py-4 text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 border-t border-slate-50 dark:border-slate-800">
                       {t("priceListShowMore")} <ChevronDown className="w-4 h-4" />
                     </button>
                   </motion.div>
@@ -325,7 +325,7 @@ export default function PriceList() {
       </section>
 
       {/* Stats Bar */}
-      <section className="py-12 bg-white border-y border-slate-100">
+      <section className="py-12 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label={t("priceListStat1")} />
@@ -337,12 +337,12 @@ export default function PriceList() {
       </section>
 
       {/* Info Sections */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-3 gap-12">
             {/* How it works */}
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-8">{t("priceListHowItWorks")}</h3>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8">{t("priceListHowItWorks")}</h3>
               <div className="space-y-8">
                 <StepItem num="1" title={t("priceListStep1Title")} desc={t("priceListStep1Desc")} />
                 <StepItem num="2" title={t("priceListStep2Title")} desc={t("priceListStep2Desc")} />
@@ -353,7 +353,7 @@ export default function PriceList() {
 
             {/* Price Formation */}
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-8">{t("priceListPriceFormationTitle")}</h3>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8">{t("priceListPriceFormationTitle")}</h3>
               <div className="space-y-6">
                 <PriceFactor icon={<LayoutGrid />} title={t("priceListFactor1Title")} desc={t("priceListFactor1Desc")} />
                 <PriceFactor icon={<MapPin />} title={t("priceListFactor2Title")} desc={t("priceListFactor2Desc")} />
@@ -364,7 +364,7 @@ export default function PriceList() {
 
             {/* FAQ */}
             <div>
-              <h3 className="text-2xl font-black text-slate-900 mb-8">{t("priceListFaqTitle")}</h3>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8">{t("priceListFaqTitle")}</h3>
               <Accordion type="single" collapsible className="space-y-3">
                 {[
                   { q: t("priceListFaq1Q"), a: t("priceListFaq1A") },
@@ -373,11 +373,11 @@ export default function PriceList() {
                   { q: t("priceListFaq4Q"), a: t("priceListFaq4A") },
                   { q: t("priceListFaq5Q"), a: t("priceListFaq5A") },
                 ].map((faq, i) => (
-                  <AccordionItem key={i} value={`faq-${i}`} className="border rounded-2xl px-5 bg-slate-50/50 border-transparent hover:border-slate-200 transition-all">
-                    <AccordionTrigger className="py-4 hover:no-underline font-bold text-slate-700 text-sm text-left leading-tight">
+                  <AccordionItem key={i} value={`faq-${i}`} className="border rounded-2xl px-5 bg-slate-50/50 dark:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                    <AccordionTrigger className="py-4 hover:no-underline font-bold text-slate-700 dark:text-slate-200 text-sm text-left leading-tight">
                       {faq.q}
                     </AccordionTrigger>
-                    <AccordionContent className="text-slate-500 text-xs leading-relaxed">
+                    <AccordionContent className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
                       {faq.a}
                     </AccordionContent>
                   </AccordionItem>
@@ -392,7 +392,7 @@ export default function PriceList() {
       </section>
 
       {/* CTA Banner */}
-      <section className="pb-20 bg-white">
+      <section className="pb-20 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="bg-emerald-600 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-emerald-100">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/50 to-transparent pointer-events-none" />
@@ -422,7 +422,7 @@ export default function PriceList() {
                 </a>
                 <Button
                   size="lg"
-                  className="bg-white text-emerald-600 hover:bg-emerald-50 font-black rounded-[1.25rem] px-8 h-16 shadow-xl active:scale-95 transition-all whitespace-nowrap shrink-0"
+                  className="bg-white dark:bg-slate-900 text-emerald-600 hover:bg-emerald-50 font-black rounded-[1.25rem] px-8 h-16 shadow-xl active:scale-95 transition-all whitespace-nowrap shrink-0"
                   onClick={() => setOrderModal({ open: true })}
                 >
                   {t("priceListCtaButton")}
@@ -449,10 +449,10 @@ export default function PriceList() {
 function BenefitItem({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">{icon}</div>
+      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">{icon}</div>
       <div>
-        <p className="text-xs font-black text-slate-900 leading-tight mb-0.5">{title}</p>
-        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{sub}</p>
+        <p className="text-xs font-black text-slate-900 dark:text-white leading-tight mb-0.5">{title}</p>
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">{sub}</p>
       </div>
     </div>
   );
@@ -465,8 +465,8 @@ function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-3xl font-black text-slate-900 leading-none mb-2">{value}</p>
-        <p className="text-xs text-slate-500 font-medium uppercase tracking-widest leading-tight break-words">{label}</p>
+        <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-2">{value}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest leading-tight break-words">{label}</p>
       </div>
     </div>
   );
@@ -479,8 +479,8 @@ function StepItem({ num, title, desc }: { num: string; title: string; desc: stri
         {num}
       </div>
       <div>
-        <h4 className="font-bold text-slate-900 mb-1">{title}</h4>
-        <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+        <h4 className="font-bold text-slate-900 dark:text-white mb-1">{title}</h4>
+        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
       </div>
     </div>
   );
@@ -488,13 +488,13 @@ function StepItem({ num, title, desc }: { num: string; title: string; desc: stri
 
 function PriceFactor({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+    <div className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800">
       <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div>
-        <h4 className="font-bold text-slate-900 text-sm mb-1">{title}</h4>
-        <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+        <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">{title}</h4>
+        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
       </div>
     </div>
   );

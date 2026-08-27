@@ -205,7 +205,7 @@ const BecomeMaster = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <Header />
       <section className="relative overflow-hidden pt-10 pb-24">
         <div className="absolute inset-x-0 top-0 h-96 bg-emerald-100/80 blur-3xl" />
@@ -219,10 +219,10 @@ const BecomeMaster = () => {
               <Badge className="mb-6 rounded-full bg-emerald-50 text-emerald-700 px-4 py-2 text-sm font-bold tracking-[0.18em] uppercase">
                 Работа в Душанбе
               </Badge>
-              <h1 className="text-4xl md:text-5xl xl:text-6xl font-black tracking-tight text-slate-900 leading-tight mb-6">
+              <h1 className="text-4xl md:text-5xl xl:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight mb-6">
                 Станьте мастером <span className="text-emerald-600">в Душанбе</span> и зарабатывайте каждый день
               </h1>
-              <p className="text-lg md:text-xl text-slate-600 max-w-2xl mb-8">
+              <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mb-8">
                 Мы подключаем вас к проверенным клиентам, организуем заказы и поддерживаем работу 24/7.
               </p>
               <div className="grid gap-3 max-w-xl mb-10">
@@ -232,9 +232,9 @@ const BecomeMaster = () => {
                   "Работаете когда удобно",
                   "Безопасные клиенты",
                 ].map((item) => (
-                  <div key={item} className="flex items-center gap-3 rounded-3xl bg-white/80 border border-slate-200 px-5 py-3 shadow-sm">
+                  <div key={item} className="flex items-center gap-3 rounded-3xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 px-5 py-3 shadow-sm">
                     <CheckCircle className="w-5 h-5 text-emerald-500" />
-                    <span className="text-sm font-semibold text-slate-700">{item}</span>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{item}</span>
                   </div>
                 ))}
               </div>
@@ -248,7 +248,7 @@ const BecomeMaster = () => {
                 <Button
                   asChild
                   variant="outline"
-                  className="rounded-full h-14 px-8 text-slate-700 border-slate-300 hover:bg-slate-50 hover-soft"
+                  className="rounded-full h-14 px-8 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover-soft"
                 >
                   <a href="https://wa.me/992979117007" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
                     <MessageCircle className="w-5 h-5 text-emerald-500" />
@@ -265,7 +265,7 @@ const BecomeMaster = () => {
             >
               <div className="relative mx-auto max-w-2xl lg:max-w-none">
                 <div className="absolute -left-10 -top-10 w-48 h-48 rounded-full bg-emerald-200/50 blur-3xl" />
-                <div className="absolute -right-16 top-24 w-64 h-64 rounded-full bg-slate-200/70 blur-3xl" />
+                <div className="absolute -right-16 top-24 w-64 h-64 rounded-full bg-slate-200/70 dark:bg-slate-700/70 blur-3xl" />
                 <div className="relative overflow-hidden rounded-[3rem] shadow-[0_40px_120px_rgba(15,23,42,0.08)] hover-image-zoom hover-lift">
                   <img
                     src={heroImage}
@@ -283,43 +283,43 @@ const BecomeMaster = () => {
             transition={{ delay: 0.3 }}
             className="mt-16 grid gap-6 md:grid-cols-3"
           >
-            <div className="rounded-[2.25rem] border border-slate-200 bg-white/95 p-6 shadow-xl hover-soft hover-glow flex flex-col justify-between">
+            <div className="rounded-[2.25rem] border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-6 shadow-xl hover-soft hover-glow flex flex-col justify-between">
               <div className="mb-4 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-emerald-100 text-emerald-700">
                   <Clock className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">Гибкий график</p>
-                  <p className="font-bold text-slate-900">Работайте в удобное время</p>
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Гибкий график</p>
+                  <p className="font-bold text-slate-900 dark:text-white">Работайте в удобное время</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-500 leading-relaxed">Вы сами выбираете, когда принимать заказы и сколько заявок брать в день.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Вы сами выбираете, когда принимать заказы и сколько заявок брать в день.</p>
             </div>
 
-            <div className="rounded-[2.25rem] border border-slate-200 bg-white/95 p-6 shadow-xl hover-soft hover-glow flex flex-col justify-between">
+            <div className="rounded-[2.25rem] border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-6 shadow-xl hover-soft hover-glow flex flex-col justify-between">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 rounded-3xl bg-emerald-600 text-white flex items-center justify-center">
                   <Zap className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">Мастер ТЧ</p>
-                  <p className="font-bold text-slate-900">Ремонт и обслуживание</p>
+                  <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">Мастер ТЧ</p>
+                  <p className="font-bold text-slate-900 dark:text-white">Ремонт и обслуживание</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-500 leading-relaxed">Средний доход наших мастеров — от 3000 сомони при активной работе.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Средний доход наших мастеров — от 3000 сомони при активной работе.</p>
             </div>
 
-            <div className="rounded-[2.25rem] border border-slate-200 bg-white/95 p-6 shadow-xl hover-soft hover-glow flex flex-col justify-between">
+            <div className="rounded-[2.25rem] border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-6 shadow-xl hover-soft hover-glow flex flex-col justify-between">
               <div className="mb-4 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-600">
                   <Shield className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">Надёжная платформа</p>
-                  <p className="font-bold text-slate-900">Проверенные клиенты</p>
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Надёжная платформа</p>
+                  <p className="font-bold text-slate-900 dark:text-white">Проверенные клиенты</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-500 leading-relaxed">Все заявки проходят через сервис, а поддержка помогает на каждом этапе работы.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Все заявки проходят через сервис, а поддержка помогает на каждом этапе работы.</p>
             </div>
           </motion.div>
 
@@ -330,13 +330,13 @@ const BecomeMaster = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
-                className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-xl transition-shadow hover-lift hover-glow"
+                className="rounded-[2rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-xl transition-shadow hover-lift hover-glow"
               >
                 <div className="w-12 h-12 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
                   <benefit.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{benefit.title}</h3>
-                <p className="text-sm text-slate-500">{benefit.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{benefit.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{benefit.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -359,7 +359,7 @@ const BecomeMaster = () => {
 
           <div className="mt-24 text-center">
             <p className="text-sm uppercase font-bold tracking-[0.3em] text-emerald-500">Как это работает</p>
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mt-4">Всё просто: регистрация, подтверждение и первые заказы</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mt-4">Всё просто: регистрация, подтверждение и первые заказы</h2>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -369,13 +369,13 @@ const BecomeMaster = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="rounded-[2.5rem] border border-slate-200 bg-white p-8 text-center shadow-sm hover:shadow-xl transition-shadow hover-lift hover-glow"
+                className="rounded-[2.5rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center shadow-sm hover:shadow-xl transition-shadow hover-lift hover-glow"
               >
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-600">
                   <step.icon className="w-7 h-7" />
                 </div>
-                <p className="text-xl font-bold text-slate-900 mb-3">{step.title}</p>
-                <p className="text-sm text-slate-500">{step.description}</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white mb-3">{step.title}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{step.description}</p>
                 <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white font-black text-lg">
                   {index + 1}
                 </div>
@@ -385,25 +385,25 @@ const BecomeMaster = () => {
 
           <div className="mt-24 grid gap-10 lg:grid-cols-12 items-start" id="apply-form">
             <div className="lg:col-span-5">
-              <div className="rounded-[3rem] border border-slate-200 bg-white p-10 shadow-sm hover-soft hover-glow">
+              <div className="rounded-[3rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-10 shadow-sm hover-soft hover-glow">
                 <p className="text-sm uppercase tracking-[0.24em] text-emerald-600 mb-4 font-bold">Готовы начать</p>
-                <h2 className="text-3xl font-black text-slate-900 mb-6">Оставьте заявку и работайте на своих условиях</h2>
-                <p className="text-slate-600 mb-8">
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-6">Оставьте заявку и работайте на своих условиях</h2>
+                <p className="text-slate-600 dark:text-slate-300 mb-8">
                   Заполните простую форму, и наш менеджер свяжется с вами для подтверждения.
                 </p>
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-4">
+                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 dark:bg-slate-800 p-4">
                     <Phone className="w-5 h-5 text-emerald-500" />
                     <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Позвоните</p>
-                      <p className="font-semibold text-slate-900">+992 979 117 007</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Позвоните</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">+992 979 117 007</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-4">
+                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 dark:bg-slate-800 p-4">
                     <MessageCircle className="w-5 h-5 text-emerald-500" />
                     <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Напишите</p>
-                      <p className="font-semibold text-slate-900">WhatsApp / Telegram</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Напишите</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">WhatsApp / Telegram</p>
                     </div>
                   </div>
                 </div>
@@ -418,17 +418,17 @@ const BecomeMaster = () => {
                   </div>
                 </div>
               ) : !user ? (
-                <Card className="rounded-[3rem] border border-slate-200 bg-white shadow-sm hover-soft hover-glow">
+                <Card className="rounded-[3rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm hover-soft hover-glow">
                   <CardContent className="p-12 text-center">
                     <Download className="mx-auto mb-6 h-16 w-16 text-emerald-500" />
-                    <h3 className="text-2xl font-black text-slate-900 mb-4">Установите приложение</h3>
-                    <p className="text-slate-500 mb-8">Установите приложение Мастер ТЧ, чтобы отправить заявку на статус мастера и начать получать заказы.</p>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Установите приложение</h3>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8">Установите приложение Мастер ТЧ, чтобы отправить заявку на статус мастера и начать получать заказы.</p>
                     <Button onClick={() => navigate("/install-app")} className="mb-2 rounded-full bg-emerald-600 text-white px-10 h-14 hover:bg-emerald-700">
                       Установить приложение
                     </Button>
                     <div className="hidden">
-                    <h3 className="text-2xl font-black text-slate-900 mb-4">Войдите в аккаунт</h3>
-                    <p className="text-slate-500 mb-8">Авторизуйтесь, чтобы отправить заявку на статус мастера и начать получать заказы.</p>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Войдите в аккаунт</h3>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8">Авторизуйтесь, чтобы отправить заявку на статус мастера и начать получать заказы.</p>
                     <Button onClick={() => navigate("/install-app")} className="rounded-full bg-emerald-600 text-white px-10 h-14 hover:bg-emerald-700">
                       Войти / Регистрация
                     </Button>
@@ -436,25 +436,25 @@ const BecomeMaster = () => {
                   </CardContent>
                 </Card>
               ) : existingApp && existingApp.status !== "rejected" ? (
-                <Card className={`rounded-[3rem] border border-slate-200 p-10 text-center hover-soft hover-glow ${statusConfig[existingApp.status]?.bg || "bg-slate-50"}`}>
+                <Card className={`rounded-[3rem] border border-slate-200 dark:border-slate-700 p-10 text-center hover-soft hover-glow ${statusConfig[existingApp.status]?.bg || "bg-slate-50 dark:bg-slate-800"}`}>
                   <CardContent>
                     {(() => {
                       const status = statusConfig[existingApp.status] || statusConfig.pending;
                       const StatusIcon = status.icon;
                       return (
                         <>
-                          <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[2.5rem] bg-white ${status.bg}`}>
+                          <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[2.5rem] bg-white dark:bg-slate-900 ${status.bg}`}>
                             <StatusIcon className={`w-10 h-10 ${status.color}`} />
                           </div>
                           <Badge className={`mb-6 inline-flex rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.25em] ${status.color}`}>
                             {status.label}
                           </Badge>
-                          <h3 className="text-2xl font-black text-slate-900 mb-4">Статус заявки</h3>
-                          <p className="text-slate-500 mb-8">{status.message}</p>
+                          <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Статус заявки</h3>
+                          <p className="text-slate-500 dark:text-slate-400 mb-8">{status.message}</p>
                         </>
                       );
                     })()}
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400 mb-8">Отправлено {new Date(existingApp.created_at).toLocaleDateString("ru-RU")}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500 mb-8">Отправлено {new Date(existingApp.created_at).toLocaleDateString("ru-RU")}</p>
                     {existingApp.status === "approved" && (
                       <Button onClick={() => navigate("/master-dashboard")} className="rounded-full bg-emerald-600 px-10 h-14 text-white hover:bg-emerald-700">
                         Перейти в кабинет
@@ -463,9 +463,9 @@ const BecomeMaster = () => {
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="rounded-[3rem] border border-slate-200 bg-white shadow-sm hover-soft hover-glow">
+                <Card className="rounded-[3rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm hover-soft hover-glow">
                   <CardContent className="p-10">
-                    <h3 className="text-3xl font-black text-slate-900 mb-8">Оформить заявку</h3>
+                    <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-8">Оформить заявку</h3>
                     {existingApp?.status === "rejected" && (
                       <div className="mb-8 rounded-[2rem] bg-red-50 p-5 border border-red-100 text-red-700">
                         <div className="flex items-start gap-3">
@@ -480,42 +480,42 @@ const BecomeMaster = () => {
                     <form onSubmit={handleSubmit} className="space-y-5">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Имя</label>
+                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Имя</label>
                           <Input
                             placeholder="Назаров Фарход"
                             value={formData.full_name}
                             onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                             required
-                            className="h-14 rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500"
+                            className="h-14 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Телефон</label>
+                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Телефон</label>
                           <Input
                             placeholder="+992 900 00 00 00"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             required
                             type="tel"
-                            className="h-14 rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500"
+                            className="h-14 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500"
                           />
                         </div>
                       </div>
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Email</label>
+                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Email</label>
                           <Input
                             placeholder="email@example.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             type="email"
-                            className="h-14 rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500"
+                            className="h-14 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Район</label>
+                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Район</label>
                           <Select value={formData.district} onValueChange={(value) => setFormData({ ...formData, district: value })}>
-                            <SelectTrigger className="h-14 rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500">
+                            <SelectTrigger className="h-14 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500">
                               <SelectValue placeholder="Выберите район" />
                             </SelectTrigger>
                             <SelectContent>
@@ -530,12 +530,12 @@ const BecomeMaster = () => {
                       </div>
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Специализация</label>
+                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Специализация</label>
                           <Select
                             value={formData.specialization}
                             onValueChange={(value) => setFormData({ ...formData, specialization: value })}
                           >
-                            <SelectTrigger className="h-14 rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500">
+                            <SelectTrigger className="h-14 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500">
                               <SelectValue placeholder="Выберите специализацию" />
                             </SelectTrigger>
                             <SelectContent>
@@ -548,7 +548,7 @@ const BecomeMaster = () => {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Опыт (лет)</label>
+                          <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Опыт (лет)</label>
                           <Input
                             placeholder="5"
                             type="number"
@@ -556,18 +556,18 @@ const BecomeMaster = () => {
                             max={50}
                             value={formData.experience_years}
                             onChange={(e) => setFormData({ ...formData, experience_years: e.target.value })}
-                            className="h-14 rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500"
+                            className="h-14 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500"
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">О себе</label>
+                        <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">О себе</label>
                         <Textarea
                           placeholder="Расскажите о своем опыте и специализации"
                           value={formData.description}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                           rows={4}
-                          className="rounded-3xl bg-slate-50 border-none focus-visible:ring-emerald-500 p-5"
+                          className="rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500 p-5"
                         />
                       </div>
                       <Button
@@ -586,14 +586,14 @@ const BecomeMaster = () => {
 
           <div className="mt-20 grid gap-6 md:grid-cols-3">
             {reviews.map((review, index) => (
-              <Card key={review.name} className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm hover:shadow-xl transition-shadow">
+              <Card key={review.name} className="rounded-[2.5rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 shadow-sm hover:shadow-xl transition-shadow">
                 <CardContent className="p-0">
                   <div className="flex items-center gap-4 mb-5">
-                    <div className="h-14 w-14 rounded-3xl bg-slate-50 flex items-center justify-center text-emerald-600 text-lg font-black">
+                    <div className="h-14 w-14 rounded-3xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-emerald-600 text-lg font-black">
                       {review.name.slice(0, 1)}
                     </div>
                     <div>
-                      <p className="font-black text-slate-900">{review.name}</p>
+                      <p className="font-black text-slate-900 dark:text-white">{review.name}</p>
                       <p className="text-xs uppercase tracking-[0.24em] text-emerald-600">{review.spec}</p>
                     </div>
                   </div>
@@ -602,7 +602,7 @@ const BecomeMaster = () => {
                       <Star key={starIndex} className="w-4 h-4" />
                     ))}
                   </div>
-                  <p className="text-sm leading-relaxed text-slate-500">“{review.text}”</p>
+                  <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">“{review.text}”</p>
                 </CardContent>
               </Card>
             ))}

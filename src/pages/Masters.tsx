@@ -175,11 +175,11 @@ export default function Masters() {
   const activeFilters = [category !== "all", district !== "all", minRating > 0].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-[#F0FDF4] pt-8 pb-12 overflow-hidden border-b border-green-100">
+      <section className="bg-[#F0FDF4] dark:bg-emerald-950/20 pt-8 pb-12 overflow-hidden border-b border-green-100 dark:border-emerald-900/30">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-8 relative">
             
@@ -189,7 +189,7 @@ export default function Masters() {
               animate={{ opacity: 1, x: 0 }}
               className="hidden lg:block w-1/4"
             >
-              <div className="hover-image-zoom hover-soft overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-lg">
+              <div className="hover-image-zoom hover-soft overflow-hidden rounded-[2rem] border border-white/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/70 shadow-lg">
                 <img src={heroImage} alt="Master" className="h-[360px] w-full object-cover object-center" />
               </div>
             </motion.div>
@@ -197,13 +197,13 @@ export default function Masters() {
             {/* Center Content */}
             <div className="flex-1 text-center lg:px-4">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2">{t("mastersHeroTitle")}</h1>
-                <p className="text-lg text-slate-600 mb-8 font-medium">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-2">{t("mastersHeroTitle")}</h1>
+                <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 font-medium">
                   {t("mastersHeroSubtitle", { count: masters.length })}
                 </p>
 
-                <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl border border-white max-w-2xl mx-auto mb-10 shadow-sm">
-                  <p className="text-slate-600 leading-relaxed text-sm md:text-base">
+                <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-3xl border border-white dark:border-slate-800 max-w-2xl mx-auto mb-10 shadow-sm">
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm md:text-base">
                     {t("mastersHeroDesc")}
                   </p>
                 </div>
@@ -222,7 +222,7 @@ export default function Masters() {
               animate={{ opacity: 1, x: 0 }}
               className="w-full lg:w-1/4 max-w-sm group"
             >
-              <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 relative overflow-hidden hover-lift hover-glow flex flex-col h-full">
+              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-slate-800 relative overflow-hidden hover-lift hover-glow flex flex-col h-full">
                 <div className="relative h-48 shrink-0 overflow-hidden">
                   <img
                     src={consultantImage}
@@ -237,8 +237,8 @@ export default function Masters() {
                   </div>
                 </div>
                 <div className="p-7 pt-4 flex flex-col flex-1">
-                  <h3 className="text-xl font-black text-slate-900 mb-2 leading-tight">{t("mastersHelpTitle")}</h3>
-                  <p className="text-sm text-slate-500 mb-6 leading-relaxed flex-1">
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 leading-tight">{t("mastersHelpTitle")}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed flex-1">
                     {t("mastersHelpDesc")}
                   </p>
                   <Button
@@ -261,17 +261,17 @@ export default function Masters() {
           {/* Search Bar Row */}
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="relative flex-1 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
               <Input
                 placeholder={t("mastersSearchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-12 h-14 bg-white border-slate-200 rounded-2xl shadow-sm focus-visible:ring-emerald-500 focus-visible:border-emerald-500 text-lg"
+                className="pl-12 h-14 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm focus-visible:ring-emerald-500 focus-visible:border-emerald-500 text-lg"
               />
             </div>
             <Button
               variant="outline"
-              className={`h-14 gap-2 rounded-2xl shrink-0 px-8 border-slate-200 hover:border-emerald-500 hover:text-emerald-500 transition-all font-semibold ${showFilters ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : 'bg-white'}`}
+              className={`h-14 gap-2 rounded-2xl shrink-0 px-8 border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-500 transition-all font-semibold ${showFilters ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : 'bg-white dark:bg-slate-900'}`}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="w-5 h-5" />
@@ -290,13 +290,13 @@ export default function Masters() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8 p-6 rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden"
+              className="mb-8 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("mastersFilterCategory")}</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 block">{t("mastersFilterCategory")}</label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger className="h-12 rounded-xl border-slate-200">
+                    <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-slate-700">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -308,9 +308,9 @@ export default function Masters() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("mastersFilterDistrict")}</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 block">{t("mastersFilterDistrict")}</label>
                   <Select value={district} onValueChange={setDistrict}>
-                    <SelectTrigger className="h-12 rounded-xl border-slate-200">
+                    <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-slate-700">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -322,9 +322,9 @@ export default function Masters() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("mastersFilterSort")}</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 block">{t("mastersFilterSort")}</label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="h-12 rounded-xl border-slate-200">
+                    <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-slate-700">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -338,7 +338,7 @@ export default function Masters() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 block">
                     {t("mastersMinRatingLabel")} {minRating > 0 ? minRating.toFixed(1) : t("mastersAny")}
                   </label>
                   <div className="pt-4">
@@ -356,7 +356,7 @@ export default function Masters() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="mt-6 text-slate-400 hover:text-red-500 transition-colors"
+                  className="mt-6 text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors"
                   onClick={() => { setCategory("all"); setDistrict("all"); setMinRating(0); }}
                 >
                   <X className="w-4 h-4 mr-2" /> {t("mastersResetFilters")}
@@ -366,17 +366,17 @@ export default function Masters() {
           )}
 
           {/* Results Summary Row */}
-          <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover-soft">
+          <div className="flex items-center justify-between mb-6 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover-soft">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-sm font-semibold text-slate-700">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {t("mastersFoundCount", { count: filtered.length })}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium whitespace-nowrap">{t("mastersSortShortLabel")}</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-medium whitespace-nowrap">{t("mastersSortShortLabel")}</span>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="h-8 border-none bg-transparent p-0 font-bold text-slate-700 shadow-none focus:ring-0 w-[140px] gap-1 hover:text-emerald-500 transition-colors">
+                <SelectTrigger className="h-8 border-none bg-transparent p-0 font-bold text-slate-700 dark:text-slate-200 shadow-none focus:ring-0 w-[140px] gap-1 hover:text-emerald-500 transition-colors">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="end">
@@ -395,14 +395,14 @@ export default function Masters() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div key={i} className="h-80 bg-slate-100 animate-pulse rounded-3xl" />
+                <div key={i} className="h-80 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-3xl" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+            <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
               <Users className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2">{t("mastersEmptyTitle")}</h3>
-              <p className="text-slate-500">{t("mastersEmptyDesc")}</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("mastersEmptyTitle")}</h3>
+              <p className="text-slate-500 dark:text-slate-400">{t("mastersEmptyDesc")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -464,8 +464,8 @@ function BenefitItem({ icon, text, subtext }: { icon: React.ReactNode; text: str
     <div className="group flex items-center gap-3 text-left cursor-default transition-transform duration-300 hover:translate-x-1">
       <div className="bg-emerald-50 p-2 rounded-full border border-emerald-100 transition-colors duration-300 group-hover:bg-emerald-500 [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">{icon}</div>
       <div>
-        <p className="text-sm font-bold text-slate-900 leading-tight">{text}</p>
-        <p className="text-[11px] text-slate-500">{subtext}</p>
+        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{text}</p>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400">{subtext}</p>
       </div>
     </div>
   );
@@ -473,12 +473,12 @@ function BenefitItem({ icon, text, subtext }: { icon: React.ReactNode; text: str
 
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="group bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center text-center gap-3 hover-soft hover-glow hover:border-emerald-200 transition-colors">
+    <div className="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col items-center text-center gap-3 hover-soft hover-glow hover:border-emerald-200 transition-colors">
       <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110 [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">
         {icon}
       </div>
-      <h4 className="font-bold text-slate-900">{title}</h4>
-      <p className="text-xs text-slate-500">{desc}</p>
+      <h4 className="font-bold text-slate-900 dark:text-white">{title}</h4>
+      <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
     </div>
   );
 }
@@ -518,7 +518,7 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
       transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
     >
       <Link to={`/masters/${master.id}`}>
-        <Card className="group h-full bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer border-slate-100 rounded-[2.5rem] relative hover-lift hover-glow">
+        <Card className="group h-full bg-white dark:bg-slate-900 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer border-slate-100 dark:border-slate-800 rounded-[2.5rem] relative hover-lift hover-glow">
           {/* Top category bar */}
           <div className={`absolute top-0 left-0 right-0 h-1 ${color} opacity-80`} />
           
@@ -530,7 +530,7 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <h3 className="font-bold text-slate-900 text-base group-hover:text-emerald-600 transition-colors truncate">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-emerald-600 transition-colors truncate">
                     {master.full_name}
                   </h3>
                   {master.is_top_master && (
@@ -539,8 +539,8 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-bold text-slate-800">{master.average_rating}</span>
-                  <span className="text-[11px] text-slate-400">{t("mastersReviewsCount", { count: master.total_reviews })}</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{master.average_rating}</span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500">{t("mastersReviewsCount", { count: master.total_reviews })}</span>
                 </div>
               </div>
             </div>
@@ -548,7 +548,7 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
             {/* Badges */}
             <div className="flex flex-wrap gap-1.5 mb-5">
               {getDisplayCategories(master.service_categories, search).map((cat) => (
-                <span key={cat} className="px-2.5 py-1 bg-slate-50 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                <span key={cat} className="px-2.5 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                   {t(CATEGORY_LABEL_KEYS[cat] ?? "") || cat}
                 </span>
               ))}
@@ -556,36 +556,36 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
 
             {/* Details */}
             <div className="space-y-2 mb-6 flex-1">
-              <div className="flex items-center gap-2 text-[11px] text-slate-500">
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
                 <Clock className="w-3.5 h-3.5 text-slate-300" />
                 <span>{t("mastersYearsExp", { years: master.experience_years })}</span>
                 <span className="text-slate-200">•</span>
                 <span>{t("mastersJobsCount", { count: master.completed_orders })}</span>
               </div>
-              <div className="flex items-center gap-2 text-[11px] text-slate-500">
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
                 <MapPin className="w-3.5 h-3.5 text-slate-300" />
                 <span className="truncate">{t("mastersCityDistricts", { districts: master.working_districts.map((d) => t(DISTRICT_LABEL_KEYS[d] ?? "") || d).join(", ") })}</span>
               </div>
             </div>
 
             {/* Footer: Price + Actions */}
-            <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
+            <div className="pt-4 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
               <div>
-                <p className="text-[10px] text-slate-400 font-medium">{t("fromPrice")}</p>
-                <p className="text-lg font-black text-slate-900 leading-none">
-                  {master.price_min} <span className="text-xs font-normal text-slate-400">{t("mastersCurrencyShort")}</span>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{t("fromPrice")}</p>
+                <p className="text-lg font-black text-slate-900 dark:text-white leading-none">
+                  {master.price_min} <span className="text-xs font-normal text-slate-400 dark:text-slate-500">{t("mastersCurrencyShort")}</span>
                 </p>
               </div>
               <div className="flex gap-2">
                 <button 
                   onClick={(e) => { e.preventDefault(); window.open(`tel:${master.phone}`); }}
-                  className="w-9 h-9 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 hover:border-emerald-100 transition-all shadow-sm hover-soft"
+                  className="w-9 h-9 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-emerald-50 hover:text-emerald-500 hover:border-emerald-100 transition-all shadow-sm hover-soft"
                 >
                   <Phone className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={(e) => { e.preventDefault(); window.open(`https://wa.me/${master.phone.replace(/\D/g, "")}`); }}
-                  className="w-9 h-9 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 hover:border-emerald-100 transition-all shadow-sm hover-soft"
+                  className="w-9 h-9 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-emerald-50 hover:text-emerald-500 hover:border-emerald-100 transition-all shadow-sm hover-soft"
                 >
                   <MessageCircle className="w-4 h-4" />
                 </button>

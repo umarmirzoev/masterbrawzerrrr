@@ -68,7 +68,7 @@ const Index = () => {
     { icon: <Thermometer className="text-red-500" />, name: "Отопление", nameKey: "catHeating", priceKey: "catHeatingPrice", color: "bg-red-50" },
     { icon: <Construction className="text-pink-500" />, name: "Мелкие работы", nameKey: "catSmallJobs", priceKey: "catSmallJobsPrice", color: "bg-pink-50" },
     { icon: <Layers className="text-orange-600" />, name: "Полы и ламинат", nameKey: "catFloors", priceKey: "catFloorsPrice", color: "bg-orange-50" },
-    { icon: <Grid className="text-slate-500" />, name: "Другие услуги", nameKey: "catOtherServices", priceKey: "catOtherServicesPrice", color: "bg-slate-50" },
+    { icon: <Grid className="text-slate-500 dark:text-slate-400" />, name: "Другие услуги", nameKey: "catOtherServices", priceKey: "catOtherServicesPrice", color: "bg-slate-50 dark:bg-slate-800" },
   ];
 
   const [topMasters, setTopMasters] = useState<TopMasterCard[]>([]);
@@ -124,7 +124,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-background selection:bg-emerald-100 selection:text-emerald-900">
       <Header />
 
       {/* Hero Section */}
@@ -151,21 +151,21 @@ const Index = () => {
                   {t("heroBadgeText")}
                 </motion.div>
 
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-8 leading-[1.05] tracking-tight">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white mb-8 leading-[1.05] tracking-tight">
                   {t("heroTitle")}
                 </h1>
 
-                <p className="text-xl text-slate-500 mb-12 max-w-lg leading-relaxed font-medium">
+                <p className="text-xl text-slate-500 dark:text-slate-400 mb-12 max-w-lg leading-relaxed font-medium">
                   {t("heroDescription")}
                 </p>
 
                 <div className="relative max-w-xl mb-12 group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-500" />
-                  <div className="relative flex items-center bg-white p-2.5 rounded-2xl border border-slate-100 shadow-2xl shadow-slate-200/50">
-                    <Search className="w-6 h-6 text-slate-400 ml-5 mr-3" />
+                  <div className="relative flex items-center bg-white dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50">
+                    <Search className="w-6 h-6 text-slate-400 dark:text-slate-500 ml-5 mr-3" />
                     <Input 
                       placeholder={t("heroSearchPlaceholder")} 
-                      className="border-0 focus-visible:ring-0 text-slate-900 text-lg font-medium placeholder:text-slate-400 h-14"
+                      className="border-0 focus-visible:ring-0 text-slate-900 dark:text-white text-lg font-medium placeholder:text-slate-400 dark:text-slate-500 h-14"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -195,17 +195,17 @@ const Index = () => {
                           {item.i}
                         </motion.div>
                       ))}
-                      <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-50 flex items-center justify-center text-[11px] font-black text-slate-400 shadow-xl">
+                      <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-[11px] font-black text-slate-400 dark:text-slate-500 shadow-xl">
                         +500
                       </div>
                    </div>
                    <div className="space-y-1">
-                      <p className="text-sm font-black text-slate-900 tracking-tight">{t("trustMastersInDushanbe")}</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{t("trustMastersInDushanbe")}</p>
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
                           {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
                         </div>
-                        <span className="text-xs font-bold text-slate-400">{t("trustRatingDesc")}</span>
+                        <span className="text-xs font-bold text-slate-400 dark:text-slate-500">{t("trustRatingDesc")}</span>
                       </div>
                    </div>
                 </div>
@@ -239,12 +239,12 @@ const Index = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.8, duration: 0.8 }}
                     whileHover={{ scale: 1.03 }}
-                    className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-20 bg-white/80 backdrop-blur-xl p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[1.75rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/50 w-max max-w-[calc(100%-2rem)] cursor-default"
+                    className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[1.75rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/50 w-max max-w-[calc(100%-2rem)] cursor-default"
                   >
                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter">4.8</p>
+                        <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tighter">4.8</p>
                         <div className="text-right">
-                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("floatingCardRating")}</p>
+                           <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t("floatingCardRating")}</p>
                            <div className="flex gap-0.5 justify-end">
                               {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
                            </div>
@@ -263,7 +263,7 @@ const Index = () => {
       </section>
 
       {/* Features Bar */}
-      <section className="py-12 bg-white border-b border-slate-50">
+      <section className="py-12 bg-white dark:bg-slate-900 border-b border-slate-50 dark:border-slate-800">
         <div className="container px-4 mx-auto max-w-7xl">
            <motion.div 
              variants={staggerContainer}
@@ -281,15 +281,15 @@ const Index = () => {
       </section>
 
       {/* Services Section */}
-      <section className="py-28 bg-white">
+      <section className="py-28 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
            <motion.div 
              {...fadeInUp}
              className="flex flex-col md:flex-row items-start md:items-center justify-between mb-16 gap-6"
            >
               <div>
-                <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">{t("categoriesTitle")}</h2>
-                <p className="text-lg text-slate-500 font-medium">{t("categoriesDescription")}</p>
+                <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{t("categoriesTitle")}</h2>
+                <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">{t("categoriesDescription")}</p>
               </div>
               <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
                  {t("viewAllCategories")} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -316,13 +316,13 @@ const Index = () => {
                     borderColor: "rgba(16, 185, 129, 0.3)"
                   }}
                   onClick={() => handleCategoryClick(service.name)}
-                  className="group p-7 bg-white rounded-3xl border border-slate-100 transition-all cursor-pointer text-center md:text-left"
+                  className="group p-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all cursor-pointer text-center md:text-left"
                 >
                   <div className={`w-14 h-14 rounded-2xl ${service.color} flex items-center justify-center mb-6 mx-auto md:mx-0 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500`}>
                      {React.cloneElement(service.icon as React.ReactElement, { className: "w-7 h-7" })}
                   </div>
-                  <h3 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-600 transition-colors">{t(service.nameKey)}</h3>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t(service.priceKey)}</p>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2 group-hover:text-emerald-600 transition-colors">{t(service.nameKey)}</h3>
+                  <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t(service.priceKey)}</p>
                 </motion.div>
               ))}
            </motion.div>
@@ -331,7 +331,7 @@ const Index = () => {
 
       {/* Best Masters Section */}
       {topMasters.length > 0 && (
-      <section className="py-28 bg-[#f9fafb] relative overflow-hidden">
+      <section className="py-28 bg-[#f9fafb] dark:bg-slate-900/60 relative overflow-hidden">
         <div className="absolute top-0 left-1/4 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-50/50 via-transparent to-transparent opacity-50 -z-10" />
         
         <div className="container px-4 mx-auto max-w-7xl">
@@ -340,8 +340,8 @@ const Index = () => {
              className="flex flex-col md:flex-row items-start md:items-center justify-between mb-16 gap-6"
            >
               <div>
-                <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">{t("homeBestMastersTitle")}</h2>
-                <p className="text-lg text-slate-500 font-medium">{t("homeBestMastersSubtitle")}</p>
+                <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{t("homeBestMastersTitle")}</h2>
+                <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">{t("homeBestMastersSubtitle")}</p>
               </div>
               <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
                  {t("homeAllMastersButton")} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -364,7 +364,7 @@ const Index = () => {
                   }}
                   whileHover={{ y: -8 }}
                 >
-                  <Card className="border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden group rounded-[2rem] h-full">
+                  <Card className="border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden group rounded-[2rem] h-full">
                     <CardContent className="p-6">
                       <div className="relative mb-6">
                         <motion.div 
@@ -373,17 +373,17 @@ const Index = () => {
                         >
                            {master.initials}
                         </motion.div>
-                        <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-lg">
+                        <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 p-1 rounded-full shadow-lg">
                            <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
                         </div>
                       </div>
-                      <h3 className="text-base font-black text-slate-900 mb-2 leading-tight group-hover:text-emerald-600 transition-colors">{master.name}</h3>
+                      <h3 className="text-base font-black text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-emerald-600 transition-colors">{master.name}</h3>
                       <div className="flex items-center gap-1.5 mb-5">
                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                         <span className="text-xs font-black text-slate-900">{master.rating}</span>
-                         <span className="text-xs font-bold text-slate-400">({master.reviews})</span>
+                         <span className="text-xs font-black text-slate-900 dark:text-white">{master.rating}</span>
+                         <span className="text-xs font-bold text-slate-400 dark:text-slate-500">({master.reviews})</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-500 font-black uppercase tracking-widest bg-slate-50 py-2 px-3 rounded-xl w-fit">
+                      <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest bg-slate-50 dark:bg-slate-800 py-2 px-3 rounded-xl w-fit">
                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                          {t("homeExperienceYears", { years: master.expYears })}
                       </div>
@@ -397,11 +397,11 @@ const Index = () => {
       )}
 
       {/* How it Works */}
-      <section className="py-32 bg-white relative">
+      <section className="py-32 bg-white dark:bg-slate-900 relative">
         <div className="container px-4 mx-auto max-w-7xl text-center mb-24">
            <motion.h2 
              {...fadeInUp}
-             className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight"
+             className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight"
            >
              {t("howItWorksTitle")}
            </motion.h2>
@@ -438,13 +438,13 @@ const Index = () => {
       </section>
 
       {/* Reviews Section */}
-      <section className="py-32 bg-[#f9fafb] relative overflow-hidden">
+      <section className="py-32 bg-[#f9fafb] dark:bg-slate-900/60 relative overflow-hidden">
         <div className="container px-4 mx-auto max-w-7xl relative z-10">
            <motion.div 
              {...fadeInUp}
              className="flex flex-col md:flex-row items-center justify-between mb-20 gap-8"
            >
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight">{t("reviewsTitle")}</h2>
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t("reviewsTitle")}</h2>
               <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-8 py-7 rounded-2xl flex items-center gap-3 group text-lg">
                  {t("viewAllReviews")} <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </Button>
@@ -477,7 +477,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
            <motion.div 
              initial={{ opacity: 0, scale: 0.95 }}
@@ -541,7 +541,7 @@ const FloatingCardItem = ({ text }: { text: string }) => (
     <div className="w-5 h-5 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500 transition-colors duration-300">
       <CheckCircle2 className="w-3 h-3 text-emerald-500 group-hover:text-white transition-colors duration-300" />
     </div>
-    <span className="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-emerald-600 transition-colors duration-300 whitespace-nowrap">{text}</span>
+    <span className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-emerald-600 transition-colors duration-300 whitespace-nowrap">{text}</span>
   </motion.li>
 );
 
@@ -558,8 +558,8 @@ const FeatureItem = ({ icon, title, sub }: { icon: React.ReactNode; title: strin
       {React.cloneElement(icon as React.ReactElement, { className: "w-7 h-7" })}
     </div>
     <div>
-      <h4 className="font-black text-slate-900 text-base leading-tight mb-1 group-hover:text-emerald-600 transition-colors">{title}</h4>
-      <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{sub}</p>
+      <h4 className="font-black text-slate-900 dark:text-white text-base leading-tight mb-1 group-hover:text-emerald-600 transition-colors">{title}</h4>
+      <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{sub}</p>
     </div>
   </motion.div>
 );
@@ -571,22 +571,22 @@ const StepItem = ({ num, icon, title, desc }: { num: string; icon: React.ReactNo
       whileInView: { opacity: 1, y: 0 }
     }}
     whileHover={{ y: -10 }}
-    className="relative p-10 flex flex-col items-center text-center group bg-white rounded-[3rem] border border-transparent hover:border-emerald-100 hover:shadow-2xl transition-all duration-500"
+    className="relative p-10 flex flex-col items-center text-center group bg-white dark:bg-slate-900 rounded-[3rem] border border-transparent hover:border-emerald-100 hover:shadow-2xl transition-all duration-500"
   >
     <div className="relative mb-10">
       <motion.div 
         initial={{ opacity: 0, scale: 0.5 }}
         whileInView={{ opacity: 1, scale: 1 }}
-        className="text-9xl font-black text-slate-50 absolute -top-16 left-1/2 -translate-x-1/2 -z-10 group-hover:text-emerald-50/50 transition-colors"
+        className="text-9xl font-black text-slate-50 dark:text-slate-300 absolute -top-16 left-1/2 -translate-x-1/2 -z-10 group-hover:text-emerald-50/50 transition-colors"
       >
         {num}
       </motion.div>
-      <div className="w-20 h-20 rounded-[2.5rem] bg-white shadow-2xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white group-hover:rotate-12 transition-all duration-500 relative z-10 border border-slate-50">
+      <div className="w-20 h-20 rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-2xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white group-hover:rotate-12 transition-all duration-500 relative z-10 border border-slate-50 dark:border-slate-800">
         {React.cloneElement(icon as React.ReactElement, { className: "w-9 h-9" })}
       </div>
     </div>
-    <h3 className="text-2xl font-black text-slate-900 mb-5 group-hover:text-emerald-600 transition-colors">{title}</h3>
-    <p className="text-base text-slate-500 leading-relaxed max-w-[280px] font-medium">{desc}</p>
+    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-5 group-hover:text-emerald-600 transition-colors">{title}</h3>
+    <p className="text-base text-slate-500 dark:text-slate-400 leading-relaxed max-w-[280px] font-medium">{desc}</p>
   </motion.div>
 );
 
@@ -599,16 +599,16 @@ const ReviewCard = ({ text, author, index }: { text: string; author: string; ind
     whileHover={{ y: -10, scale: 1.02 }}
     transition={{ duration: 0.5 }}
   >
-    <Card className="rounded-[3rem] border-slate-100 shadow-xl shadow-slate-200/20 bg-white p-10 h-full relative overflow-hidden group">
+    <Card className="rounded-[3rem] border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/20 bg-white dark:bg-slate-900 p-10 h-full relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/30 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-colors" />
       <CardContent className="p-0 relative z-10">
         <div className="flex gap-1.5 mb-8">
           {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
         </div>
-        <p className="text-slate-600 font-bold italic text-lg leading-relaxed mb-10">“{text}”</p>
+        <p className="text-slate-600 dark:text-slate-300 font-bold italic text-lg leading-relaxed mb-10">“{text}”</p>
         <div className="flex items-center gap-4">
           <div className="w-10 h-1 bg-emerald-500 rounded-full group-hover:w-16 transition-all duration-500" />
-          <p className="text-base font-black text-slate-900">— {author}</p>
+          <p className="text-base font-black text-slate-900 dark:text-white">— {author}</p>
         </div>
       </CardContent>
     </Card>

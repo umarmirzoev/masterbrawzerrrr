@@ -199,7 +199,7 @@ export default function HeaderNav({ items }: HeaderNavProps) {
                 className={`snap-start snap-always shrink-0 flex items-center justify-center px-1 py-2 rounded-xl text-sm font-bold transition-all duration-300 group whitespace-nowrap ${
                   isActive(item.path)
                     ? "text-emerald-500"
-                    : "text-slate-500 hover:text-slate-900"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <span className="relative">

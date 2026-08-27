@@ -59,8 +59,8 @@ export default function Header() {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100"
-          : "bg-white border-b border-slate-50"
+          ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-sm border-b border-slate-100 dark:border-slate-800"
+          : "bg-white dark:bg-slate-950 border-b border-slate-50 dark:border-slate-800"
       }`}
     >
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1440px]">
@@ -70,7 +70,7 @@ export default function Header() {
             <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
               М
             </div>
-            <span className="text-xl font-bold text-slate-900 tracking-tight hidden sm:block whitespace-nowrap">
+            <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight hidden sm:block whitespace-nowrap">
               Мастер ТЧ
             </span>
           </Link>
@@ -81,8 +81,8 @@ export default function Header() {
           {/* Right Actions */}
           <div className="flex items-center gap-2 lg:gap-3">
             <div className="hidden 2xl:flex items-center gap-2 mr-1">
-               <a href="tel:+992979117007" className="flex items-center gap-2 text-slate-600 hover:text-emerald-500 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center">
+               <a href="tel:+992979117007" className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
                     <Phone className="w-3.5 h-3.5" />
                   </div>
                   <span className="text-sm font-black tracking-tight whitespace-nowrap">+992 979 117 007</span>
@@ -97,9 +97,9 @@ export default function Header() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1.5 rounded-xl px-2.5 h-10 hover:bg-slate-50">
-                  <Languages className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs font-bold text-slate-700">{languageShortLabel}</span>
+                <Button variant="ghost" size="sm" className="gap-1.5 rounded-xl px-2.5 h-10 hover:bg-slate-50 dark:hover:bg-slate-800">
+                  <Languages className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{languageShortLabel}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[130px] rounded-xl">
@@ -116,18 +116,18 @@ export default function Header() {
                   onClick={() => navigate(getDashboardPath())}
                   variant="ghost"
                   size="sm"
-                  className="rounded-xl h-10 px-3 bg-slate-50 gap-1.5 hidden sm:flex"
+                  className="rounded-xl h-10 px-3 bg-slate-50 dark:bg-slate-800 gap-1.5 hidden sm:flex"
                 >
-                  <User className="w-4 h-4 text-slate-600" />
-                  <span className="text-xs font-bold text-slate-700">Кабинет</span>
+                  <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Кабинет</span>
                 </Button>
                 <Button
                   onClick={() => navigate(getDashboardPath())}
                   variant="ghost"
                   size="icon"
-                  className="rounded-full w-10 h-10 bg-slate-50 sm:hidden"
+                  className="rounded-full w-10 h-10 bg-slate-50 dark:bg-slate-800 sm:hidden"
                 >
-                  <User className="w-5 h-5 text-slate-600" />
+                  <User className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                 </Button>
               </div>
             )}
@@ -137,7 +137,7 @@ export default function Header() {
                 onClick={() => navigate("/auth")}
                 variant="outline"
                 size="sm"
-                className="hidden md:flex rounded-xl h-10 px-4 font-bold border-slate-200 text-slate-700"
+                className="hidden md:flex rounded-xl h-10 px-4 font-bold border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
               >
                 Войти
               </Button>
@@ -146,16 +146,16 @@ export default function Header() {
             {/* Mobile Menu Trigger */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="xl:hidden rounded-xl h-10 w-10 bg-slate-50">
-                  <Menu className="w-5 h-5 text-slate-600" />
+                <Button variant="ghost" size="icon" className="xl:hidden rounded-xl h-10 w-10 bg-slate-50 dark:bg-slate-800">
+                  <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] p-0">
                 <div className="flex flex-col h-full">
-                  <div className="p-6 border-b border-slate-50">
+                  <div className="p-6 border-b border-slate-50 dark:border-slate-800">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-500/20">М</div>
-                      <span className="text-lg font-bold text-slate-900 tracking-tight">Мастер ТЧ</span>
+                      <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Мастер ТЧ</span>
                     </div>
                   </div>
                   <nav className="flex-1 p-4 space-y-1">
@@ -166,7 +166,7 @@ export default function Header() {
                           <Link
                             to={item.path}
                             className={`flex items-center justify-between px-4 py-4 rounded-2xl transition-all ${
-                              isActive(item.path) ? "bg-emerald-50 text-emerald-600" : "text-slate-600 hover:bg-slate-50"
+                              isActive(item.path) ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ export default function Header() {
                       );
                     })}
                   </nav>
-                  <div className="p-4 border-t border-slate-50 space-y-2">
+                  <div className="p-4 border-t border-slate-50 dark:border-slate-800 space-y-2">
                     {user ? (
                       <>
                         <SheetClose asChild>
@@ -191,7 +191,7 @@ export default function Header() {
                             Кабинет
                           </Button>
                         </SheetClose>
-                        <Button onClick={signOut} variant="outline" className="w-full rounded-2xl h-14 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 gap-2">
+                        <Button onClick={signOut} variant="outline" className="w-full rounded-2xl h-14 border-red-100 dark:border-red-900/40 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 gap-2">
                           <LogOut className="w-5 h-5" />
                           {t("logout")}
                         </Button>

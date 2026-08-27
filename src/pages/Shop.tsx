@@ -74,16 +74,16 @@ export default function Shop() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-12 bg-slate-50/30">
+      <section className="relative py-12 bg-slate-50/30 dark:bg-slate-800/30">
         <div className="container px-4 mx-auto max-w-[1600px]">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden bg-white rounded-[3.5rem] border border-slate-100 shadow-2xl shadow-slate-200/40 min-h-[750px] flex flex-col lg:flex-row items-stretch"
+            className="relative overflow-hidden bg-white dark:bg-slate-900 rounded-[3.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/40 min-h-[750px] flex flex-col lg:flex-row items-stretch"
           >
             {/* Left Content Column */}
             <div className="w-full lg:w-[65%] relative z-20 py-16 px-8 md:py-24 md:px-24 flex items-center">
@@ -93,18 +93,18 @@ export default function Shop() {
                    <span className="text-[11px] font-black uppercase tracking-widest">{t("shopAboutBadge")}</span>
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 leading-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
                   {t("shopAboutTitle")} <span className="text-emerald-500">Мастер ТЧ</span>
                 </h1>
 
-                <div className="space-y-6 mb-12 text-slate-500">
+                <div className="space-y-6 mb-12 text-slate-500 dark:text-slate-400">
                   <p className="text-base md:text-lg leading-relaxed">
                     {t("shopAboutPara1")}
                   </p>
                   <p className="text-base md:text-lg leading-relaxed">
                     {t("shopAboutPara2")}
                   </p>
-                  <p className="text-base md:text-lg font-bold text-slate-800 leading-relaxed">
+                  <p className="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
                     {t("shopAboutPara3")}
                   </p>
                 </div>
@@ -137,15 +137,15 @@ export default function Shop() {
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ y: -4 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 w-[400px] transition-shadow duration-300 hover:shadow-[0_30px_60px_-15px_rgba(16,185,129,0.25)]"
+                    className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 w-[400px] transition-shadow duration-300 hover:shadow-[0_30px_60px_-15px_rgba(16,185,129,0.25)]"
                   >
                     <div className="flex items-center justify-between mb-5">
                        <div className="space-y-1">
-                         <p className="text-sm font-bold text-slate-900 leading-tight">{t("shopTrustLine1")}</p>
-                         <p className="text-sm font-bold text-slate-900 leading-tight">{t("shopTrustLine2")}</p>
+                         <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{t("shopTrustLine1")}</p>
+                         <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{t("shopTrustLine2")}</p>
                        </div>
                        <div className="text-right">
-                         <p className="text-2xl font-black text-slate-900">4.8</p>
+                         <p className="text-2xl font-black text-slate-900 dark:text-white">4.8</p>
                        </div>
                     </div>
                     
@@ -154,16 +154,16 @@ export default function Shop() {
                           <div className="flex gap-0.5">
                             {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
                           </div>
-                          <span className="text-xs font-bold text-slate-400 ml-1">{t("shopTrustReviewsCount")}</span>
+                          <span className="text-xs font-bold text-slate-400 dark:text-slate-500 ml-1">{t("shopTrustReviewsCount")}</span>
                        </div>
                        <div className="flex -space-x-2">
                           {[...Array(4)].map((_, i) => (
-                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-sm">
+                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 dark:bg-slate-700 overflow-hidden shadow-sm">
                               <img src={`https://i.pravatar.cc/100?u=user${i}`} alt="user" />
                             </div>
                           ))}
-                          <div className="w-8 h-8 rounded-full border-2 border-white bg-white flex items-center justify-center shadow-lg">
-                            <ArrowRight className="w-4 h-4 text-slate-400" />
+                          <div className="w-8 h-8 rounded-full border-2 border-white bg-white dark:bg-slate-900 flex items-center justify-center shadow-lg">
+                            <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                           </div>
                        </div>
                     </div>
@@ -175,7 +175,7 @@ export default function Shop() {
       </section>
 
       {/* Stats Bar */}
-      <section className="py-12 bg-white border-y border-slate-100">
+      <section className="py-12 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }}>
@@ -195,13 +195,13 @@ export default function Shop() {
       </section>
 
       {/* Popular Products Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-12">
-            <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
               {t("shopPopularProductsTitle")}
             </h2>
-            <Link to="#" className="group text-sm font-bold text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-2">
+            <Link to="#" className="group text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-2">
               {t("shopViewAllProducts")} <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>
@@ -222,8 +222,8 @@ export default function Shop() {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                 >
-                  <Card className="group h-full border-slate-100 hover:border-emerald-100 hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden flex flex-col hover-lift">
-                    <Link to={`/shop/product/${p.id}`} className="relative aspect-square bg-slate-50 p-6 flex items-center justify-center overflow-hidden">
+                  <Card className="group h-full border-slate-100 dark:border-slate-800 hover:border-emerald-100 hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden flex flex-col hover-lift">
+                    <Link to={`/shop/product/${p.id}`} className="relative aspect-square bg-slate-50 dark:bg-slate-800 p-6 flex items-center justify-center overflow-hidden">
                       <SmartProductImage
                         product={p}
                         alt={p.name}
@@ -251,21 +251,21 @@ export default function Shop() {
 
                     <CardContent className="p-3 sm:p-5 flex flex-col flex-1">
                       <Link to={`/shop/product/${p.id}`}>
-                        <h3 className="text-sm font-bold text-slate-900 mb-2 line-clamp-2 leading-snug h-10 transition-colors duration-300 group-hover:text-emerald-600">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 leading-snug h-10 transition-colors duration-300 group-hover:text-emerald-600">
                           {p.name}
                         </h3>
                       </Link>
 
                       <div className="flex items-center gap-1 mb-4">
                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                         <span className="text-[11px] font-bold text-slate-900">{p.rating}</span>
-                         <span className="text-[11px] text-slate-400">({p.reviews_count || 0})</span>
+                         <span className="text-[11px] font-bold text-slate-900 dark:text-white">{p.rating}</span>
+                         <span className="text-[11px] text-slate-400 dark:text-slate-500">({p.reviews_count || 0})</span>
                       </div>
 
                       <div className="mt-auto flex items-center justify-between gap-1.5">
                         <div className="min-w-0">
-                          <p className="text-base sm:text-lg font-black text-slate-900 truncate">{p.price} {t("currencySomoni")}</p>
-                          {p.old_price && <p className="text-[11px] text-slate-400 line-through truncate">{p.old_price} {t("currencySomoni")}</p>}
+                          <p className="text-base sm:text-lg font-black text-slate-900 dark:text-white truncate">{p.price} {t("currencySomoni")}</p>
+                          {p.old_price && <p className="text-[11px] text-slate-400 dark:text-slate-500 line-through truncate">{p.old_price} {t("currencySomoni")}</p>}
                         </div>
 
                         <div className="flex items-center gap-1 shrink-0">
@@ -308,13 +308,13 @@ export default function Shop() {
       </section>
 
       {/* Consultation Banner */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-[#F1F5F9] rounded-[3rem] p-8 md:p-16 relative overflow-hidden flex flex-col lg:flex-row items-center gap-12"
+            className="bg-[#F1F5F9] dark:bg-slate-800/60 rounded-[3rem] p-8 md:p-16 relative overflow-hidden flex flex-col lg:flex-row items-center gap-12"
           >
              <div className="absolute top-0 right-0 w-1/3 h-full bg-emerald-500/5 blur-3xl rounded-full" />
              
@@ -328,7 +328,7 @@ export default function Shop() {
                <div className="group relative">
                  <div className="absolute -inset-4 bg-emerald-500/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                  <img src={specialistImage} alt="Specialist" className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full border-8 border-white shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105" />
-                 <div className="absolute bottom-4 right-4 bg-white p-4 rounded-3xl shadow-xl z-20 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
+                 <div className="absolute bottom-4 right-4 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-xl z-20 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
                    <Wrench className="w-8 h-8 text-emerald-500 transition-colors duration-300 group-hover:text-white" />
                  </div>
                </div>
@@ -341,8 +341,8 @@ export default function Shop() {
                transition={{ delay: 0.2 }}
                className="flex-1 z-10"
              >
-               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">{t("shopConsultTitle")}</h2>
-               <p className="text-lg text-slate-600 mb-8 max-w-xl">{t("shopConsultDesc")}</p>
+               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-6">{t("shopConsultTitle")}</h2>
+               <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-xl">{t("shopConsultDesc")}</p>
 
                <div className="space-y-4 mb-10">
                  <CheckPoint text={t("shopCheckPoint1")} />
@@ -351,13 +351,13 @@ export default function Shop() {
                </div>
                
                <div className="flex flex-col sm:flex-row items-center gap-8">
-                 <a href="tel:+992979117007" className="group flex items-center gap-4 text-slate-900 hover-soft rounded-2xl">
+                 <a href="tel:+992979117007" className="group flex items-center gap-4 text-slate-900 dark:text-white hover-soft rounded-2xl">
                     <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-100 transition-transform duration-300 group-hover:scale-110">
                       <Phone className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="text-2xl font-black">+992 979 117 007</p>
-                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("shopWorkHours")}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">{t("shopWorkHours")}</p>
                     </div>
                  </a>
 
@@ -382,8 +382,8 @@ function ShopFeatureItem({ icon, title, desc }: { icon: React.ReactNode; title: 
         {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
       </div>
       <div>
-        <h4 className="font-bold text-slate-900 text-sm mb-1 leading-tight">{title}</h4>
-        <p className="text-[10px] text-slate-400 leading-normal max-w-[150px]">{desc}</p>
+        <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1 leading-tight">{title}</h4>
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-normal max-w-[150px]">{desc}</p>
       </div>
     </div>
   );
@@ -396,8 +396,8 @@ function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string
         {React.cloneElement(icon as React.ReactElement, { className: "w-8 h-8 text-emerald-500 transition-colors duration-300 group-hover:text-white" })}
       </div>
       <div className="min-w-0">
-        <p className="text-3xl font-black text-slate-900 leading-none mb-2">{value}</p>
-        <p className="text-xs text-slate-500 font-medium uppercase tracking-widest leading-tight break-words">{label}</p>
+        <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-2">{value}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest leading-tight break-words">{label}</p>
       </div>
     </div>
   );
@@ -405,11 +405,11 @@ function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string
 
 function BenefitSmallItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="group rounded-[1.75rem] border border-slate-200 bg-[#fbfcfb] p-6 sm:p-7 text-center hover-soft hover:border-emerald-200 hover:bg-white transition-colors">
+    <div className="group rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-[#fbfcfb] dark:bg-slate-900 p-6 sm:p-7 text-center hover-soft hover:border-emerald-200 hover:bg-white dark:hover:bg-slate-800 transition-colors">
       <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
         {React.cloneElement(icon as React.ReactElement, { className: "h-7 w-7" })}
       </div>
-      <p className="text-sm sm:text-base font-semibold text-slate-900 leading-snug">{text}</p>
+      <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white leading-snug">{text}</p>
     </div>
   );
 }
@@ -420,7 +420,7 @@ function CheckPoint({ text }: { text: string }) {
       <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 transition-colors duration-300 group-hover:text-white" />
       </div>
-      <span className="text-sm font-bold text-slate-700">{text}</span>
+      <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{text}</span>
     </div>
   );
 }

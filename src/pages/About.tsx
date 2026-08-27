@@ -65,21 +65,21 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f7f9f8]">
+    <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="overflow-hidden bg-white pb-8 pt-10 md:pt-14">
+      <section className="overflow-hidden bg-white dark:bg-slate-900 pb-8 pt-10 md:pt-14">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">{t("aboutPageBadge")}</p>
-              <h1 className="mb-5 text-4xl font-extrabold leading-tight text-slate-900 md:text-5xl">
+              <h1 className="mb-5 text-4xl font-extrabold leading-tight text-slate-900 dark:text-white md:text-5xl">
                 {t("aboutPageHeroTitle1")}
                 <br />
                 {t("aboutPageHeroTitle2")}
                 <br />{t("aboutPageHeroTitle3")}
               </h1>
-              <p className="mb-5 text-sm leading-6 text-slate-600 md:text-base">
+              <p className="mb-5 text-sm leading-6 text-slate-600 dark:text-slate-300 md:text-base">
                 {t("aboutPageHeroDesc")}
               </p>
               <ul className="mb-7 space-y-2">
@@ -89,7 +89,7 @@ const About = () => {
                   t("aboutPageBullet3"),
                   t("aboutPageBullet4"),
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
                     <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
                     {item}
                   </li>
@@ -123,7 +123,7 @@ const About = () => {
               <div className="absolute -inset-10 bg-emerald-500/10 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
               <div className="absolute -inset-10 bg-sky-500/5 blur-[80px] rounded-full translate-x-20 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-100" />
               
-              <div className="relative overflow-hidden rounded-[2.5rem] border border-white bg-white shadow-[0_32px_80px_-16px_rgba(15,23,42,0.15)] hover-lift transition-all duration-700">
+              <div className="relative overflow-hidden rounded-[2.5rem] border border-white bg-white dark:bg-slate-900 shadow-[0_32px_80px_-16px_rgba(15,23,42,0.15)] hover-lift transition-all duration-700">
                 <div className="relative h-[420px] md:h-[480px] overflow-hidden">
                   <img
                     src={heroImage}
@@ -135,17 +135,17 @@ const About = () => {
                 
                 {/* Integrated Info Panel */}
                 <div className="absolute bottom-6 left-6 right-6">
-                  <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] p-5 md:p-6 border border-white/50 shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex items-center justify-between transition-transform duration-500 group-hover:translate-y-[-4px]">
+                  <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-[2rem] p-5 md:p-6 border border-white/50 dark:border-slate-700/50 shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex items-center justify-between transition-transform duration-500 group-hover:translate-y-[-4px]">
                     <div>
-                      <p className="text-xl font-black text-slate-900 leading-tight mb-1">Мастер ТЧ</p>
-                      <p className="text-sm text-slate-500 font-semibold tracking-wide">{t("aboutPageCardTagline")}</p>
+                      <p className="text-xl font-black text-slate-900 dark:text-white leading-tight mb-1">Мастер ТЧ</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold tracking-wide">{t("aboutPageCardTagline")}</p>
                     </div>
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-4 py-2 rounded-2xl text-sm font-black shadow-lg shadow-emerald-200 transition-colors group-hover:bg-emerald-600">
                         <Star className="h-4 w-4 fill-current" />
                         4.8
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-1.5 uppercase tracking-[0.2em] font-bold">{t("aboutPageRatingLabel")}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5 uppercase tracking-[0.2em] font-bold">{t("aboutPageRatingLabel")}</p>
                     </div>
                   </div>
                 </div>
@@ -153,7 +153,7 @@ const About = () => {
 
               {/* Decorative elements */}
               <div className="absolute -top-6 -right-6 hidden lg:block">
-                <div className="h-20 w-20 rounded-3xl bg-white shadow-xl border border-slate-100 flex items-center justify-center animate-bounce-slow">
+                <div className="h-20 w-20 rounded-3xl bg-white dark:bg-slate-900 shadow-xl border border-slate-100 dark:border-slate-800 flex items-center justify-center animate-bounce-slow">
                    <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                       <Wrench className="h-5 w-5" />
                    </div>
@@ -164,7 +164,7 @@ const About = () => {
         </div>
       </section>
 
-      <section className="bg-white py-8">
+      <section className="bg-white dark:bg-slate-900 py-8">
         <div className="container mx-auto px-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {topStats.map((item, i) => {
@@ -176,11 +176,11 @@ const About = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.06 }}
-                  className="group rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm hover-soft hover:border-emerald-200"
+                  className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-center shadow-sm hover-soft hover:border-emerald-200"
                 >
                   <Icon className="mx-auto mb-2 h-5 w-5 text-emerald-600 transition-transform duration-300 group-hover:scale-110" />
-                  <p className="text-2xl font-extrabold text-slate-900">{item.value}</p>
-                  <p className="text-xs text-slate-500">{item.label}</p>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{item.value}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{item.label}</p>
                 </motion.div>
               );
             })}
@@ -194,7 +194,7 @@ const About = () => {
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl"
+            className="mb-6 text-center text-2xl font-bold text-slate-900 dark:text-white md:text-3xl"
           >
             {t("aboutPageClientsTitle")}
           </motion.h2>
@@ -208,13 +208,13 @@ const About = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover-soft hover:border-emerald-200"
+                  className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm hover-soft hover:border-emerald-200"
                 >
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
-                  <h3 className="mb-2 text-sm font-semibold text-slate-900">{item.title}</h3>
-                  <p className="text-xs leading-5 text-slate-500">{item.desc}</p>
+                  <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">{item.desc}</p>
                 </motion.div>
               );
             })}
@@ -222,13 +222,13 @@ const About = () => {
         </div>
       </section>
 
-      <section className="bg-white py-12">
+      <section className="bg-white dark:bg-slate-900 py-12">
         <div className="container mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl"
+            className="mb-6 text-center text-2xl font-bold text-slate-900 dark:text-white md:text-3xl"
           >
             {t("aboutPageMastersTitle")}
           </motion.h2>
@@ -242,13 +242,13 @@ const About = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.06 }}
-                  className="group rounded-2xl border border-slate-200 bg-[#fbfcfb] p-4 text-center hover-soft hover:border-emerald-200 hover:bg-white"
+                  className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#fbfcfb] dark:bg-slate-900 p-4 text-center hover-soft hover:border-emerald-200 hover:bg-white dark:hover:bg-slate-800"
                 >
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
-                  <h3 className="mb-1 text-sm font-semibold text-slate-900">{item.title}</h3>
-                  <p className="text-xs leading-5 text-slate-500">{item.desc}</p>
+                  <h3 className="mb-1 text-sm font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">{item.desc}</p>
                 </motion.div>
               );
             })}
@@ -264,14 +264,14 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
               viewport={{ once: true }}
-              className="group relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-[#f8f8f6] p-8 md:p-10 shadow-sm hover-soft hover-glow min-h-[340px] flex flex-col justify-center"
+              className="group relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-700 bg-[#f8f8f6] dark:bg-slate-900 p-8 md:p-10 shadow-sm hover-soft hover-glow min-h-[340px] flex flex-col justify-center"
             >
               <div className="relative z-10 max-w-full md:max-w-[60%]">
-                <h3 className="mb-4 text-3xl font-black text-slate-900">{t("aboutPageMissionTitle")}</h3>
-                <p className="text-base leading-relaxed text-slate-600 mb-3">
+                <h3 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">{t("aboutPageMissionTitle")}</h3>
+                <p className="text-base leading-relaxed text-slate-600 dark:text-slate-300 mb-3">
                   {t("aboutPageMissionDesc1")}
                 </p>
-                <p className="text-base leading-relaxed text-slate-600">
+                <p className="text-base leading-relaxed text-slate-600 dark:text-slate-300">
                   {t("aboutPageMissionDesc2")}
                 </p>
               </div>
@@ -284,7 +284,7 @@ const About = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-[#f8f8f6] via-[#f8f8f6]/50 to-transparent pointer-events-none" />
               </div>
               <div className="mt-8 block md:hidden">
-                <div className="relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm">
+                <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-4 shadow-sm">
                   <img
                     src={missionImage}
                     alt={t("aboutPageMissionImgAlt")}
@@ -299,11 +299,11 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
               viewport={{ once: true }}
-              className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-[#f8f8f6] p-8 md:p-10 shadow-sm hover-soft hover-glow min-h-[340px] flex flex-col justify-center"
+              className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-700 bg-[#f8f8f6] dark:bg-slate-900 p-8 md:p-10 shadow-sm hover-soft hover-glow min-h-[340px] flex flex-col justify-center"
             >
               <div className="relative z-10 max-w-full md:max-w-[70%]">
-                <h3 className="mb-4 text-3xl font-black text-slate-900">{t("aboutPageSafetyTitle")}</h3>
-                <p className="mb-6 text-base leading-relaxed text-slate-600">
+                <h3 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">{t("aboutPageSafetyTitle")}</h3>
+                <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-300">
                   {t("aboutPageSafetyDesc")}
                 </p>
                 <ul className="grid gap-3 sm:grid-cols-2">
@@ -313,7 +313,7 @@ const About = () => {
                     t("aboutPageSafety3"),
                     t("aboutPageSafety4"),
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <li key={item} className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
                       <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                         <CheckCircle className="h-3 w-3" />
                       </div>
@@ -328,7 +328,7 @@ const About = () => {
                 </div>
               </div>
               <div className="absolute right-6 top-6 hidden lg:block">
-                <div className="rounded-2xl bg-white/80 p-3 shadow-xl backdrop-blur-sm border border-emerald-50">
+                <div className="rounded-2xl bg-white/80 dark:bg-slate-900/80 p-3 shadow-xl backdrop-blur-sm border border-emerald-50 dark:border-emerald-900/30">
                    <ShieldCheck className="h-10 w-10 text-emerald-600" />
                 </div>
               </div>
@@ -337,13 +337,13 @@ const About = () => {
         </div>
       </section>
 
-      <section className="bg-white py-12">
+      <section className="bg-white dark:bg-slate-900 py-12">
         <div className="container mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-6 text-center text-2xl font-bold text-slate-900 md:text-3xl"
+            className="mb-6 text-center text-2xl font-bold text-slate-900 dark:text-white md:text-3xl"
           >
             {t("aboutPageValuesTitle")}
           </motion.h2>
@@ -357,13 +357,13 @@ const About = () => {
                   viewport={{ once: true }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="group rounded-2xl border border-slate-200 bg-[#fbfcfb] p-5 text-center hover-soft hover:border-emerald-200 hover:bg-white"
+                  className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#fbfcfb] dark:bg-slate-900 p-5 text-center hover-soft hover:border-emerald-200 hover:bg-white dark:hover:bg-slate-800"
                 >
                   <div className="mx-auto mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
-                  <h3 className="mb-2 text-sm font-semibold text-slate-900">{item.title}</h3>
-                  <p className="text-xs leading-5 text-slate-500">{item.desc}</p>
+                  <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">{item.desc}</p>
                 </motion.div>
               );
             })}
