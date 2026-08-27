@@ -16,6 +16,9 @@ import {
   CreditCard, RotateCcw, HelpCircle
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import { SmartProductImage } from "@/components/shop/SmartProductImage";
+import { FavoriteButton } from "@/components/favorites/FavoritesSection";
+import { fallbackShopProducts } from "@/data/shopFallback";
 
 export default function Shop() {
   const { t } = useLanguage();
@@ -24,19 +27,40 @@ export default function Shop() {
   // Custom Images from public/shop directory
   const heroImage = "/shop/hero.png";
   const specialistImage = "/shop/specialist.png";
-  const drillImg = "/shop/drill.png";
-  const faucetImg = "/shop/faucet.png";
-  const waterHeaterImg = "/shop/heater.png";
-  const toiletImg = "/shop/toilet.png";
-  const tilesImg = "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=400&auto=format&fit=crop"; 
 
-  const popularProducts = [
-    { id: "1", name: "Дрель-шуруповерт Bosch GSR 120-Li", price: "350", oldPrice: "450", rating: "4.8", reviews: "124", image: drillImg, labelKey: "shopBadgeSale15", labelColor: "bg-red-500" },
-    { id: "2", name: "Смеситель для кухни Grohe Start", price: "85", oldPrice: null, rating: "4.9", reviews: "86", image: faucetImg, labelKey: "shopBadgeBestseller", labelColor: "bg-purple-600" },
-    { id: "3", name: "Водонагреватель Ariston 80 л", price: "750", oldPrice: null, rating: "4.7", reviews: "42", image: waterHeaterImg, labelKey: "shopBadgeNew", labelColor: "bg-orange-500" },
-    { id: "4", name: "Унитаз-компакт Cersanit Parva", price: "450", oldPrice: "520", rating: "4.8", reviews: "115", image: toiletImg, labelKey: "shopBadgeSale10", labelColor: "bg-blue-500" },
-    { id: "5", name: "Керамическая плитка 60х60 см", price: "120", oldPrice: "150", rating: "4.5", reviews: "18", image: tilesImg, labelKey: "shopBadgePromo", labelColor: "bg-emerald-500" },
-  ];
+  // Раньше здесь был захардкоженный список с id "1".."5" — из-за него корзина падала
+  // с "invalid input syntax for type uuid". Берём настоящие товары, а если база
+  // недоступна — локальный каталог, у которого id понимает и корзина, и избранное.
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const pickTop = (list: any[]) =>
+      [...list]
+        .sort(
+          (a, b) =>
+            (b.is_popular ? 1 : 0) - (a.is_popular ? 1 : 0) ||
+            (b.rating || 0) - (a.rating || 0),
+        )
+        .slice(0, 5);
+
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("shop_products")
+        .select("*, shop_categories(name)")
+        .limit(60);
+
+      if (cancelled) return;
+      const rows = !error && data && data.length ? data : fallbackShopProducts;
+      setPopularProducts(pickTop(rows as any[]));
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -172,55 +196,79 @@ export default function Shop() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
-            {popularProducts.map((p, i) => (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Card className="group h-full border-slate-100 hover:border-emerald-100 hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden flex flex-col hover-lift">
-                  <div className="relative aspect-square bg-slate-50 p-6 flex items-center justify-center overflow-hidden">
-                    <img src={p.image} alt={p.name} className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700" />
-                    
-                    <div className="absolute top-4 left-4">
-                      <Badge className={`${p.labelColor} text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg`}>
-                        {t(p.labelKey)}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <CardContent className="p-3 sm:p-5 flex flex-col flex-1">
-                    <h3 className="text-sm font-bold text-slate-900 mb-2 line-clamp-2 leading-snug h-10 transition-colors duration-300 group-hover:text-emerald-600">
-                      {p.name}
-                    </h3>
-                    
-                    <div className="flex items-center gap-1 mb-4">
-                       <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                       <span className="text-[11px] font-bold text-slate-900">{p.rating}</span>
-                       <span className="text-[11px] text-slate-400">({p.reviews})</span>
-                    </div>
-                    
-                    <div className="mt-auto flex items-center justify-between gap-1.5">
-                      <div className="min-w-0">
-                        <p className="text-base sm:text-lg font-black text-slate-900 truncate">{p.price} сомони</p>
-                        {p.oldPrice && <p className="text-[11px] text-slate-400 line-through truncate">{p.oldPrice} сомони</p>}
+            {popularProducts.map((p, i) => {
+              const discount = p.old_price && p.old_price > p.price
+                ? Math.round((1 - p.price / p.old_price) * 100)
+                : 0;
+              const isNew = !!p.created_at
+                && Date.now() - new Date(p.created_at).getTime() < 1000 * 60 * 60 * 24 * 45;
+
+              return (
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <Card className="group h-full border-slate-100 hover:border-emerald-100 hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden flex flex-col hover-lift">
+                    <Link to={`/shop/product/${p.id}`} className="relative aspect-square bg-slate-50 p-6 flex items-center justify-center overflow-hidden">
+                      <SmartProductImage
+                        product={p}
+                        alt={p.name}
+                        className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700"
+                      />
+
+                      <div className="absolute top-4 left-4 flex max-w-[80%] flex-wrap gap-1.5">
+                        {discount > 0 && (
+                          <Badge className="bg-red-500 text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg">
+                            {t("shopBadgeDiscountN", { percent: discount })}
+                          </Badge>
+                        )}
+                        {p.is_popular && discount === 0 && (
+                          <Badge className="bg-purple-600 text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg">
+                            {t("shopBadgeBestseller")}
+                          </Badge>
+                        )}
+                        {isNew && discount === 0 && !p.is_popular && (
+                          <Badge className="bg-orange-500 text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg">
+                            {t("shopBadgeNew")}
+                          </Badge>
+                        )}
+                      </div>
+                    </Link>
+
+                    <CardContent className="p-3 sm:p-5 flex flex-col flex-1">
+                      <Link to={`/shop/product/${p.id}`}>
+                        <h3 className="text-sm font-bold text-slate-900 mb-2 line-clamp-2 leading-snug h-10 transition-colors duration-300 group-hover:text-emerald-600">
+                          {p.name}
+                        </h3>
+                      </Link>
+
+                      <div className="flex items-center gap-1 mb-4">
+                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                         <span className="text-[11px] font-bold text-slate-900">{p.rating}</span>
+                         <span className="text-[11px] text-slate-400">({p.reviews_count || 0})</span>
                       </div>
 
-                      <div className="flex gap-1 shrink-0">
-                        <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-300 hover:scale-110 active:scale-90 shrink-0">
-                          <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </Button>
-                        <Button size="icon" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100 shrink-0 transition-transform duration-300 hover:scale-110 active:scale-90" onClick={() => addToCart(p.id)}>
-                          <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </Button>
+                      <div className="mt-auto flex items-center justify-between gap-1.5">
+                        <div className="min-w-0">
+                          <p className="text-base sm:text-lg font-black text-slate-900 truncate">{p.price} {t("currencySomoni")}</p>
+                          {p.old_price && <p className="text-[11px] text-slate-400 line-through truncate">{p.old_price} {t("currencySomoni")}</p>}
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <FavoriteButton itemType="product" itemId={p.id} size="sm" />
+                          <Button size="icon" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100 shrink-0 transition-transform duration-300 hover:scale-110 active:scale-90" onClick={() => addToCart(p.id)}>
+                            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
