@@ -45,6 +45,15 @@ export default function Shop() {
         )
         .slice(0, 5);
 
+    // Эти 4 демо-товара (плейсхолдеры со стоковыми фото) убраны из блока
+    // "Популярные товары" по просьбе — реальных карточек это не касается.
+    const HIDDEN_PRODUCT_NAMES = new Set([
+      "Стиральная машина",
+      "Микроволновая печь",
+      "Кондиционер",
+      "Пылесос",
+    ]);
+
     const load = async () => {
       const { data, error } = await supabase
         .from("shop_products")
@@ -52,7 +61,9 @@ export default function Shop() {
         .limit(60);
 
       if (cancelled) return;
-      const rows = !error && data && data.length ? data : fallbackShopProducts;
+      const rows = (!error && data && data.length ? data : fallbackShopProducts).filter(
+        (item: any) => !HIDDEN_PRODUCT_NAMES.has(item.name),
+      );
       setPopularProducts(pickTop(rows as any[]));
     };
 

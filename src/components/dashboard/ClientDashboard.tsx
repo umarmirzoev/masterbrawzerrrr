@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ClipboardList, Plus, Star, Clock, User, XCircle, MapPin, Phone,
   CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar, FileText,
-  CreditCard, DollarSign, Heart, HelpCircle,
+  CreditCard, DollarSign, Heart, HelpCircle, ShoppingBag,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
@@ -211,6 +211,7 @@ export default function ClientDashboard() {
 
   const navItems = [
     { path: "/dashboard", label: t("navMyOrders"), icon: ClipboardList, badge: activeOrders.length },
+    { path: "/shop/orders", label: "Мои покупки", icon: ShoppingBag },
     { path: "/dashboard/favorites", label: t("favorites"), icon: Heart },
     { path: "/dashboard/payments", label: t("navPayments"), icon: CreditCard },
     { path: "/dashboard/profile", label: t("dashProfile"), icon: User },
@@ -402,6 +403,7 @@ export default function ClientDashboard() {
           <Card className="border-0 shadow-sm divide-y divide-border/60">
             {[
               { label: t("clientMenuOrderHistory"), icon: ClipboardList, action: () => setTab("orders") },
+              { label: "Мои покупки", icon: ShoppingBag, action: () => navigate("/shop/orders") },
               { label: t("clientMenuPaymentMethods"), icon: CreditCard, action: () => setTab("payments") },
               { label: t("clientMenuFavorites"), icon: Heart, action: () => navigate("/dashboard/favorites") },
               ...(myApplication ? [{ label: t("clientMenuMasterApplication"), icon: FileText, action: () => setTab("application") }] : []),
