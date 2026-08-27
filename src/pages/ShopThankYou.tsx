@@ -35,12 +35,16 @@ const paymentStatusLabels: Record<string, string> = {
 
 export default function ShopThankYou() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<any | null>(null);
 
   useEffect(() => {
+    // Не редиректим на /auth, пока сессия ещё восстанавливается — иначе
+    // залогиненного пользователя на секунду кидает на страницу входа.
+    if (authLoading) return;
+
     if (!user) {
       navigate("/auth");
       return;
@@ -67,7 +71,7 @@ export default function ShopThankYou() {
     };
 
     loadOrder();
-  }, [id, navigate, user]);
+  }, [id, navigate, user, authLoading]);
 
   return (
     <div className="min-h-screen bg-background">

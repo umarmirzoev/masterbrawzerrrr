@@ -91,7 +91,7 @@ const paymentStatusLabels: Record<string, string> = {
 };
 
 export default function ShopOrders() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -170,13 +170,17 @@ export default function ShopOrders() {
   };
 
   useEffect(() => {
+    // Не редиректим на /auth, пока сессия ещё восстанавливается — иначе
+    // залогиненного пользователя на секунду кидает на страницу входа.
+    if (authLoading) return;
+
     if (!user) {
       navigate("/auth");
       return;
     }
 
     loadOrders();
-  }, [navigate, user]);
+  }, [navigate, user, authLoading]);
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
@@ -198,6 +202,17 @@ export default function ShopOrders() {
       }, {}),
     [orderItems],
   );
+
+  // Сводка расходов по магазину: сколько всего заказано и потрачено
+  // (отменённые заказы в сумму расходов не считаем).
+  const spendSummary = useMemo(() => {
+    const activeOrders = orders.filter((order) => order.status !== "cancelled");
+    return {
+      totalOrders: orders.length,
+      activeCount: activeOrders.length,
+      totalSpent: activeOrders.reduce((sum, order) => sum + Number(order.total || 0), 0),
+    };
+  }, [orders]);
 
   const cancelOrder = async (orderId: string) => {
     setCancelId(orderId);
@@ -254,6 +269,33 @@ export default function ShopOrders() {
             </Button>
           </div>
         </div>
+
+        {!loading && orders.length > 0 && (
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-2">
+            <Card className="border-border/70">
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="rounded-2xl bg-primary/10 p-2.5">
+                  <Package className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Всего заказов</p>
+                  <p className="text-xl font-bold text-foreground">{spendSummary.totalOrders}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-border/70">
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="rounded-2xl bg-emerald-100 p-2.5">
+                  <CreditCard className="h-5 w-5 text-emerald-700" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Всего потрачено</p>
+                  <p className="text-xl font-bold text-foreground">{spendSummary.totalSpent} сомонӣ</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {createdOrderId && (
           <Card className="mb-6 border-emerald-200 bg-emerald-50/70">

@@ -308,6 +308,9 @@ export default function CartPage() {
       toast({ title: `${t("cartOrderSuccess")} ✓`, description: t("cartOrderSuccessDesc") });
       navigate(`/shop/thank-you/${order.id}`);
     } catch (err: any) {
+      // Логируем реальную причину сбоя — иначе заказ молча уходит в
+      // локальный запасной вариант и в админке не видно, что пошло не так.
+      console.error("Shop order save error:", err?.message || err);
       if (createdOrderId) {
         await supabase
           .from("shop_orders")
@@ -337,7 +340,8 @@ export default function CartPage() {
       setCheckout(false);
       toast({
         title: t("cartOrderSuccess"),
-        description: "Заказ сохранён локально и уже появился в кабинетах.",
+        description: "Заказ сохранён на этом устройстве. Свяжитесь с нами, если он не появится в «Мои покупки».",
+        variant: "destructive",
       });
       navigate(`/shop/thank-you/${localOrderId}`);
     } finally {

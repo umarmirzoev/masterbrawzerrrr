@@ -89,7 +89,7 @@ const paymentStatusLabels: Record<string, string> = {
 
 export default function ShopOrderDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -169,6 +169,10 @@ export default function ShopOrderDetail() {
   };
 
   useEffect(() => {
+    // Не редиректим на /auth, пока сессия ещё восстанавливается — иначе
+    // залогиненного пользователя на секунду кидает на страницу входа.
+    if (authLoading) return;
+
     if (!user) {
       navigate("/auth");
       return;
@@ -180,7 +184,7 @@ export default function ShopOrderDetail() {
     }
 
     loadOrder();
-  }, [id, navigate, user]);
+  }, [id, navigate, user, authLoading]);
 
   const currentStepIndex = useMemo(() => {
     if (!order) return 0;
