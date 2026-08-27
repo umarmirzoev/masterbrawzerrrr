@@ -381,8 +381,10 @@ export default function ProductDetail() {
   ];
 
   // Быстрая покупка кладёт товар в корзину и переводит пользователя к оформлению.
+  // Раньше здесь был ранний return для товаров без настоящего id в базе (fallback-*),
+  // из-за которого кнопка "Купить сейчас" молча ничего не делала — теперь корзина
+  // сама умеет работать с такими товарами (см. useCart.tsx), поэтому проверка не нужна.
   const handleBuyNow = async () => {
-    if (isFallbackProductId(product.id)) return;
     await addToCart(product.id, withInstall);
     window.location.href = "/cart";
   };

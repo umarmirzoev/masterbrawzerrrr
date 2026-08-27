@@ -14,7 +14,7 @@ import {
   CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar, FileText,
   CreditCard, DollarSign, Heart, HelpCircle, ShoppingBag,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
@@ -29,6 +29,7 @@ import SupportTicketDialog from "@/components/SupportTicketDialog";
 import LanguagePreferenceSelect from "@/components/LanguagePreferenceSelect";
 import { getLanguageLocale } from "@/lib/i18n";
 import { resolveNotificationText } from "@/lib/notifications";
+import { getLocalShopOrdersByUser, mergeShopOrders } from "@/lib/localShopOrders";
 
 const allStatuses = [
   { key: "new", label: "Новый заказ", icon: ClipboardList, color: "bg-blue-500" },
@@ -74,10 +75,12 @@ export default function ClientDashboard() {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("profile");
   const [favoritesCount, setFavoritesCount] = useState(0);
+  const [shopSpent, setShopSpent] = useState(0);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [masterInfo, setMasterInfo] = useState<any>(null);
@@ -128,7 +131,45 @@ export default function ClientDashboard() {
     if (data && data.length > 0) setMyApplication(data[0]);
   };
 
-  useEffect(() => { fetchOrders(); fetchApplication(); fetchFavoritesCount(); }, [user]);
+  // "Потрачено" должно учитывать не только заказы услуг мастеров, но и реальные
+  // покупки в магазине — иначе цифра в кабинете не совпадает с тем, что видно
+  // на странице «Мои покупки».
+  const fetchShopSpend = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("shop_orders")
+      .select("id, total, status")
+      .eq("user_id", user.id);
+    const merged = mergeShopOrders((data as any[]) || [], getLocalShopOrdersByUser(user.id) as any[]);
+    const total = merged
+      .filter((order: any) => order.status !== "cancelled")
+      .reduce((sum: number, order: any) => sum + Number(order.total || 0), 0);
+    setShopSpent(total);
+  };
+
+  // Синхронизируем вкладку кабинета с адресом страницы: переход по ссылке из
+  // сайдбара (/dashboard/payments, /dashboard/profile и т.д.) должен реально
+  // открывать соответствующий раздел, а не оставлять прежнюю вкладку.
+  const TAB_ROUTES: Record<string, Tab> = {
+    "/dashboard": "orders",
+    "/dashboard/favorites": "favorites",
+    "/dashboard/payments": "payments",
+    "/dashboard/profile": "profile",
+    "/dashboard/notifications": "notifications",
+  };
+
+  useEffect(() => {
+    const matched = TAB_ROUTES[location.pathname];
+    if (matched) setTab(matched);
+  }, [location.pathname]);
+
+  const goToTab = (key: Tab) => {
+    setTab(key);
+    const path = Object.keys(TAB_ROUTES).find((p) => TAB_ROUTES[p] === key);
+    if (path && path !== location.pathname) navigate(path);
+  };
+
+  useEffect(() => { fetchOrders(); fetchApplication(); fetchFavoritesCount(); fetchShopSpend(); }, [user]);
   useEffect(() => {
     if (profile) {
       setEditName(profile.full_name || "");
@@ -209,7 +250,7 @@ export default function ClientDashboard() {
   const clientReviews = orders.filter(o => o.status === "reviewed");
 
   const paidOrders = orders.filter(o => (o as any).payment_status === "paid");
-  const totalSpent = paidOrders.reduce((sum, o) => sum + Number((o as any).total_amount || (o as any).service_price || o.budget || 0), 0);
+  const totalSpent = paidOrders.reduce((sum, o) => sum + Number((o as any).total_amount || (o as any).service_price || o.budget || 0), 0) + shopSpent;
   const initials = (profile?.full_name || user?.email || "?").trim().split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   const navItems = [
@@ -319,7 +360,7 @@ export default function ClientDashboard() {
         {tabs.map((tb) => {
           const Icon = tb.icon;
           return (
-            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => setTab(tb.key)} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs transition-transform hover:scale-105 active:scale-95">
+            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => goToTab(tb.key)} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs transition-transform hover:scale-105 active:scale-95">
               <Icon className="w-3.5 h-3.5" />
               {tb.label}
               {tb.count !== undefined && tb.count > 0 && (
@@ -405,12 +446,12 @@ export default function ClientDashboard() {
           {/* Quick menu */}
           <Card className="border-0 shadow-sm divide-y divide-border/60">
             {[
-              { label: t("clientMenuOrderHistory"), icon: ClipboardList, action: () => setTab("orders") },
+              { label: t("clientMenuOrderHistory"), icon: ClipboardList, action: () => goToTab("orders") },
               { label: "Мои покупки", icon: ShoppingBag, action: () => navigate("/shop/orders") },
-              { label: t("clientMenuPaymentMethods"), icon: CreditCard, action: () => setTab("payments") },
+              { label: t("clientMenuPaymentMethods"), icon: CreditCard, action: () => goToTab("payments") },
               { label: t("clientMenuFavorites"), icon: Heart, action: () => navigate("/dashboard/favorites") },
               ...(myApplication ? [{ label: t("clientMenuMasterApplication"), icon: FileText, action: () => setTab("application") }] : []),
-              { label: t("clientMenuNotifications"), icon: Bell, action: () => setTab("notifications") },
+              { label: t("clientMenuNotifications"), icon: Bell, action: () => goToTab("notifications") },
               { label: t("clientMenuSupport"), icon: HelpCircle, action: () => setSupportOpen(true) },
             ].map((item, i) => (
               <button
