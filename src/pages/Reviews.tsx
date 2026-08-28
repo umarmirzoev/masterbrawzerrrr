@@ -62,7 +62,7 @@ const Reviews = () => {
               Отзывы клиентов из Душанбе
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-medium mb-10">
-              Реальные оценки людей, которые уже вызывали мастеров через Мастер ТЧ.
+              Реальные оценки людей, которые уже вызывали мастеров через Master.TJ.
             </p>
 
             <div className="inline-flex flex-wrap items-center justify-center gap-8 sm:gap-12 bg-white/70 dark:bg-slate-900/70 backdrop-blur rounded-[2rem] px-8 py-6 border border-white/60 dark:border-slate-700/60 shadow-sm">

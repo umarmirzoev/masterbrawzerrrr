@@ -71,7 +71,7 @@ export default function Header() {
               М
             </div>
             <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight hidden sm:block whitespace-nowrap">
-              Мастер ТЧ
+              Master.TJ
             </span>
           </Link>
 
@@ -155,7 +155,7 @@ export default function Header() {
                   <div className="p-6 border-b border-slate-50 dark:border-slate-800">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-500/20">М</div>
-                      <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Мастер ТЧ</span>
+                      <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Master.TJ</span>
                     </div>
                   </div>
                   <nav className="flex-1 p-4 space-y-1">

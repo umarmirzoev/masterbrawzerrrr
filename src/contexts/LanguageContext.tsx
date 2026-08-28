@@ -25,7 +25,7 @@ interface LanguageContextType {
 const translations: Record<Language, Record<string, string>> = {
    ru: {
      // Nav
-     brandName: "Мастер ТЧ",
+     brandName: "Master.TJ",
      navHome: "Главная",
      navAbout: "О нас",
      navCategories: "Услуги",
@@ -49,7 +49,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Hero homepage
     heroTitle: "Мастер приедет к вам сегодня",
     heroSubtitle: "Проверенные мастера • Приезд от 30 минут • Гарантия работ",
-    heroDescription: "Мастер Час — сервис вызова мастеров на дом в Душанбе. Электрика, сантехника, уборка, ремонт техники и другие услуги — быстро, надёжно, по честным ценам в сомони.",
+    heroDescription: "Master.TJ — сервис вызова мастеров на дом в Душанбе. Электрика, сантехника, уборка, ремонт техники и другие услуги — быстро, надёжно, по честным ценам в сомони.",
     heroOrderButton: "Вызвать мастера",
     heroEmergencyButton: "🚨 Аварийный мастер 24/7",
     heroEmergencySubtext: "выезд 30–60 минут по Душанбе",
@@ -132,7 +132,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Shop page extra
     shopAboutBadge: "О магазине",
     shopAboutTitle: "О магазине",
-    shopAboutPara1: "Магазин Мастер ТЧ — это надёжный выбор для дома, ремонта и профессиональных работ в Душанбе и по всему Таджикистану.",
+    shopAboutPara1: "Магазин Master.TJ — это надёжный выбор для дома, ремонта и профессиональных работ в Душанбе и по всему Таджикистану.",
     shopAboutPara2: "Мы предлагаем только качественные товары от проверенных производителей и помогаем не только купить, но и установить с помощью наших мастеров.",
     shopAboutPara3: "Наша цель — сделать ремонт простым, быстрым и доступным для каждого клиента.",
     shopFeatQuality: "Проверенное качество",
@@ -310,7 +310,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // About page (About.tsx)
     aboutPageBadge: "О компании",
-    aboutPageHeroTitle1: "Мастер ТЧ — сервис,",
+    aboutPageHeroTitle1: "Master.TJ — сервис,",
     aboutPageHeroTitle2: "которому доверяют",
     aboutPageHeroTitle3: "в Душанбе",
     aboutPageHeroDesc: "Мы объединяем клиентов и проверенных мастеров, чтобы любые бытовые задачи решались быстро, безопасно и по прозрачной цене.",
@@ -374,7 +374,7 @@ const translations: Record<Language, Record<string, string>> = {
     aboutPageCallButton: "Позвонить",
 
     // About
-    aboutTitle: "Мастер Час — сервис мастеров на дом в Душанбе",
+    aboutTitle: "Master.TJ — сервис мастеров на дом в Душанбе",
     aboutDescription: "Мы помогаем жителям Душанбе быстро найти проверенного мастера для любых бытовых задач — от установки розетки до ремонта под ключ.",
     aboutFeature1Title: "Проверенные мастера",
     aboutFeature1Desc: "Каждый мастер проходит проверку документов и навыков. Работаем только с надёжными специалистами Душанбе.",
@@ -426,7 +426,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Become Master
     becomeMasterTitle: "Станьте мастером в Душанбе",
-    becomeMasterSubtitle: "Присоединяйтесь к команде Мастер Час — получайте заказы каждый день по всему Душанбе",
+    becomeMasterSubtitle: "Присоединяйтесь к команде Master.TJ — получайте заказы каждый день по всему Душанбе",
     becomeMasterBenefit1: "Заказы каждый день",
     becomeMasterBenefit2: "Свободный график",
     becomeMasterBenefit3: "Оплата сразу после работы",
@@ -471,10 +471,10 @@ const translations: Record<Language, Record<string, string>> = {
     districtIsmoili: "Исмоили Сомони",
 
     // Footer
-    footerAboutText: "Мастер Час — сервис вызова мастеров на дом в Душанбе. Электрика, сантехника, уборка, ремонт — быстро и по честным ценам.",
+    footerAboutText: "Master.TJ — сервис вызова мастеров на дом в Душанбе. Электрика, сантехника, уборка, ремонт — быстро и по честным ценам.",
     footerContacts: "Контакты",
     footerDistricts: "Районы Душанбе",
-    footerRights: "© 2025 Мастер Час. Душанбе, Тоҷикистон. Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
+    footerRights: "© 2025 Master.TJ. Душанбе, Тоҷикистон. Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
     footerServices: "Услуги",
     footerSubscriptions: "Тарифы",
     footerBecomeMaster: "Стать мастером",
@@ -505,7 +505,7 @@ const translations: Record<Language, Record<string, string>> = {
     orderModalSuccess: "Дархост қабул шуд! Мы скоро свяжемся.",
 
     // ===== SHOP =====
-    shopTitle: "Магазин Мастер ТЧ",
+    shopTitle: "Магазин Master.TJ",
     shopSubtitle: "Товары для ремонта, дома и установки — с доставкой и возможностью заказать мастера для монтажа",
     shopMarketplace: "Маркетплейс товаров",
     shopGoToCatalog: "Перейти в каталог",
@@ -537,7 +537,7 @@ const translations: Record<Language, Record<string, string>> = {
     shopRecommended: "Рекомендуем",
     shopRecommendedSubtitle: "Лучшие товары по рейтингу и отзывам",
     shopAllProducts: "Все товары",
-    shopTrustTitle: "Почему покупать у Мастер ТЧ?",
+    shopTrustTitle: "Почему покупать у Master.TJ?",
     shopTrustSubtitle: "Мы объединяем магазин и сервис мастеров — всё в одном месте",
     shopTrustMasters: "Проверенные мастера",
     shopTrustMastersDesc: "Все мастера проходят проверку",
@@ -743,8 +743,8 @@ const translations: Record<Language, Record<string, string>> = {
     authPhone: "Телефон",
 
     // ===== ABOUT PAGE =====
-    aboutPageTitle: "О компании Мастер Час",
-    aboutPageDesc: "Мастер Час — это современный маркетплейс бытовых услуг в Душанбе, который помогает быстро найти надёжного мастера для любых задач по дому и офису. Мы соединяем клиентов с проверенными специалистами, обеспечивая качество, скорость и прозрачность на каждом этапе.",
+    aboutPageTitle: "О компании Master.TJ",
+    aboutPageDesc: "Master.TJ — это современный маркетплейс бытовых услуг в Душанбе, который помогает быстро найти надёжного мастера для любых задач по дому и офису. Мы соединяем клиентов с проверенными специалистами, обеспечивая качество, скорость и прозрачность на каждом этапе.",
     aboutMission: "Наша миссия",
     aboutMissionDesc: "Сделать бытовые услуги в Душанбе быстрыми, безопасными, прозрачными и доступными каждому. Мы стремимся к тому, чтобы каждый житель города мог получить качественную помощь мастера за считанные минуты — без лишних звонков, поисков и переплат.",
     aboutWhyChoose: "Почему выбирают нас",
@@ -1097,7 +1097,7 @@ const translations: Record<Language, Record<string, string>> = {
     topProductsDesc: "Самые популярные товары в магазине",
   },
    tj: {
-     brandName: "Мастер ТҶ",
+     brandName: "Master.TJ",
      navHome: "Асосӣ",
      navAbout: "Дар бораи мо",
      navCategories: "Хидматҳо",
@@ -1119,7 +1119,7 @@ const translations: Record<Language, Record<string, string>> = {
     shopAddProduct: "Иловаи мол",
     heroTitle: "Усто ба хонаатон меояд",
     heroSubtitle: "Устоони боэътимод • Баромадан аз 30 дақиқа • Кафолати кор",
-    heroDescription: "Мастер Час — хидмати даъвати усто ба хона дар Душанбе. Барқ, сантехника, тозакунӣ, таъмири техника ва дигар хидматҳо — зуд, боэътимод, бо нархҳои одилона дар сомонӣ.",
+    heroDescription: "Master.TJ — хидмати даъвати усто ба хона дар Душанбе. Барқ, сантехника, тозакунӣ, таъмири техника ва дигар хидматҳо — зуд, боэътимод, бо нархҳои одилона дар сомонӣ.",
     heroOrderButton: "Усто даъват кунед",
     heroEmergencyButton: "🚨 Устои таъҷилӣ 24/7",
     heroEmergencySubtext: "баромадан 30–60 дақиқа дар Душанбе",
@@ -1194,7 +1194,7 @@ const translations: Record<Language, Record<string, string>> = {
     aiCallErrorStart: "Оғоз кардани сӯҳбат муяссар нашуд. Дар браузер ба микрофон иҷозат диҳед ва аз нав кӯшиш кунед.",
     shopAboutBadge: "Дар бораи мағоза",
     shopAboutTitle: "Дар бораи мағозаи",
-    shopAboutPara1: "Мағозаи Мастер ТЧ — интихоби боэътимод барои хона, таъмир ва корҳои касбӣ дар Душанбе ва тамоми Тоҷикистон.",
+    shopAboutPara1: "Мағозаи Master.TJ — интихоби боэътимод барои хона, таъмир ва корҳои касбӣ дар Душанбе ва тамоми Тоҷикистон.",
     shopAboutPara2: "Мо танҳо маҳсулоти босифат аз истеҳсолкунандагони боэътимодро пешниҳод мекунем ва на танҳо дар харид, балки дар насб бо ёрии устоёнамон кӯмак мерасонем.",
     shopAboutPara3: "Мақсади мо — осон, зуд ва дастрас кардани таъмир барои ҳар як мизоҷ.",
     shopFeatQuality: "Сифати санҷидашуда",
@@ -1369,7 +1369,7 @@ const translations: Record<Language, Record<string, string>> = {
     districtSuburb: "Атрофи шаҳр",
 
     aboutPageBadge: "Дар бораи ширкат",
-    aboutPageHeroTitle1: "Мастер ТЧ — хидмате,",
+    aboutPageHeroTitle1: "Master.TJ — хидмате,",
     aboutPageHeroTitle2: "ки ба он бовар мекунанд",
     aboutPageHeroTitle3: "дар Душанбе",
     aboutPageHeroDesc: "Мо мизоҷон ва устоёни санҷидашударо муттаҳид мекунем, то ки ҳар гуна вазифаҳои рӯзгор зуд, бехатар ва бо нархи шаффоф ҳал шаванд.",
@@ -1432,7 +1432,7 @@ const translations: Record<Language, Record<string, string>> = {
     aboutPageWhatsappButton: "Ба WhatsApp нависед",
     aboutPageCallButton: "Занг задан",
 
-    aboutTitle: "Мастер Час — хидмати устоон дар Душанбе",
+    aboutTitle: "Master.TJ — хидмати устоон дар Душанбе",
     aboutDescription: "Мо ба сокинони Душанбе кӯмак мекунем, ки зуд устои боэътимод пайдо кунанд — аз насби розетка то таъмири пурра.",
     aboutFeature1Title: "Устоони тасдиқшуда",
     aboutFeature1Desc: "Ҳар як усто тафтиши ҳуҷҷатҳо ва малакаро мегузарад.",
@@ -1463,7 +1463,7 @@ const translations: Record<Language, Record<string, string>> = {
     contactsPhone: "Телефон", contactsEmail: "Почта",
     contactsWorkHours: "Тартиби корӣ", contactsWorkHoursValue: "24/7 — шабонарӯзӣ",
     becomeMasterTitle: "Дар Душанбе усто шавед",
-    becomeMasterSubtitle: "Ба дастаи Мастер Час ҳамроҳ шавед — ҳар рӯз фармоиш гиред",
+    becomeMasterSubtitle: "Ба дастаи Master.TJ ҳамроҳ шавед — ҳар рӯз фармоиш гиред",
     becomeMasterBenefit1: "Ҳар рӯз фармоишҳо", becomeMasterBenefit2: "Ҷадвали озод",
     becomeMasterBenefit3: "Пардохт фавран пас аз кор", becomeMasterBenefit4: "Дастгирии дастаи 24/7",
     becomeMasterFormTitle: "Дархост гузоред", becomeMasterFormName: "Номи шумо",
@@ -1479,9 +1479,9 @@ const translations: Record<Language, Record<string, string>> = {
     formDistrict: "Ноҳияи Душанбе", formComment: "Вазифаро тавсиф кунед (ихтиёрӣ)",
     formSubmit: "Фиристодани дархост", formSuccess: "Раҳмат! Мо зуд бо шумо тамос мегирем",
     districtSino: "Сино", districtFirdausi: "Фирдавсӣ", districtShomansur: "Шоҳмансур", districtIsmoili: "Исмоилӣ Сомонӣ",
-    footerAboutText: "Мастер Час — хидмати даъвати усто ба хона дар Душанбе.",
+    footerAboutText: "Master.TJ — хидмати даъвати усто ба хона дар Душанбе.",
     footerContacts: "Тамос", footerDistricts: "Ноҳияҳои Душанбе",
-    footerRights: "© 2025 Мастер Час. Душанбе, Тоҷикистон.",
+    footerRights: "© 2025 Master.TJ. Душанбе, Тоҷикистон.",
     footerServices: "Хидматҳо", footerSubscriptions: "Тарифҳо", footerBecomeMaster: "Усто шавед",
     footerForBusiness: "Барои бизнес", footerPrivacy: "Сиёсати махфият", footerTerms: "Шартҳои истифода",
     footerNavTitle: "Навигатсия", footerClientsTitle: "Барои мизоҷон",
@@ -1499,7 +1499,7 @@ const translations: Record<Language, Record<string, string>> = {
     orderModalSubmit: "Фиристодан", orderModalSuccess: "Дархост қабул шуд! Мо зуд тамос мегирем.",
 
     // Shop
-    shopTitle: "Мағозаи Мастер ТҶ", shopSubtitle: "Молҳо барои таъмир, хона ва насб — бо интиқол ва имконияти фармоиши усто",
+    shopTitle: "Мағозаи Master.TJ", shopSubtitle: "Молҳо барои таъмир, хона ва насб — бо интиқол ва имконияти фармоиши усто",
     shopMarketplace: "Маркетплейси молҳо", shopGoToCatalog: "Ба каталог гузаред",
     shopFindMaster: "Усто барои насб ёбед", shopProducts: "мол", shopCategories: "категория",
     shopDelivery: "Интиқол", shopCart: "Сабад",
@@ -1514,7 +1514,7 @@ const translations: Record<Language, Record<string, string>> = {
     shopInstallFrom: "Насб аз", shopMasterInstall: "Насб аз тарафи усто",
     shopBuyWithInstallBtn: "Бо насб харед", shopRecommended: "Тавсия мекунем",
     shopRecommendedSubtitle: "Беҳтарин молҳо аз рӯи рейтинг", shopAllProducts: "Ҳамаи молҳо",
-    shopTrustTitle: "Чаро аз Мастер ТҶ харед?",
+    shopTrustTitle: "Чаро аз Master.TJ харед?",
     shopTrustSubtitle: "Мо мағоза ва хидмати устоонро дар як ҷо муттаҳид мекунем",
     shopTrustMasters: "Устоони тасдиқшуда", shopTrustMastersDesc: "Ҳамаи устоон тафтиш мешаванд",
     shopTrustGuarantee: "Кафолати кор", shopTrustGuaranteeDesc: "Кафолат ба ҳамаи хидматҳо",
@@ -1604,8 +1604,8 @@ const translations: Record<Language, Record<string, string>> = {
     authEmailNotConfirmed: "Email тасдиқ нашудааст. Почтаро тафтиш кунед.",
     authPasswordMinLength: "Рамз бояд на камтар аз 8 аломат бошад",
     authYourName: "Номи шумо", authPhone: "Телефон",
-    aboutPageTitle: "Дар бораи ширкати Мастер Час",
-    aboutPageDesc: "Мастер Час — маркетплейси муосири хидматҳои маишӣ дар Душанбе аст.",
+    aboutPageTitle: "Дар бораи ширкати Master.TJ",
+    aboutPageDesc: "Master.TJ — маркетплейси муосири хидматҳои маишӣ дар Душанбе аст.",
     aboutMission: "Рисолати мо", aboutMissionDesc: "Хидматҳои маиширо дар Душанбе зуд, бехатар ва шаффоф кардан.",
     aboutWhyChoose: "Чаро моро интихоб мекунанд",
     aboutVerifiedMasters: "Устоони тасдиқшуда", aboutVerifiedMastersDesc: "Ҳамаи устоон тафтиши ҳуҷҷатҳо ва малакаро мегузаранд.",

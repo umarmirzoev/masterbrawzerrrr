@@ -127,7 +127,7 @@ const About = () => {
                 <div className="relative h-[420px] md:h-[480px] overflow-hidden">
                   <img
                     src={heroImage}
-                    alt="Мастер ТЧ"
+                    alt="Master.TJ"
                     className="h-full w-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -137,7 +137,7 @@ const About = () => {
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-[2rem] p-5 md:p-6 border border-white/50 dark:border-slate-700/50 shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex items-center justify-between transition-transform duration-500 group-hover:translate-y-[-4px]">
                     <div>
-                      <p className="text-xl font-black text-slate-900 dark:text-white leading-tight mb-1">Мастер ТЧ</p>
+                      <p className="text-xl font-black text-slate-900 dark:text-white leading-tight mb-1">Master.TJ</p>
                       <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold tracking-wide">{t("aboutPageCardTagline")}</p>
                     </div>
                     <div className="flex flex-col items-end">

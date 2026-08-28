@@ -15,7 +15,7 @@ export const Footer = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
                 М
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">Мастер ТЧ</span>
+              <span className="text-xl font-bold text-white tracking-tight">Master.TJ</span>
             </Link>
             <p className="text-sm leading-relaxed max-w-xs">
               {t("footerAboutText")}

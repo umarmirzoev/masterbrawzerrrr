@@ -94,7 +94,7 @@ export default function Shop() {
                 </div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
-                  {t("shopAboutTitle")} <span className="text-emerald-500">Мастер ТЧ</span>
+                  {t("shopAboutTitle")} <span className="text-emerald-500">Master.TJ</span>
                 </h1>
 
                 <div className="space-y-6 mb-12 text-slate-500 dark:text-slate-400">

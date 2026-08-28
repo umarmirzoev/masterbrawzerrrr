@@ -302,7 +302,7 @@ const BecomeMaster = () => {
                   <Zap className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">Мастер ТЧ</p>
+                  <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">Master.TJ</p>
                   <p className="font-bold text-slate-900 dark:text-white">Ремонт и обслуживание</p>
                 </div>
               </div>
@@ -422,7 +422,7 @@ const BecomeMaster = () => {
                   <CardContent className="p-12 text-center">
                     <Download className="mx-auto mb-6 h-16 w-16 text-emerald-500" />
                     <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Установите приложение</h3>
-                    <p className="text-slate-500 dark:text-slate-400 mb-8">Установите приложение Мастер ТЧ, чтобы отправить заявку на статус мастера и начать получать заказы.</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8">Установите приложение Master.TJ, чтобы отправить заявку на статус мастера и начать получать заказы.</p>
                     <Button onClick={() => navigate("/install-app")} className="mb-2 rounded-full bg-emerald-600 text-white px-10 h-14 hover:bg-emerald-700">
                       Установить приложение
                     </Button>

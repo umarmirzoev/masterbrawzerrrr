@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ClipboardList, Plus, Star, Clock, User, XCircle, MapPin, Phone,
   CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar, FileText,
-  CreditCard, DollarSign, Heart, HelpCircle, ShoppingBag,
+  CreditCard, DollarSign, Heart, HelpCircle, ShoppingBag, Trash2,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
@@ -55,6 +55,13 @@ export default function ClientDashboard() {
   const [payOrder, setPayOrder] = useState<any>(null);
   const [receiptOrder, setReceiptOrder] = useState<any>(null);
   const [supportOpen, setSupportOpen] = useState(false);
+
+  // Способы оплаты (сохранённые карты) — хранятся локально на устройстве клиента.
+  const [savedCards, setSavedCards] = useState<{ id: string; last4: string; expiry: string }[]>([]);
+  const [addCardOpen, setAddCardOpen] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
 
   // Profile editing
   const [editName, setEditName] = useState("");
@@ -135,6 +142,62 @@ export default function ClientDashboard() {
   };
 
   useEffect(() => { fetchOrders(); fetchApplication(); fetchFavoritesCount(); fetchShopSpend(); }, [user]);
+  // Загружаем сохранённые карты клиента (хранятся локально в браузере, привязаны к id пользователя).
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = localStorage.getItem(`masterchas_payment_cards_${user.id}`);
+      setSavedCards(raw ? JSON.parse(raw) : []);
+    } catch {
+      setSavedCards([]);
+    }
+  }, [user]);
+
+  const formatCardNumber = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 12);
+    return digits.replace(/(.{4})/g, "$1 ").trim();
+  };
+
+  const formatCardExpiry = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  };
+
+  const handleAddCard = () => {
+    const digits = cardNumber.replace(/\D/g, "");
+    const [month, year] = cardExpiry.split("/");
+
+    if (digits.length !== 12) {
+      toast({ title: "Проверьте номер карты", description: "Номер карты должен содержать 12 цифр", variant: "destructive" });
+      return;
+    }
+    if (!month || !year || year.length !== 2 || Number(month) < 1 || Number(month) > 12) {
+      toast({ title: "Проверьте срок действия", description: "Укажите срок действия в формате ММ/ГГ", variant: "destructive" });
+      return;
+    }
+    if (cardCvv.length !== 3) {
+      toast({ title: "Проверьте CVV", description: "CVV должен содержать 3 цифры", variant: "destructive" });
+      return;
+    }
+
+    const newCard = { id: crypto.randomUUID(), last4: digits.slice(-4), expiry: cardExpiry };
+    const next = [...savedCards, newCard];
+    setSavedCards(next);
+    if (user) localStorage.setItem(`masterchas_payment_cards_${user.id}`, JSON.stringify(next));
+
+    setCardNumber("");
+    setCardExpiry("");
+    setCardCvv("");
+    setAddCardOpen(false);
+    toast({ title: "Карта добавлена", description: `Карта •••• ${newCard.last4} сохранена` });
+  };
+
+  const handleDeleteCard = (id: string) => {
+    const next = savedCards.filter((c) => c.id !== id);
+    setSavedCards(next);
+    if (user) localStorage.setItem(`masterchas_payment_cards_${user.id}`, JSON.stringify(next));
+  };
   useEffect(() => {
     if (profile) {
       setEditName(profile.full_name || "");
@@ -389,7 +452,43 @@ export default function ClientDashboard() {
         </motion.div>
       ) : tab === "payments" ? (
         <div className="space-y-3">
-          <h3 className="text-base font-semibold mb-2">История оплат</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-base font-semibold">Способы оплаты</h3>
+            <Button size="sm" variant="outline" className="rounded-full gap-1.5" onClick={() => setAddCardOpen(true)}>
+              <Plus className="w-3.5 h-3.5" /> Добавить карту
+            </Button>
+          </div>
+          {savedCards.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <CreditCard className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground text-sm">Нет сохранённых карт</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {savedCards.map((card) => (
+                <Card key={card.id}>
+                  <CardContent className="p-4 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
+                        <CreditCard className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm">•••• •••• •••• {card.last4}</p>
+                        <p className="text-xs text-muted-foreground">Срок действия {card.expiry}</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground hover:text-red-500" onClick={() => handleDeleteCard(card.id)}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          <h3 className="text-base font-semibold mt-6 mb-2">История оплат</h3>
           {orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").length === 0 ? (
             <Card><CardContent className="py-12 text-center"><CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" /><p className="text-muted-foreground">Нет оплат</p></CardContent></Card>
           ) : orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").map(o => (
@@ -602,6 +701,56 @@ export default function ClientDashboard() {
         open={!!receiptOrder}
         onOpenChange={(open) => { if (!open) setReceiptOrder(null); }}
       />
+
+      {/* Add payment card dialog */}
+      <Dialog open={addCardOpen} onOpenChange={setAddCardOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Добавить карту</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground uppercase">Номер карты</label>
+              <Input
+                inputMode="numeric"
+                placeholder="0000 0000 0000"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                maxLength={14}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase">Срок действия (ММ/ГГ)</label>
+                <Input
+                  inputMode="numeric"
+                  placeholder="ММ/ГГ"
+                  value={cardExpiry}
+                  onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
+                  maxLength={5}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase">CVV</label>
+                <Input
+                  type="password"
+                  inputMode="numeric"
+                  placeholder="•••"
+                  value={cardCvv}
+                  onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                  maxLength={3}
+                />
+              </div>
+            </div>
+            <Button className="w-full rounded-xl" onClick={handleAddCard}>
+              Сохранить карту
+            </Button>
+            <p className="text-[11px] text-muted-foreground text-center">
+              Данные карты хранятся только на этом устройстве
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Support button (floating) */}
       <div className="fixed bottom-24 right-4 z-40">
