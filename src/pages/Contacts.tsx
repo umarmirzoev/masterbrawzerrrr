@@ -57,7 +57,7 @@ const Contacts = () => {
       
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-green-100 dark:border-emerald-900/30 bg-[#eefbf5] dark:bg-emerald-950/20 pt-12 pb-16">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.12),transparent_28%),linear-gradient(135deg,#f7fffb_0%,#eefbf5_52%,#f8fafc_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.12),transparent_28%),linear-gradient(135deg,#f7fffb_0%,#eefbf5_52%,#f8fafc_100%)] dark:opacity-0" />
         <div className="absolute -left-16 top-10 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" />
         <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" />
         <div className="container px-4 mx-auto max-w-7xl">
@@ -66,7 +66,7 @@ const Contacts = () => {
             {/* Left Content */}
             <div className="flex-1 text-left">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="mb-5 inline-flex rounded-full border border-emerald-200 bg-white/80 dark:bg-slate-900/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 shadow-sm backdrop-blur">
+                <div className="mb-5 inline-flex rounded-full border border-emerald-200 bg-white/80 dark:bg-slate-900/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400 shadow-sm backdrop-blur">
                   Контакты 24/7
                 </div>
                 <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Свяжитесь с нами</h1>
@@ -115,7 +115,7 @@ const Contacts = () => {
             {/* Right Contact Grid */}
             <div className="w-full lg:w-2/3">
               <div className="hidden lg:block mb-[66px]">
-                <div className="mb-3 inline-flex rounded-full border border-emerald-200 bg-white/80 dark:bg-slate-900/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 shadow-sm backdrop-blur">
+                <div className="mb-3 inline-flex rounded-full border border-emerald-200 bg-white/80 dark:bg-slate-900/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400 shadow-sm backdrop-blur">
                   Все способы связи
                 </div>
                 <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-1 tracking-tight">Выберите удобный способ</h2>
