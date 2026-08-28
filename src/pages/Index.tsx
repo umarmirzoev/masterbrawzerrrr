@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import OrderModal from "@/components/OrderModal";
@@ -445,8 +445,10 @@ const Index = () => {
              className="flex flex-col md:flex-row items-center justify-between mb-20 gap-8"
            >
               <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t("reviewsTitle")}</h2>
-              <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-8 py-7 rounded-2xl flex items-center gap-3 group text-lg">
-                 {t("viewAllReviews")} <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              <Button asChild variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 px-8 py-7 rounded-2xl flex items-center gap-3 group text-lg">
+                 <Link to="/reviews">
+                   {t("viewAllReviews")} <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                 </Link>
               </Button>
            </motion.div>
 

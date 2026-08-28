@@ -45,6 +45,11 @@ import ShopSearch from "./pages/ShopSearch";
 import ShopFavorites from "./pages/ShopFavorites";
 import ShopReviews from "./pages/ShopReviews";
 import { FavoritesProvider } from "@/components/favorites/FavoritesSection";
+import HowItWorks from "./pages/HowItWorks";
+import Guarantee from "./pages/Guarantee";
+import FAQ from "./pages/Faq";
+import Reviews from "./pages/Reviews";
+import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +76,11 @@ const AnimatedRoutes = () => {
           <Route path="/category/:id" element={<PageTransition><CategoryDetail /></PageTransition>} />
           <Route path="/service/:id" element={<PageTransition><ServiceDetail /></PageTransition>} />
           <Route path="/contacts" element={<PageTransition><Contacts /></PageTransition>} />
+          <Route path="/how-it-works" element={<PageTransition><HowItWorks /></PageTransition>} />
+          <Route path="/guarantee" element={<PageTransition><Guarantee /></PageTransition>} />
+          <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
+          <Route path="/reviews" element={<PageTransition><Reviews /></PageTransition>} />
+          <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
         <Route path="/ai-call" element={<PageTransition><AiCall /></PageTransition>} />
           <Route path="/services" element={<PageTransition><NotFound /></PageTransition>} />
           <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
