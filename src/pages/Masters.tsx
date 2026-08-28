@@ -229,7 +229,7 @@ export default function Masters() {
                     alt="Consultant"
                     className="h-full w-full object-cover object-[center_18%] transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-white/20 dark:via-slate-900/20 to-transparent" />
                   <div className="absolute bottom-4 left-6">
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 border-2 border-white">
                       <Headset className="h-5 w-5" />

@@ -128,7 +128,7 @@ export default function Shop() {
                  className="absolute inset-0 w-full h-full object-cover object-center"
                />
                {/* Mask for smooth transition */}
-               <div className="absolute inset-0 bg-gradient-to-r from-white via-white/5 to-transparent z-10" />
+               <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-slate-900 via-white/5 dark:via-slate-900/5 to-transparent z-10" />
                
                {/* Rating Badge - Absolute inside the photo column but fixed to bottom right */}
                <div className="absolute bottom-10 right-10 z-30 hidden xl:block scale-90 origin-bottom-right">

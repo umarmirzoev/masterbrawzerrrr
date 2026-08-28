@@ -128,7 +128,7 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-24 overflow-hidden bg-gradient-to-b from-[#f9fafb] to-white">
+      <section className="relative pt-12 pb-24 overflow-hidden bg-gradient-to-b from-[#f9fafb] to-white dark:from-slate-900 dark:to-slate-950">
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             {/* Hero Left Content */}
@@ -165,7 +165,7 @@ const Index = () => {
                     <Search className="w-6 h-6 text-slate-400 dark:text-slate-500 ml-5 mr-3" />
                     <Input 
                       placeholder={t("heroSearchPlaceholder")} 
-                      className="border-0 focus-visible:ring-0 text-slate-900 dark:text-white text-lg font-medium placeholder:text-slate-400 dark:text-slate-500 h-14"
+                      className="border-0 focus-visible:ring-0 text-slate-900 dark:text-white text-lg font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 h-14"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}

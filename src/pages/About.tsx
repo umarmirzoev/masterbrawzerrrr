@@ -281,7 +281,7 @@ const About = () => {
                   alt={t("aboutPageMissionImgAlt")}
                   className="h-full w-full object-contain object-right-bottom transition-transform duration-700 group-hover:scale-110 group-hover:-translate-x-4"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#f8f8f6] via-[#f8f8f6]/50 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#f8f8f6] dark:from-slate-900 via-[#f8f8f6]/50 dark:via-slate-900/50 to-transparent pointer-events-none" />
               </div>
               <div className="mt-8 block md:hidden">
                 <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-4 shadow-sm">
