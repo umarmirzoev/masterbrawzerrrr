@@ -18,7 +18,7 @@ export const Footer = () => {
               <span className="text-xl font-bold text-white tracking-tight">Мастер ТЧ</span>
             </Link>
             <p className="text-sm leading-relaxed max-w-xs">
-              Сервис вызова мастеров на дом в Душанбе. Электрика, сантехника, уборка, ремонт и многие другие услуги.
+              {t("footerAboutText")}
             </p>
             <div className="flex items-center gap-4 pt-2">
               <SocialLink href="#" icon={<Send className="w-4 h-4" />} />
@@ -29,47 +29,47 @@ export const Footer = () => {
 
           {/* Navigation */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">Навигация</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">{t("footerNavTitle")}</h3>
             <ul className="space-y-4">
-              <FooterLink path="/" label="Главная" />
-              <FooterLink path="/categories" label="Услуги" />
-              <FooterLink path="/masters" label="Мастера" />
-              <FooterLink path="/shop" label="Магазин" />
-              <FooterLink path="/about" label="О нас" />
-              <FooterLink path="/contacts" label="Контакты" />
+              <FooterLink path="/" label={t("navHome")} />
+              <FooterLink path="/categories" label={t("navCategories")} />
+              <FooterLink path="/masters" label={t("navMasters")} />
+              <FooterLink path="/shop" label={t("navShop")} />
+              <FooterLink path="/about" label={t("navAbout")} />
+              <FooterLink path="/contacts" label={t("navContacts")} />
             </ul>
           </div>
 
           {/* For Clients */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">Для клиентов</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">{t("footerClientsTitle")}</h3>
             <ul className="space-y-4">
-              <FooterLink path="/how-it-works" label="Как это работает" />
-              <FooterLink path="/guarantee" label="Гарантии" />
-              <FooterLink path="/faq" label="Вопросы и ответы" />
-              <FooterLink path="/reviews" label="Отзывы" />
-              <FooterLink path="/blog" label="Блог" />
+              <FooterLink path="/how-it-works" label={t("footerHowItWorksLink")} />
+              <FooterLink path="/guarantee" label={t("footerGuaranteeLink")} />
+              <FooterLink path="/faq" label={t("footerFaqLink")} />
+              <FooterLink path="/reviews" label={t("footerReviewsLink")} />
+              <FooterLink path="/blog" label={t("footerBlogLink")} />
             </ul>
           </div>
 
           {/* Contacts */}
           <div className="lg:col-span-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">Контакты</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">{t("footerContacts")}</h3>
             <div className="space-y-5">
               <ContactItem icon={<Phone className="w-4 h-4 text-emerald-500" />} text="+992 979 117 007" />
               <ContactItem icon={<Mail className="w-4 h-4 text-emerald-500" />} text="support@masterchas.tj" />
-              <ContactItem icon={<MapPin className="w-4 h-4 text-emerald-500" />} text="Душанбе, Таджикистан" />
-              <ContactItem icon={<MessageCircle className="w-4 h-4 text-emerald-500" />} text="Ежедневно с 8:00 до 22:00" />
+              <ContactItem icon={<MapPin className="w-4 h-4 text-emerald-500" />} text={t("footerAddress")} />
+              <ContactItem icon={<MessageCircle className="w-4 h-4 text-emerald-500" />} text={t("footerHours")} />
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-medium uppercase tracking-wider text-slate-500">
-          <p>© 2025 Мастер ТЧ. Все права защищены.</p>
+          <p>{t("footerRights")}</p>
           <div className="flex items-center gap-8">
-            <a href="#" className="hover:text-emerald-500 transition-colors">Политика конфиденциальности</a>
-            <a href="#" className="hover:text-emerald-500 transition-colors">Условия использования</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors">{t("footerPrivacy")}</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors">{t("footerTerms")}</a>
           </div>
         </div>
       </div>

@@ -92,7 +92,7 @@ export default function Header() {
             <Button
               className="hidden md:flex bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 h-11 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95"
             >
-              Вызвать мастера
+              {t("heroOrderButton")}
             </Button>
 
             <DropdownMenu>
@@ -119,7 +119,7 @@ export default function Header() {
                   className="rounded-xl h-10 px-3 bg-slate-50 dark:bg-slate-800 gap-1.5 hidden sm:flex"
                 >
                   <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Кабинет</span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{t("cabinet")}</span>
                 </Button>
                 <Button
                   onClick={() => navigate(getDashboardPath())}
@@ -139,7 +139,7 @@ export default function Header() {
                 size="sm"
                 className="hidden md:flex rounded-xl h-10 px-4 font-bold border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
               >
-                Войти
+                {t("login")}
               </Button>
             )}
 
@@ -188,7 +188,7 @@ export default function Header() {
                             className="w-full rounded-2xl h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-2"
                           >
                             <User className="w-5 h-5" />
-                            Кабинет
+                            {t("cabinet")}
                           </Button>
                         </SheetClose>
                         <Button onClick={signOut} variant="outline" className="w-full rounded-2xl h-14 border-red-100 dark:border-red-900/40 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 gap-2">
@@ -203,7 +203,7 @@ export default function Header() {
                           className="w-full rounded-2xl h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-2"
                         >
                           <User className="w-5 h-5" />
-                          Войти / Регистрация
+                          {t("loginRegister")}
                         </Button>
                       </SheetClose>
                     )}
