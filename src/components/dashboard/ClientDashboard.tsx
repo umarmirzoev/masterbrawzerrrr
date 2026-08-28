@@ -323,23 +323,23 @@ export default function ClientDashboard() {
 
           {/* Real stats */}
           <div className="grid grid-cols-3 gap-3">
-            <Card className="group border-0 shadow-sm bg-blue-50/60 hover-soft transition-shadow cursor-default">
+            <Card className="group border-0 shadow-sm bg-blue-50/60 dark:bg-blue-500/10 hover-soft transition-shadow cursor-default">
               <CardContent className="p-4 text-center">
-                <ClipboardList className="w-5 h-5 text-blue-600 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
+                <ClipboardList className="w-5 h-5 text-blue-600 dark:text-blue-400 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
                 <p className="text-xl font-black text-foreground">{orders.length}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatOrders")}</p>
               </CardContent>
             </Card>
-            <Card className="group border-0 shadow-sm bg-rose-50/60 hover-soft transition-shadow cursor-default">
+            <Card className="group border-0 shadow-sm bg-rose-50/60 dark:bg-rose-500/10 hover-soft transition-shadow cursor-default">
               <CardContent className="p-4 text-center">
-                <Heart className="w-5 h-5 text-rose-500 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
+                <Heart className="w-5 h-5 text-rose-500 dark:text-rose-400 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
                 <p className="text-xl font-black text-foreground">{favoritesCount}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatFavorites")}</p>
               </CardContent>
             </Card>
-            <Card className="group border-0 shadow-sm bg-amber-50/60 hover-soft transition-shadow cursor-default">
+            <Card className="group border-0 shadow-sm bg-amber-50/60 dark:bg-amber-500/10 hover-soft transition-shadow cursor-default">
               <CardContent className="p-4 text-center">
-                <DollarSign className="w-5 h-5 text-amber-600 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
+                <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
                 <p className="text-xl font-black text-foreground">{totalSpent.toLocaleString()}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatSpent")}</p>
               </CardContent>

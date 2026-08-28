@@ -57,17 +57,17 @@ const Index = () => {
   };
 
   const services = [
-    { icon: <Zap className="text-amber-500" />, name: "Электрика", nameKey: "catElectric", priceKey: "catElectricPrice", color: "bg-amber-50" },
-    { icon: <Droplets className="text-blue-500" />, name: "Сантехника", nameKey: "catPlumbing", priceKey: "catPlumbingPrice", color: "bg-blue-50" },
-    { icon: <Hammer className="text-emerald-500" />, name: "Отделка и ремонт", nameKey: "catRenovation", priceKey: "catRenovationPrice", color: "bg-emerald-50" },
-    { icon: <Sofa className="text-orange-500" />, name: "Мебель и двери", nameKey: "catFurniture", priceKey: "catFurniturePrice", color: "bg-orange-50" },
-    { icon: <Cpu className="text-violet-500" />, name: "Умный дом", nameKey: "catSmartHome", priceKey: "catSmartHomePrice", color: "bg-violet-50" },
-    { icon: <Waves className="text-sky-500" />, name: "Водоснабжение", nameKey: "catWaterSupply", priceKey: "catWaterSupplyPrice", color: "bg-sky-50" },
-    { icon: <Trash2 className="text-green-500" />, name: "Уборка", nameKey: "catCleaning", priceKey: "catCleaningPrice", color: "bg-green-50" },
-    { icon: <Snowflake className="text-cyan-500" />, name: "Кондиционеры", nameKey: "catAirConditioners", priceKey: "catAirConditionersPrice", color: "bg-cyan-50" },
-    { icon: <Thermometer className="text-red-500" />, name: "Отопление", nameKey: "catHeating", priceKey: "catHeatingPrice", color: "bg-red-50" },
-    { icon: <Construction className="text-pink-500" />, name: "Мелкие работы", nameKey: "catSmallJobs", priceKey: "catSmallJobsPrice", color: "bg-pink-50" },
-    { icon: <Layers className="text-orange-600" />, name: "Полы и ламинат", nameKey: "catFloors", priceKey: "catFloorsPrice", color: "bg-orange-50" },
+    { icon: <Zap className="text-amber-500 dark:text-amber-400" />, name: "Электрика", nameKey: "catElectric", priceKey: "catElectricPrice", color: "bg-amber-50 dark:bg-amber-500/10" },
+    { icon: <Droplets className="text-blue-500 dark:text-blue-400" />, name: "Сантехника", nameKey: "catPlumbing", priceKey: "catPlumbingPrice", color: "bg-blue-50 dark:bg-blue-500/10" },
+    { icon: <Hammer className="text-emerald-500 dark:text-emerald-400" />, name: "Отделка и ремонт", nameKey: "catRenovation", priceKey: "catRenovationPrice", color: "bg-emerald-50 dark:bg-emerald-500/10" },
+    { icon: <Sofa className="text-orange-500 dark:text-orange-400" />, name: "Мебель и двери", nameKey: "catFurniture", priceKey: "catFurniturePrice", color: "bg-orange-50 dark:bg-orange-500/10" },
+    { icon: <Cpu className="text-violet-500 dark:text-violet-400" />, name: "Умный дом", nameKey: "catSmartHome", priceKey: "catSmartHomePrice", color: "bg-violet-50 dark:bg-violet-500/10" },
+    { icon: <Waves className="text-sky-500 dark:text-sky-400" />, name: "Водоснабжение", nameKey: "catWaterSupply", priceKey: "catWaterSupplyPrice", color: "bg-sky-50 dark:bg-sky-500/10" },
+    { icon: <Trash2 className="text-green-500 dark:text-green-400" />, name: "Уборка", nameKey: "catCleaning", priceKey: "catCleaningPrice", color: "bg-green-50 dark:bg-green-500/10" },
+    { icon: <Snowflake className="text-cyan-500 dark:text-cyan-400" />, name: "Кондиционеры", nameKey: "catAirConditioners", priceKey: "catAirConditionersPrice", color: "bg-cyan-50 dark:bg-cyan-500/10" },
+    { icon: <Thermometer className="text-red-500 dark:text-red-400" />, name: "Отопление", nameKey: "catHeating", priceKey: "catHeatingPrice", color: "bg-red-50 dark:bg-red-500/10" },
+    { icon: <Construction className="text-pink-500 dark:text-pink-400" />, name: "Мелкие работы", nameKey: "catSmallJobs", priceKey: "catSmallJobsPrice", color: "bg-pink-50 dark:bg-pink-500/10" },
+    { icon: <Layers className="text-orange-600 dark:text-orange-400" />, name: "Полы и ламинат", nameKey: "catFloors", priceKey: "catFloorsPrice", color: "bg-orange-50 dark:bg-orange-500/10" },
     { icon: <Grid className="text-slate-500 dark:text-slate-400" />, name: "Другие услуги", nameKey: "catOtherServices", priceKey: "catOtherServicesPrice", color: "bg-slate-50 dark:bg-slate-800" },
   ];
 
