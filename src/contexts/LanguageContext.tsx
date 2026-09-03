@@ -2542,6 +2542,7 @@ const extraTranslations: Record<Language, Record<string, string>> = {
     mpTrust4: "Гарантия качества",
     mpTrust4Sub: "Гарантия на услуги",
     mpSendOrder: "Отправить заявку",
+    downloadApp: "Скачать",
   },
   tj: {
     dashboardControlPanel: "Панели идоракунӣ",
@@ -2711,6 +2712,7 @@ const extraTranslations: Record<Language, Record<string, string>> = {
     mpTrust4: "Кафолати сифат",
     mpTrust4Sub: "Кафолати хизматрасонӣ",
     mpSendOrder: "Фиристодани фармоиш",
+    downloadApp: "Боргирӣ",
   },
   en: {
     dashboardControlPanel: "Control panel",
@@ -2880,6 +2882,7 @@ const extraTranslations: Record<Language, Record<string, string>> = {
     mpTrust4: "Quality guarantee",
     mpTrust4Sub: "Service is guaranteed",
     mpSendOrder: "Send request",
+    downloadApp: "Download",
   },
 };
 
