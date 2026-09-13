@@ -23,7 +23,7 @@ export default function AiCall() {
   const [assistantSpeaking, setAssistantSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
-  const transcriptEndRef = useRef<HTMLDivElement>(null);
+  const transcriptContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const vapi = getVapi();
@@ -61,7 +61,12 @@ export default function AiCall() {
   }, []);
 
   useEffect(() => {
-    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Прокручиваем только внутренний контейнер транскрипта, а не всю страницу —
+    // scrollIntoView() тянул за собой весь документ вниз при каждой новой реплике.
+    const container = transcriptContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [transcript]);
 
   const startCall = async () => {
@@ -181,14 +186,13 @@ export default function AiCall() {
                         {assistantSpeaking ? t("aiCallSpeaking") : t("aiCallListening")}
                       </p>
 
-                      <div className="w-full max-h-52 overflow-y-auto space-y-2 border-t border-border pt-4">
+                      <div ref={transcriptContainerRef} className="w-full max-h-52 overflow-y-auto space-y-2 border-t border-border pt-4">
                         {transcript.map((line, i) => (
                           <div key={i} className={`rounded-2xl border px-3 py-2 text-sm ${line.role === "assistant" ? "border-emerald-100 bg-emerald-50/60 text-foreground" : "border-slate-100 bg-slate-50 text-muted-foreground"}`}>
                             <span className="font-semibold">{line.role === "assistant" ? t("aiCallLabelAi") : t("aiCallLabelUser")}</span>
                             {line.text}
                           </div>
                         ))}
-                        <div ref={transcriptEndRef} />
                       </div>
 
                       <Button onClick={endCall} variant="destructive" className="hover-soft w-full rounded-full h-12 gap-2 transition-all active:scale-95">
