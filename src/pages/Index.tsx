@@ -4,7 +4,7 @@ import {
   Search, Star, CheckCircle2, Clock, ShieldCheck, 
   Wallet, Users, ArrowRight, Phone, MessageSquare,
   Zap, Droplets, Hammer, Sofa, Cpu, Waves, 
-  Trash2, Snowflake, Thermometer, Construction, Layers, Grid, Siren, Camera
+  Trash2, Snowflake, Thermometer, Construction, Layers, Grid, Siren, Camera, Bot
 } from "lucide-react";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import OrderModal from "@/components/OrderModal";
 import QuickBooking from "@/components/QuickBooking";
 import AiMasterMatch from "@/components/AiMasterMatch";
+import { AI_AGENT_PHONE, AI_AGENT_PHONE_LABEL } from "@/lib/utils";
 
 const AVATAR_COLORS = [
   "bg-emerald-500", "bg-blue-500", "bg-orange-500",
@@ -188,6 +189,20 @@ const Index = () => {
                     <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shrink-0"><Camera className="w-5 h-5 text-white" /></span>
                     <span className="min-w-0"><span className="block font-black text-violet-700 dark:text-violet-300">Фото ИИ</span><span className="block text-xs text-violet-600/80 dark:text-violet-300/70 truncate">Определим поломку по фото</span></span>
                   </Link>
+                  <a href={`tel:${AI_AGENT_PHONE}`} className="col-span-2 group flex items-center gap-3 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <span className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shrink-0">
+                      <Bot className="w-5 h-5 text-white" />
+                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-lime-400 border-2 border-white dark:border-slate-900 animate-pulse" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-black text-emerald-700 dark:text-emerald-300">ИИ-диспетчер 24/7</span>
+                      <span className="block text-xs text-emerald-700/80 dark:text-emerald-300/70 truncate">Позвоните — примем заказ за 1 минуту</span>
+                    </span>
+                    <span className="hidden sm:flex items-center gap-1.5 text-sm font-black text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                      <Phone className="w-4 h-4" /> {AI_AGENT_PHONE_LABEL}
+                    </span>
+                    <Phone className="sm:hidden w-5 h-5 text-emerald-600 dark:text-emerald-300 shrink-0" />
+                  </a>
                 </div>
 
                 <div className="flex items-center gap-10">

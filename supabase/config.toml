@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.get-products]
 verify_jwt = false
+
+[functions.sos-order]
+verify_jwt = false

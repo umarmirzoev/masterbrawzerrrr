@@ -51,30 +51,15 @@ export default function Sos() {
 
   const selected = EMERGENCIES.find((e) => e.id === type);
 
-  const submit = async () => {
-    if (!selected) {
-      toast({ title: "Выберите, что случилось", variant: "destructive" });
-      return;
-    }
-    if (!phone.trim() || !address.trim()) {
-      toast({ title: "Укажите телефон и адрес", variant: "destructive" });
-      return;
-    }
-    if (!user) return;
-
-    setSending(true);
-    const description = `🚨 СРОЧНО (SOS): ${selected.title}. ${comment}`.trim();
+  // Сохраняем заявку в Supabase (только для вошедших) — для кабинета клиента и уведомлений админам сайта.
+  const saveToSupabase = async (title: string): Promise<boolean> => {
+    if (!user) return false;
+    const description = `🚨 СРОЧНО (SOS): ${title}. ${comment}`.trim();
     const { data, error } = await supabase
       .from("orders")
       .insert({ client_id: user.id, description, address: address.trim(), phone: phone.trim(), status: "new" })
       .select("id");
-
-    if (error) {
-      setSending(false);
-      toast({ title: "Не удалось отправить", description: "Позвоните диспетчеру — это быстрее.", variant: "destructive" });
-      return;
-    }
-
+    if (error) return false;
     const orderId = data?.[0]?.id;
     const { data: admins } = await supabase.from("user_roles").select("user_id").in("role", ["admin", "super_admin"]);
     if (admins?.length) {
@@ -84,7 +69,7 @@ export default function Sos() {
             buildLocalizedNotification({
               userId: a.user_id,
               fallbackTitle: "🚨 SOS-вызов",
-              fallbackMessage: `${selected.title} • ${address.trim()} • ${phone.trim()}`,
+              fallbackMessage: `${title} • ${address.trim()} • ${phone.trim()}`,
               type: "order_created",
               relatedId: orderId ?? null,
             }),
@@ -92,7 +77,39 @@ export default function Sos() {
         ),
       );
     }
+    return true;
+  };
+
+  // Отправляем заявку в админку admin.emaster.tj (раздел «Заказы → SOS»). Работает и для гостей.
+  const sendToAdminPanel = async (title: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke("sos-order", {
+        body: { type: title, phone: phone.trim(), address: address.trim(), comment: comment.trim(), name: profile?.full_name ?? "" },
+      });
+      return !error && Boolean(data?.success);
+    } catch {
+      return false;
+    }
+  };
+
+  const submit = async () => {
+    if (!selected) {
+      toast({ title: "Выберите, что случилось", variant: "destructive" });
+      return;
+    }
+    if (phone.replace(/\D/g, "").length < 9 || address.trim().length < 3) {
+      toast({ title: "Укажите телефон и адрес", variant: "destructive" });
+      return;
+    }
+
+    setSending(true);
+    const [adminOk, localOk] = await Promise.all([sendToAdminPanel(selected.title), saveToSupabase(selected.title)]);
     setSending(false);
+
+    if (!adminOk && !localOk) {
+      toast({ title: "Не удалось отправить", description: "Позвоните диспетчеру — это быстрее.", variant: "destructive" });
+      return;
+    }
     setSent(true);
   };
 
@@ -124,7 +141,7 @@ export default function Sos() {
               <Button asChild className="h-12 rounded-xl bg-red-600 hover:bg-red-700 font-bold">
                 <a href={`tel:${SUPPORT_PHONE}`}><Phone className="w-4 h-4 mr-2" /> Позвонить диспетчеру</a>
               </Button>
-              <Button asChild variant="outline" className="h-12 rounded-xl"><Link to="/dashboard">Мои заказы</Link></Button>
+              {user && <Button asChild variant="outline" className="h-12 rounded-xl"><Link to="/dashboard">Мои заказы</Link></Button>}
             </div>
           </motion.div>
         ) : (
@@ -160,39 +177,24 @@ export default function Sos() {
               </div>
             )}
 
-            {user ? (
-              <div className="space-y-3">
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="+992 900 000 000" className="h-12" maxLength={20} />
-                  <div className="relative">
-                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-4" />
-                    <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Адрес: район, улица, дом, кв." className="h-12 pl-9" maxLength={200} />
-                  </div>
+            <div className="space-y-3">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="+992 900 000 000" className="h-12" maxLength={20} />
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-4" />
+                  <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Адрес: район, улица, дом, кв." className="h-12 pl-9" maxLength={200} />
                 </div>
-                <Textarea value={comment} onChange={(e) => setComment(e.target.value)} maxLength={300} placeholder="Что именно случилось (необязательно)" />
               </div>
-            ) : (
-              <p className="text-sm text-center text-slate-500 dark:text-slate-400">
-                Нажмите SOS — вы сразу дозвонитесь диспетчеру. Чтобы отправить заявку онлайн, <Link to="/auth" className="text-emerald-600 font-semibold underline">войдите</Link>.
-              </p>
-            )}
+              <Textarea value={comment} onChange={(e) => setComment(e.target.value)} maxLength={300} placeholder="Что именно случилось (необязательно)" />
+            </div>
 
             <div className="flex flex-col items-center gap-4">
-              {user ? (
-                <button onClick={submit} disabled={sending} className={SOS_BUTTON_CLS}>
-                  <span className="absolute inset-0 rounded-full animate-ping bg-red-500/30" />
-                  {sending ? <Loader2 className="w-12 h-12 animate-spin" /> : <Siren className="w-12 h-12" />}
-                  <span className="text-3xl font-black tracking-widest mt-1">SOS</span>
-                  <span className="text-xs font-semibold opacity-90">Вызвать сейчас</span>
-                </button>
-              ) : (
-                <a href={`tel:${type === "gas" ? GAS_EMERGENCY_PHONE : SUPPORT_PHONE}`} className={SOS_BUTTON_CLS}>
-                  <span className="absolute inset-0 rounded-full animate-ping bg-red-500/30" />
-                  <Siren className="w-12 h-12" />
-                  <span className="text-3xl font-black tracking-widest mt-1">SOS</span>
-                  <span className="text-xs font-semibold opacity-90">Позвонить сейчас</span>
-                </a>
-              )}
+              <button onClick={submit} disabled={sending} className={SOS_BUTTON_CLS}>
+                <span className="absolute inset-0 rounded-full animate-ping bg-red-500/30" />
+                {sending ? <Loader2 className="w-12 h-12 animate-spin" /> : <Siren className="w-12 h-12" />}
+                <span className="text-3xl font-black tracking-widest mt-1">SOS</span>
+                <span className="text-xs font-semibold opacity-90">Вызвать сейчас</span>
+              </button>
               <a href={`tel:${SUPPORT_PHONE}`}
                 className="w-full sm:w-auto inline-flex flex-col items-center justify-center rounded-xl border-2 border-red-600 text-red-600 dark:text-red-400 px-6 py-2.5 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
                 <span className="flex items-center gap-2 text-sm sm:text-base"><Phone className="w-4 h-4 shrink-0" /> Позвонить диспетчеру</span>
