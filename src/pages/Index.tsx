@@ -4,7 +4,7 @@ import {
   Search, Star, CheckCircle2, Clock, ShieldCheck, 
   Wallet, Users, ArrowRight, Phone, MessageSquare,
   Zap, Droplets, Hammer, Sofa, Cpu, Waves, 
-  Trash2, Snowflake, Thermometer, Construction, Layers, Grid
+  Trash2, Snowflake, Thermometer, Construction, Layers, Grid, Siren, Camera
 } from "lucide-react";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -177,6 +177,17 @@ const Index = () => {
                       {t("heroSearchButton")}
                     </Button>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 max-w-xl -mt-6 mb-12">
+                  <Link to="/sos" className="group flex items-center gap-3 rounded-2xl border border-red-100 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center shadow-md shrink-0"><Siren className="w-5 h-5 text-white" /></span>
+                    <span className="min-w-0"><span className="block font-black text-red-700 dark:text-red-300">SOS</span><span className="block text-xs text-red-600/80 dark:text-red-300/70 truncate">Срочный вызов 24/7</span></span>
+                  </Link>
+                  <Link to="/ai-photo" className="group flex items-center gap-3 rounded-2xl border border-violet-100 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shrink-0"><Camera className="w-5 h-5 text-white" /></span>
+                    <span className="min-w-0"><span className="block font-black text-violet-700 dark:text-violet-300">Фото ИИ</span><span className="block text-xs text-violet-600/80 dark:text-violet-300/70 truncate">Определим поломку по фото</span></span>
+                  </Link>
                 </div>
 
                 <div className="flex items-center gap-10">

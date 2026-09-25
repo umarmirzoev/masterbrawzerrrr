@@ -28,6 +28,8 @@ import MasterDetail from "./pages/MasterDetail";
 import CategoryDetail from "./pages/CategoryDetail";
 import ServiceDetail from "./pages/ServiceDetail";
 import AiCall from "./pages/AiCall";
+import Sos from "./pages/Sos";
+import AiPhoto from "./pages/AiPhoto";
 import VerifyEmail from "./pages/VerifyEmail";
 import PendingApproval from "./pages/PendingApproval";
 import Shop from "./pages/Shop";
@@ -82,6 +84,8 @@ const AnimatedRoutes = () => {
           <Route path="/reviews" element={<PageTransition><Reviews /></PageTransition>} />
           <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
         <Route path="/ai-call" element={<PageTransition><AiCall /></PageTransition>} />
+        <Route path="/sos" element={<PageTransition><Sos /></PageTransition>} />
+        <Route path="/ai-photo" element={<PageTransition><AiPhoto /></PageTransition>} />
           <Route path="/services" element={<PageTransition><NotFound /></PageTransition>} />
           <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
