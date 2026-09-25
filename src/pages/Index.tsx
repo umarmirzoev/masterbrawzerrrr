@@ -170,25 +170,27 @@ const Index = () => {
 
                 <div className="relative max-w-xl mb-12 group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-500" />
-                  <div className="relative flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50">
-                    <Input 
-                      placeholder={t("heroSearchPlaceholder")} 
-                      className="flex-1 min-w-0 border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 dark:text-white text-base sm:text-lg font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 h-12 pl-4"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setVoiceOpen(true)}
-                      aria-label="Голосовой поиск"
-                      className="shrink-0 w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-500/20 active:scale-95 transition-all"
-                    >
-                      <Mic className="w-5 h-5" />
-                    </button>
+                  <div className="relative flex flex-col sm:flex-row sm:items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-none">
+                    <div className="relative flex items-center flex-1 min-w-0 rounded-xl bg-slate-50 sm:bg-transparent dark:bg-slate-800/60 sm:dark:bg-transparent">
+                      <Input 
+                        placeholder={t("heroSearchPlaceholder")} 
+                        className="flex-1 min-w-0 border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 dark:text-white text-base sm:text-lg font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm sm:placeholder:text-base h-12 pl-4 pr-14 truncate"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setVoiceOpen(true)}
+                        aria-label="Голосовой поиск"
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-emerald-100/70 sm:bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-500/25 active:scale-95 transition-all"
+                      >
+                        <Mic className="w-5 h-5" />
+                      </button>
+                    </div>
                     <Button 
                       onClick={handleSearch}
-                      className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-4 sm:px-5 h-11 rounded-xl transition-all shadow-lg shadow-emerald-100 dark:shadow-none active:scale-95"
+                      className="w-full sm:w-auto shrink-0 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-[15px] sm:text-sm px-5 h-12 sm:h-11 rounded-xl transition-all shadow-lg shadow-emerald-500/25 dark:shadow-none active:scale-[0.98]"
                     >
                       <Sparkles className="w-4 h-4 mr-1.5" />
                       <span>{t("heroSearchButton")}</span>
@@ -206,13 +208,13 @@ const Index = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 max-w-xl -mt-6 mb-12">
-                  <Link to="/sos" className="group flex items-center gap-3 rounded-2xl border border-red-100 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center shadow-md shrink-0"><Siren className="w-5 h-5 text-white" /></span>
-                    <span className="min-w-0"><span className="block font-black text-red-700 dark:text-red-300">SOS</span><span className="block text-xs text-red-600/80 dark:text-red-300/70 truncate">Срочный вызов 24/7</span></span>
+                  <Link to="/sos" className="group flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-red-100 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <span className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center shadow-md shrink-0"><Siren className="w-5 h-5 text-white" /></span>
+                    <span className="min-w-0"><span className="block font-black text-red-700 dark:text-red-300">SOS</span><span className="block text-[11px] sm:text-xs leading-tight text-red-600/80 dark:text-red-300/70">Срочный вызов 24/7</span></span>
                   </Link>
-                  <Link to="/ai-photo" className="group flex items-center gap-3 rounded-2xl border border-violet-100 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shrink-0"><Camera className="w-5 h-5 text-white" /></span>
-                    <span className="min-w-0"><span className="block font-black text-violet-700 dark:text-violet-300">Фото ИИ</span><span className="block text-xs text-violet-600/80 dark:text-violet-300/70 truncate">Определим поломку по фото</span></span>
+                  <Link to="/ai-photo" className="group flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-violet-100 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <span className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shrink-0"><Camera className="w-5 h-5 text-white" /></span>
+                    <span className="min-w-0"><span className="block font-black text-violet-700 dark:text-violet-300">Фото ИИ</span><span className="block text-[11px] sm:text-xs leading-tight text-violet-600/80 dark:text-violet-300/70">Поломка по фото</span></span>
                   </Link>
                   <button type="button" onClick={() => setAiDispatcherOpen(true)} className="col-span-2 text-left group flex items-center gap-3 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <span className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shrink-0">
@@ -221,7 +223,7 @@ const Index = () => {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-black text-emerald-700 dark:text-emerald-300">ИИ-диспетчер 24/7</span>
-                      <span className="block text-xs text-emerald-700/80 dark:text-emerald-300/70 truncate">Позвоните — примем заказ за 1 минуту</span>
+                      <span className="block text-[11px] sm:text-xs leading-tight text-emerald-700/80 dark:text-emerald-300/70">Позвоните — примем заказ за 1 минуту</span>
                     </span>
                     <span className="hidden sm:flex items-center gap-1.5 text-sm font-black text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
                       <Phone className="w-4 h-4" /> {AI_AGENT_PHONE_LABEL}
