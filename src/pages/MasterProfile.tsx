@@ -1,3 +1,4 @@
+import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -204,15 +205,15 @@ export default function MasterProfile() {
                   </Button>
 
                   <div className="flex gap-2 mt-3">
-                    {master.phone && (
+                    {SUPPORT_PHONE && (
                       <>
                         <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5 h-10 hover-soft" asChild>
-                          <a href={`tel:${master.phone}`}>
+                          <a href={`tel:${SUPPORT_PHONE}`}>
                             <Phone className="w-3.5 h-3.5" /> {t("mpCall")}
                           </a>
                         </Button>
                         <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5 h-10 hover-soft" asChild>
-                          <a href={`https://wa.me/${master.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
+                          <a href={`https://wa.me/${SUPPORT_WHATSAPP}`} target="_blank" rel="noopener noreferrer">
                             <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                           </a>
                         </Button>

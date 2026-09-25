@@ -5,3 +5,7 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+// Единый номер для звонков и WhatsApp по всем мастерам.
+export const SUPPORT_PHONE = "+992979117007";
+export const SUPPORT_WHATSAPP = "992979117007";

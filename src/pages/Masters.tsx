@@ -1,3 +1,4 @@
+import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -578,13 +579,13 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
               </div>
               <div className="flex gap-2">
                 <button 
-                  onClick={(e) => { e.preventDefault(); window.open(`tel:${master.phone}`); }}
+                  onClick={(e) => { e.preventDefault(); window.open(`tel:${SUPPORT_PHONE}`); }}
                   className="w-9 h-9 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-emerald-50 hover:text-emerald-500 hover:border-emerald-100 transition-all shadow-sm hover-soft"
                 >
                   <Phone className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={(e) => { e.preventDefault(); window.open(`https://wa.me/${master.phone.replace(/\D/g, "")}`); }}
+                  onClick={(e) => { e.preventDefault(); window.open(`https://wa.me/${SUPPORT_WHATSAPP}`); }}
                   className="w-9 h-9 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-emerald-50 hover:text-emerald-500 hover:border-emerald-100 transition-all shadow-sm hover-soft"
                 >
                   <MessageCircle className="w-4 h-4" />

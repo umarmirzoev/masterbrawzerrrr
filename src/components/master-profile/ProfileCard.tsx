@@ -1,3 +1,4 @@
+import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -138,13 +139,13 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
             >
               {t("mpBookMaster")}
             </Button>
-            {master.phone && (
+            {SUPPORT_PHONE && (
               <div className="flex gap-2">
                 <Button size="lg" variant="outline" className="flex-1 rounded-full h-12 gap-2 hover-soft" asChild>
-                  <a href={`tel:${master.phone}`}><Phone className="w-4 h-4" /> {t("mpCall")}</a>
+                  <a href={`tel:${SUPPORT_PHONE}`}><Phone className="w-4 h-4" /> {t("mpCall")}</a>
                 </Button>
                 <Button size="lg" variant="outline" className="flex-1 rounded-full h-12 gap-2 hover-soft" asChild>
-                  <a href={`https://wa.me/${master.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://wa.me/${SUPPORT_WHATSAPP}`} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="w-4 h-4" /> WhatsApp
                   </a>
                 </Button>

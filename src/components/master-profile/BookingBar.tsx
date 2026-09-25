@@ -1,3 +1,4 @@
+import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Star, Phone, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -33,9 +34,9 @@ export default function MasterBookingBar({ master, onBook }: Props) {
           </div>
         </div>
 
-        {master.phone && (
+        {SUPPORT_PHONE && (
           <a
-            href={`https://wa.me/${master.phone.replace(/\D/g, "")}`}
+            href={`https://wa.me/${SUPPORT_WHATSAPP}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-11 h-11 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors shrink-0"

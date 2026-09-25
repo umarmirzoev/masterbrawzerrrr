@@ -1,3 +1,4 @@
+import { SUPPORT_PHONE } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -205,8 +206,8 @@ export default function ClientOrderDetail() {
                           </span>
                         )}
                         {masterInfo.experience_years && <span>{masterInfo.experience_years} лет опыта</span>}
-                        {masterInfo.phone && (
-                          <a href={`tel:${masterInfo.phone}`} className="text-primary hover:underline flex items-center gap-0.5">
+                        {SUPPORT_PHONE && (
+                          <a href={`tel:${SUPPORT_PHONE}`} className="text-primary hover:underline flex items-center gap-0.5">
                             <Phone className="w-3 h-3" /> Позвонить
                           </a>
                         )}
