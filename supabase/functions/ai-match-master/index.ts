@@ -206,8 +206,7 @@ Write the explanation in ${getLanguageName(requestedLanguage)}.`;
 
       // Category match (highest weight)
       const catMatch = m.service_categories?.some((c: string) =>
-        c.toLowerCase().includes(categoryNameForScoring.toLowerCase()) ||
-        categoryNameForScoring.toLowerCase().includes(c.toLowerCase())
+        c.trim().toLowerCase() === categoryNameForScoring.trim().toLowerCase()
       );
       if (catMatch) { score += 40; reasons.push(localizedCopy.reasons.categoryMatch); }
 
@@ -243,7 +242,8 @@ Write the explanation in ${getLanguageName(requestedLanguage)}.`;
 
       return { ...m, ai_score: score, ai_reasons: reasons };
     })
-      .filter((m: any) => m.ai_score > 10)
+      // Показываем только мастеров именно этой категории.
+      .filter((m: any) => m.ai_reasons.includes(localizedCopy.reasons.categoryMatch))
       .sort((a: any, b: any) => b.ai_score - a.ai_score)
       .slice(0, 5);
 

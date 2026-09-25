@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,39 @@ import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 interface AiMasterMatchProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Текст из поиска на главной — при открытии сразу запускаем ИИ-анализ. */
+  initialDescription?: string;
+}
+
+// Локальный разбор запроса, если edge-функция ИИ недоступна. Категории — как на странице /masters.
+const LOCAL_CATEGORY_RULES: { name: string; words: string[] }[] = [
+  { name: "Электрика", words: ["электр", "розетк", "свет", "провод", "выключат", "люстр", "автомат", "щиток", "электрощит", "искрит", "лампа", "счетчик", "счётчик", "barq"] },
+  { name: "Сантехника", words: ["сантех", "кран", "труб", "течет", "течёт", "протеч", "унитаз", "раковин", "смесител", "засор", "бойлер", "водонагрев", "душ", "ванн", "канализ"] },
+  { name: "Отопление", words: ["отоплен", "батаре", "радиатор", "котел", "котёл", "теплый пол", "тёплый пол", "холодно"] },
+  { name: "Кондиционеры", words: ["кондиционер", "сплит", "кондей"] },
+  { name: "Ремонт техники", words: ["холодильн", "стиральн", "телевизор", "микроволн", "техник", "плита", "духовк", "посудомо"] },
+  { name: "Мебель и двери", words: ["мебел", "шкаф", "двер", "замок", "кухн", "сборк", "кроват", "петл"] },
+  { name: "Малярные работы", words: ["маляр", "покраск", "покрас", "краск"] },
+  { name: "Полы и ламинат", words: ["ламинат", "паркет", "линолеум", "полы"] },
+  { name: "Плитка", words: ["плитк", "кафел"] },
+  { name: "Отделка", words: ["отделк", "штукатур", "шпакл", "обои", "гипсокартон", "потолок", "стен"] },
+  { name: "Уборка", words: ["уборк", "убрать", "чистк", "мойк", "клининг", "плесень"] },
+  { name: "Умный дом", words: ["умный", "wifi", "wi-fi", "роутер", "домофон", "датчик"] },
+  { name: "Видеонаблюдение", words: ["камер", "видеонаблюд", "сигнализ"] },
+  { name: "Сварочные работы", words: ["свар", "металл", "ворот", "решетк", "решётк"] },
+  { name: "Сад и двор", words: ["сад", "двор", "газон", "дерев", "полив"] },
+  { name: "Ремонт под ключ", words: ["под ключ", "ремонт квартир", "капремонт"] },
+  { name: "Аварийные 24/7", words: ["срочно", "авария", "авари", "потоп", "затоп"] },
+];
+
+function detectLocalCategory(text: string): string {
+  const q = ` ${text.toLowerCase()} `;
+  let best = { name: "Аварийные 24/7", score: 0 };
+  for (const rule of LOCAL_CATEGORY_RULES) {
+    const score = rule.words.filter((w) => q.includes(w)).length;
+    if (score > best.score) best = { name: rule.name, score };
+  }
+  return best.score > 0 ? best.name : "";
 }
 
 interface MatchedService {
@@ -64,7 +97,7 @@ interface MatchedMaster {
 const DISTRICTS = ["Сино", "Фирдавси", "Шохмансур", "Исмоили Сомони", "Пригород"];
 
 // Компонент AI-подбора анализирует описание проблемы и предлагает подходящих мастеров.
-export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps) {
+export default function AiMasterMatch({ open, onOpenChange, initialDescription }: AiMasterMatchProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -87,8 +120,24 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
   const [submitting, setSubmitting] = useState(false);
 
   // Отправляем описание проблемы в edge function и получаем результат интеллектуального подбора.
-  const handleAnalyze = async () => {
-    if (!description.trim()) {
+  // Открыли из поиска на главной — подставляем текст и сразу анализируем.
+  const autoStartedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!open) {
+      autoStartedFor.current = null;
+      return;
+    }
+    const text = initialDescription?.trim();
+    if (text && autoStartedFor.current !== text) {
+      autoStartedFor.current = text;
+      setDescription(text);
+      void handleAnalyze(text);
+    }
+  }, [open, initialDescription]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAnalyze = async (override?: string) => {
+    const text = (typeof override === "string" ? override : description).trim();
+    if (!text) {
       toast({ title: "Опишите проблему", variant: "destructive" });
       return;
     }
@@ -98,7 +147,7 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
     try {
       const { data, error } = await supabase.functions.invoke("ai-match-master", {
         body: {
-          description: description.trim(),
+          description: text,
           district,
           urgency,
           budget: budget ? Number(budget) : null,
@@ -109,7 +158,13 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
       if (error) throw error;
 
       setMatchResult(data.match);
-      setMasters(data.masters || []);
+      // Названия категорий у мастеров — на русском, поэтому строгая проверка только для RU.
+      const aiCategory = language === "ru" ? String(data.match?.category_name || "").toLowerCase() : "";
+      setMasters(
+        (data.masters || []).filter((m: MatchedMaster) =>
+          !aiCategory || m.service_categories?.some((c) => c.toLowerCase() === aiCategory),
+        ),
+      );
       if (data.match.services?.length > 0) {
         setSelectedService(data.match.services[0]);
       }
@@ -118,24 +173,22 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
       console.warn("AI match function failed, using local fallback:", e);
       
       // Local fallback logic
-      const desc = description.toLowerCase();
-      let detectedCategory = { id: "", name: "Общие работы" };
-      
-      // Simple keyword detection
-      if (desc.includes("кран") || desc.includes("труб") || desc.includes("сантех")) {
-        detectedCategory = { id: "1", name: "Сантехника" };
-      } else if (desc.includes("свет") || desc.includes("розетк") || desc.includes("электр")) {
-        detectedCategory = { id: "2", name: "Электрика" };
-      } else if (desc.includes("мебел") || desc.includes("шкаф") || desc.includes("двер")) {
-        detectedCategory = { id: "3", name: "Мебель" };
-      }
+      const desc = text.toLowerCase();
+      const localCategory = detectLocalCategory(text);
+      const detectedCategory = { id: "", name: localCategory || "Общие работы" };
 
-      // Fetch sample masters for fallback
-      const { data: fallbackMasters } = await supabase
-        .from("master_listings")
-        .select("*")
-        .eq("is_active", true)
-        .limit(3);
+      // Только мастера именно этой категории, лучшие по рейтингу. Чужих категорий не показываем.
+      let fallbackMasters: any[] | null = null;
+      if (localCategory) {
+        const { data } = await supabase
+          .from("master_listings")
+          .select("*")
+          .eq("is_active", true)
+          .contains("service_categories", [localCategory])
+          .order("average_rating", { ascending: false })
+          .limit(6);
+        fallbackMasters = data;
+      }
 
       const mappedMasters: MatchedMaster[] = (fallbackMasters || []).map(m => ({
         id: m.id,
@@ -164,7 +217,9 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
         needs_product: desc.includes("купить") || desc.includes("замен"),
         needs_installation: desc.includes("установ"),
         product_keywords: [],
-        explanation: "Мы подобрали лучших мастеров, которые специализируются на подобных работах.",
+        explanation: localCategory
+          ? `По описанию проблема относится к категории «${localCategory}». Подобрали лучших мастеров этой специализации.`
+          : "Мы подобрали лучших мастеров, которые специализируются на подобных работах.",
       };
 
       setMatchResult(mockMatch);
@@ -366,7 +421,7 @@ export default function AiMasterMatch({ open, onOpenChange }: AiMasterMatchProps
               </div>
 
               <Button
-                onClick={handleAnalyze}
+                onClick={() => void handleAnalyze()}
                 disabled={!description.trim()}
                 className="w-full h-12 rounded-xl text-base font-semibold gap-2 bg-gradient-to-r from-primary to-emerald-500 hover:from-primary/90 hover:to-emerald-500/90 shadow-lg"
               >

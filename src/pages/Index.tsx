@@ -4,7 +4,7 @@ import {
   Search, Star, CheckCircle2, Clock, ShieldCheck, 
   Wallet, Users, ArrowRight, Phone, MessageSquare,
   Zap, Droplets, Hammer, Sofa, Cpu, Waves, 
-  Trash2, Snowflake, Thermometer, Construction, Layers, Grid, Siren, Camera, Bot
+  Trash2, Snowflake, Thermometer, Construction, Layers, Grid, Siren, Camera, Bot, Sparkles, Mic
 } from "lucide-react";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -20,6 +20,7 @@ import QuickBooking from "@/components/QuickBooking";
 import AiMasterMatch from "@/components/AiMasterMatch";
 import { AI_AGENT_PHONE_LABEL } from "@/lib/utils";
 import AiDispatcherDialog from "@/components/AiDispatcherDialog";
+import VoiceSearchDialog from "@/components/VoiceSearchDialog";
 
 const AVATAR_COLORS = [
   "bg-emerald-500", "bg-blue-500", "bg-orange-500",
@@ -41,7 +42,7 @@ interface TopMasterCard {
 }
 
 const Index = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [quickBookOpen, setQuickBookOpen] = useState(false);
@@ -49,11 +50,16 @@ const Index = () => {
   const [aiMatchOpen, setAiMatchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      navigate(`/masters?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
+  // Поиск на главной — ИИ-подбор: анализируем запрос и показываем мастеров нужной категории.
+  const [aiQuery, setAiQuery] = useState("");
+  const runAiSearch = (text: string) => {
+    const q = text.trim();
+    if (!q) return;
+    setAiQuery(q);
+    setAiMatchOpen(true);
   };
+  const handleSearch = () => runAiSearch(searchQuery);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   const handleCategoryClick = (name: string) => {
     navigate(`/masters?category=${encodeURIComponent(name)}`);
@@ -164,22 +170,39 @@ const Index = () => {
 
                 <div className="relative max-w-xl mb-12 group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-500" />
-                  <div className="relative flex items-center bg-white dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50">
-                    <Search className="w-6 h-6 text-slate-400 dark:text-slate-500 ml-5 mr-3" />
+                  <div className="relative flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50">
                     <Input 
                       placeholder={t("heroSearchPlaceholder")} 
-                      className="border-0 focus-visible:ring-0 text-slate-900 dark:text-white text-lg font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 h-14"
+                      className="flex-1 min-w-0 border-0 shadow-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 dark:text-white text-base sm:text-lg font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 h-12 pl-4"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setVoiceOpen(true)}
+                      aria-label="Голосовой поиск"
+                      className="shrink-0 w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-500/20 active:scale-95 transition-all"
+                    >
+                      <Mic className="w-5 h-5" />
+                    </button>
                     <Button 
                       onClick={handleSearch}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-10 h-14 rounded-xl transition-all shadow-xl shadow-emerald-100 active:scale-95"
+                      className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-4 sm:px-5 h-11 rounded-xl transition-all shadow-lg shadow-emerald-100 dark:shadow-none active:scale-95"
                     >
-                      {t("heroSearchButton")}
+                      <Sparkles className="w-4 h-4 mr-1.5" />
+                      <span>{t("heroSearchButton")}</span>
                     </Button>
                   </div>
+                  <VoiceSearchDialog
+                    open={voiceOpen}
+                    onOpenChange={setVoiceOpen}
+                    language={language}
+                    onResult={(text) => {
+                      setSearchQuery(text);
+                      runAiSearch(text);
+                    }}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 max-w-xl -mt-6 mb-12">
@@ -558,7 +581,7 @@ const Index = () => {
         )}
       </AnimatePresence>
       <QuickBooking open={quickBookOpen} onOpenChange={setQuickBookOpen} />
-      <AiMasterMatch open={aiMatchOpen} onOpenChange={setAiMatchOpen} />
+      <AiMasterMatch open={aiMatchOpen} onOpenChange={setAiMatchOpen} initialDescription={aiQuery} />
     </div>
   );
 };

@@ -54,7 +54,7 @@ const translations: Record<Language, Record<string, string>> = {
     heroEmergencyButton: "🚨 Аварийный мастер 24/7",
     heroEmergencySubtext: "выезд 30–60 минут по Душанбе",
     heroBadgeText: "Проверенные мастера • Гарантия качества • Работаем 24/7",
-    heroSearchPlaceholder: "Какая услуга вам нужна?",
+    heroSearchPlaceholder: "Опишите проблему: не работает розетка, течёт кран…",
     heroSearchButton: "Найти мастера",
 
     // Trust bar
