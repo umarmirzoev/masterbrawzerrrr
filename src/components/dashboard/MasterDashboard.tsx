@@ -1,4 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
+import { RecipientBadge } from "@/components/RecipientFields";
+import { parseRecipient } from "@/lib/orderRecipient";
+import { SafeCodeDialog, SafeCodeBadge } from "@/components/SafeCode";
+import OrderPhotos from "@/components/OrderPhotos";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,6 +74,7 @@ export default function MasterDashboard() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("overview");
   const [detailOrder, setDetailOrder] = useState<any>(null);
+  const [codeOrder, setCodeOrder] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
   const [chatOrderId, setChatOrderId] = useState<string | null>(null);
 
@@ -336,7 +341,7 @@ export default function MasterDashboard() {
         </Button>
       )}
       {order.status === "arrived" && (
-        <Button size="sm" onClick={() => updateStatus(order.id, "in_progress", order)} className="rounded-full gap-1.5 text-xs bg-purple-600 hover:bg-purple-700">
+        <Button size="sm" onClick={() => (order.safe_code_verified_at ? updateStatus(order.id, "in_progress", order) : setCodeOrder(order))} className="rounded-full gap-1.5 text-xs bg-purple-600 hover:bg-purple-700">
           <Play className="w-3.5 h-3.5" /> Начать работу
         </Button>
       )}
@@ -356,6 +361,12 @@ export default function MasterDashboard() {
             <p className="font-semibold text-foreground text-base">
               {order.services?.name_ru || order.service_categories?.name_ru || "Заказ"}
             </p>
+            {(parseRecipient(order) || order.safe_code_verified_at) && (
+              <div className="mt-1 flex flex-wrap gap-1">
+                <RecipientBadge recipient={parseRecipient(order)} />
+                <SafeCodeBadge order={order} />
+              </div>
+            )}
             <div className="space-y-1 mt-2">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{order.address}</span>
@@ -1142,6 +1153,12 @@ export default function MasterDashboard() {
                 <div className="space-y-1"><span className="text-muted-foreground text-xs">Телефон клиента</span><p className="font-medium">{detailOrder.phone}</p></div>
                 <div className="space-y-1"><span className="text-muted-foreground text-xs">Дата</span><p className="font-medium">{new Date(detailOrder.created_at).toLocaleDateString("ru-RU")}</p></div>
                 <div className="col-span-2 space-y-1"><span className="text-muted-foreground text-xs">Адрес</span><p className="font-medium">{detailOrder.address}</p></div>
+                {parseRecipient(detailOrder) && (
+                  <div className="col-span-2"><RecipientBadge recipient={parseRecipient(detailOrder)} /></div>
+                )}
+                <div className="col-span-2">
+                  <OrderPhotos orderId={detailOrder.id} canUpload={["arrived", "in_progress", "completed", "reviewed"].includes(detailOrder.status)} />
+                </div>
                 {detailOrder.description && (
                   <div className="col-span-2 space-y-1"><span className="text-muted-foreground text-xs">Описание</span><p className="font-medium bg-muted/50 p-2 rounded-lg">{detailOrder.description}</p></div>
                 )}
@@ -1181,6 +1198,15 @@ export default function MasterDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      <SafeCodeDialog
+        order={codeOrder}
+        onClose={() => setCodeOrder(null)}
+        onVerified={(o) => {
+          setCodeOrder(null);
+          void updateStatus(o.id, "in_progress", o);
+        }}
+      />
     </MasterDashboardLayout>
   );
 }

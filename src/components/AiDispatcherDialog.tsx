@@ -24,7 +24,7 @@ export default function AiDispatcherDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm rounded-3xl p-6">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-3xl p-5 sm:p-6">
         <DialogHeader className="items-center text-center">
           <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg mb-2">
             <Bot className="w-8 h-8 text-white" />

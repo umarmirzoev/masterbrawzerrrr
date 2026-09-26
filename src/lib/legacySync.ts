@@ -9,6 +9,9 @@ export function syncOrderToLegacyBackend(order: {
   title?: string;
   description?: string;
   address?: string;
+  /** Мастер, которого выбрал клиент: по телефону бэкенд назначит заказ именно ему. */
+  masterName?: string | null;
+  masterPhone?: string | null;
 }) {
   supabase.functions
     .invoke("legacy-sync", {
@@ -17,6 +20,8 @@ export function syncOrderToLegacyBackend(order: {
         title: order.title,
         description: order.description,
         address: order.address,
+        masterName: order.masterName || undefined,
+        masterPhone: order.masterPhone || undefined,
       },
     })
     .catch((err) => console.warn("legacy-sync order skipped:", err));

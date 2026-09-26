@@ -30,6 +30,7 @@ import ServiceDetail from "./pages/ServiceDetail";
 import AiCall from "./pages/AiCall";
 import Sos from "./pages/Sos";
 import AiPhoto from "./pages/AiPhoto";
+import Calculator from "./pages/Calculator";
 import VerifyEmail from "./pages/VerifyEmail";
 import PendingApproval from "./pages/PendingApproval";
 import Shop from "./pages/Shop";
@@ -86,6 +87,7 @@ const AnimatedRoutes = () => {
         <Route path="/ai-call" element={<PageTransition><AiCall /></PageTransition>} />
         <Route path="/sos" element={<PageTransition><Sos /></PageTransition>} />
         <Route path="/ai-photo" element={<PageTransition><AiPhoto /></PageTransition>} />
+        <Route path="/calculator" element={<PageTransition><Calculator /></PageTransition>} />
           <Route path="/services" element={<PageTransition><NotFound /></PageTransition>} />
           <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />

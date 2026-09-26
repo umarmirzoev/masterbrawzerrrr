@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { syncOrderToLegacyBackend } from "@/lib/legacySync";
+import RecipientFields from "@/components/RecipientFields";
+import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +36,10 @@ export default function MasterBookingDialog({ open, onOpenChange, master }: Prop
   const [district, setDistrict] = useState("");
   const [desc, setDesc] = useState("");
   const [time, setTime] = useState("");
+  const [recipient, setRecipient] = useState<OrderRecipient>(emptyRecipient);
+  const masterServices: string[] = Array.isArray(master?.service_categories) ? master.service_categories : [];
+  const [service, setService] = useState("");
+  const chosenService = service || masterServices[0] || "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,31 +48,39 @@ export default function MasterBookingDialog({ open, onOpenChange, master }: Prop
       navigate("/auth");
       return;
     }
+    const recipientProblem = recipientError(recipient);
+    if (recipientProblem) {
+      toast({ title: recipientProblem, variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
-    const { error } = await supabase.from("orders").insert({
+    const orderPayload = withRecipient({
       client_id: user.id,
-      description: `Мастер: ${master?.full_name}. ${desc}`,
+      description: `${chosenService ? chosenService + ". " : ""}Выбранный мастер: ${master?.full_name}. ${desc}`.trim(),
       address: `${district ? district + ", " : ""}${address}`,
       phone,
       preferred_time: time || null,
       status: "new",
-    });
+    }, recipient, { phone });
+    const { error } = await insertOrder(orderPayload);
     setSubmitting(false);
     if (error) {
       toast({ title: "Хатогӣ", description: error.message, variant: "destructive" });
       return;
     }
     syncOrderToLegacyBackend({
-      title: `Мастер: ${master?.full_name}`,
-      description: `Мастер: ${master?.full_name}. ${desc}`,
+      title: chosenService || "Заказ мастеру",
+      description: String(orderPayload.description ?? ""),
       address: `${district ? district + ", " : ""}${address}`,
+      masterName: master?.full_name,
+      masterPhone: master?.phone,
     });
     setDone(true);
     toast({ title: "Фармоиш қабул шуд! Мастер ба зудӣ бо шумо тамос мегирад." });
     setTimeout(() => {
       onOpenChange(false);
       setDone(false);
-      setPhone(""); setAddress(""); setDistrict(""); setDesc(""); setTime("");
+      setPhone(""); setAddress(""); setDistrict(""); setDesc(""); setTime(""); setRecipient(emptyRecipient); setService("");
     }, 2500);
   };
 
@@ -83,6 +97,19 @@ export default function MasterBookingDialog({ open, onOpenChange, master }: Prop
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            <RecipientFields value={recipient} onChange={setRecipient} />
+            {masterServices.length > 0 && (
+              <Select value={chosenService} onValueChange={setService}>
+                <SelectTrigger className="h-12 text-base">
+                  <SelectValue placeholder="Хизмат / Услуга" />
+                </SelectTrigger>
+                <SelectContent>
+                  {masterServices.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Input placeholder="Рақами телефон" value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" className="h-12 text-base" />
             <Select value={district} onValueChange={setDistrict}>
               <SelectTrigger className="h-12 text-base">

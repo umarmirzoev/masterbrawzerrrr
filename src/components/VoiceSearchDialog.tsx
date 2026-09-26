@@ -128,7 +128,7 @@ export default function VoiceSearchDialog({ open, onOpenChange, language, onResu
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm rounded-3xl p-6">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-3xl p-5 sm:p-6">
         <DialogHeader className="items-center text-center">
           <DialogTitle className="text-2xl font-black">Голосовой поиск</DialogTitle>
           <DialogDescription>Скажите, что нужно сделать, — ИИ подберёт мастера</DialogDescription>

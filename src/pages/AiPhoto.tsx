@@ -85,17 +85,17 @@ export default function AiPhoto() {
   const findMasters = (category: string) => navigate(`/masters?category=${encodeURIComponent(category)}`);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 overflow-x-hidden">
       <Header />
-      <main className="container mx-auto px-4 py-10 md:py-16 max-w-3xl">
+      <main className="container mx-auto px-4 py-8 md:py-16 max-w-3xl">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 text-xs font-bold mb-5">
             <Sparkles className="w-3.5 h-3.5" /> Фото ИИ
           </span>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4 break-words">
             Сфотографируйте поломку
           </h1>
-          <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
             ИИ определит проблему, подскажет нужного мастера и примерную цену в сомони.
           </p>
         </div>

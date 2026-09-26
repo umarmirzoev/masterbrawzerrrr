@@ -156,7 +156,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "order") {
-      const { title, description, address, scheduledDate, scheduledTime } = payload;
+      const { title, description, address, scheduledDate, scheduledTime, masterName, masterPhone } = payload;
 
       const { data: link } = await admin
         .from("legacy_backend_links")
@@ -204,9 +204,18 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           serviceId: WEBSITE_ORDER_SERVICE_ID,
           title: String(title || "Заявка с сайта emaster.tj").slice(0, 200),
-          description: String(description || "Без описания").slice(0, 2000) || "Без описания",
+          description: (() => {
+            // Имя выбранного мастера всегда пишем в описание — админка покажет его,
+            // даже если бэкенд не нашёл этого мастера по телефону и назначил ИИ-агента.
+            const base = String(description || "Без описания");
+            const withMaster = masterName && !base.includes(String(masterName))
+              ? `Выбранный мастер: ${masterName}${masterPhone ? ` (${masterPhone})` : ""}. ${base}`
+              : base;
+            return withMaster.slice(0, 2000) || "Без описания";
+          })(),
           price: 1,
           address: String(address || "Не указан").slice(0, 500) || "Не указан",
+          ...(masterPhone ? { masterPhone: normalizePhone(String(masterPhone)) } : {}),
           ...(scheduledDate ? { scheduledDate } : {}),
           ...(scheduledTime ? { scheduledTime } : {}),
         }),

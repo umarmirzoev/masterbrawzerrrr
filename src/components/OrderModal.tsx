@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { buildLocalizedNotification } from "@/lib/notifications";
 import { syncOrderToLegacyBackend } from "@/lib/legacySync";
+import RecipientFields from "@/components/RecipientFields";
+import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -36,12 +38,14 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
   const [district, setDistrict] = useState("");
   const [address, setAddress] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
+  const [recipient, setRecipient] = useState<OrderRecipient>(emptyRecipient);
 
   // При каждом открытии модалки сбрасываем промежуточные состояния отправки.
   useEffect(() => {
     if (isOpen) {
       setSubmitted(false);
       setSubmitting(false);
+      setRecipient(emptyRecipient);
     }
   }, [isOpen]);
 
@@ -56,8 +60,14 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
       return;
     }
 
+    const recipientProblem = recipientError(recipient);
+    if (recipientProblem) {
+      toast({ title: recipientProblem, variant: "destructive" });
+      return;
+    }
+
     setSubmitting(true);
-    const { data: createdOrders, error } = await supabase.from("orders").insert({
+    const orderPayload = withRecipient({
       client_id: user.id,
       category_id: categoryId || null,
       service_id: serviceId || null,
@@ -66,7 +76,8 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
       phone,
       preferred_time: preferredTime || null,
       status: "new",
-    }).select("id");
+    }, recipient, { name, phone });
+    const { data: createdOrders, error } = await insertOrder(orderPayload);
 
     setSubmitting(false);
 
@@ -107,7 +118,7 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
 
     syncOrderToLegacyBackend({
       title: initialServiceName || category || "Заявка с сайта emaster.tj",
-      description: `${initialServiceName ? initialServiceName + ". " : ""}${comment}`.trim(),
+      description: String(orderPayload.description ?? ""),
       address: `${district ? t(district) + ", " : ""}${address}`,
     });
 
@@ -144,6 +155,7 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            <RecipientFields value={recipient} onChange={setRecipient} />
             <Input placeholder={t("formName")} value={name} onChange={(e) => setName(e.target.value)} required className="h-12 text-base" />
             <Input placeholder={t("formPhone")} value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" className="h-12 text-base" />
             <Select value={district} onValueChange={setDistrict}>

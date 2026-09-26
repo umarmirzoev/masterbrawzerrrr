@@ -21,6 +21,7 @@ import AiMasterMatch from "@/components/AiMasterMatch";
 import { AI_AGENT_PHONE_LABEL } from "@/lib/utils";
 import AiDispatcherDialog from "@/components/AiDispatcherDialog";
 import VoiceSearchDialog from "@/components/VoiceSearchDialog";
+import LiveStats from "@/components/LiveStats";
 
 const AVATAR_COLORS = [
   "bg-emerald-500", "bg-blue-500", "bg-orange-500",
@@ -133,7 +134,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-background selection:bg-emerald-100 selection:text-emerald-900 overflow-x-hidden">
       <Header />
 
       {/* Hero Section */}
@@ -233,7 +234,9 @@ const Index = () => {
                   <AiDispatcherDialog open={aiDispatcherOpen} onOpenChange={setAiDispatcherOpen} />
                 </div>
 
-                <div className="flex items-center gap-10">
+                <LiveStats />
+
+                <div className="flex flex-wrap items-center gap-4 sm:gap-10">
                    <div className="flex items-center -space-x-4">
                       {[
                         { i: "ФК", c: "bg-emerald-500" },
@@ -324,7 +327,7 @@ const Index = () => {
              initial="initial"
              whileInView="whileInView"
              viewport={{ once: true }}
-             className="grid grid-cols-2 lg:grid-cols-4 gap-10 md:gap-16"
+             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10 md:gap-16"
            >
               <FeatureItem icon={<Clock />} title={t("homeFastArrival")} sub={t("homeFastArrivalSub")} />
               <FeatureItem icon={<ShieldCheck />} title={t("homeGuaranteeAllWorks")} sub={t("homeGuarantee12Months")} />
@@ -345,7 +348,7 @@ const Index = () => {
                 <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{t("categoriesTitle")}</h2>
                 <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">{t("categoriesDescription")}</p>
               </div>
-              <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
+              <Button variant="ghost" onClick={() => navigate("/categories")} className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
                  {t("viewAllCategories")} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
               </Button>
            </motion.div>
@@ -397,7 +400,7 @@ const Index = () => {
                 <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{t("homeBestMastersTitle")}</h2>
                 <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">{t("homeBestMastersSubtitle")}</p>
               </div>
-              <Button variant="ghost" className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
+              <Button variant="ghost" onClick={() => navigate("/masters")} className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
                  {t("homeAllMastersButton")} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
               </Button>
            </motion.div>

@@ -1,6 +1,6 @@
 import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,6 +41,7 @@ export default function MasterProfile() {
   const [similarMasters, setSimilarMasters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [searchParams] = useSearchParams();
 
   // Загружаем профиль мастера, отзывы, портфолио и похожих специалистов для полной карточки.
   useEffect(() => {
@@ -67,6 +68,8 @@ export default function MasterProfile() {
 
       if (!masterData) { setLoading(false); return; }
       setMaster(masterData);
+      // «Повторить заказ» / «Заказать снова» из кабинета клиента сразу открывает форму заказа.
+      if (searchParams.get("book") === "1") setBookingOpen(true);
 
       const masterId = masterData.user_id || masterData.id;
       const [reviewsRes, portfolioRes] = await Promise.all([

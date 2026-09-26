@@ -21,6 +21,9 @@ import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useToast } from "@/hooks/use-toast";
 import ReviewModal from "./ReviewModal";
+import MyMasters from "./MyMasters";
+import OrderModal from "@/components/OrderModal";
+import { Users as UsersIcon, RotateCcw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
 import { PaymentDialog, PaymentStatusBadge, PriceBreakdown, ReceiptDialog } from "@/components/payment/PaymentComponents";
@@ -33,7 +36,7 @@ import { getLocalShopOrdersByUser, mergeShopOrders } from "@/lib/localShopOrders
 
 import { allStatuses, statusColors, statusLabels, OrderTimeline } from "./OrderStatusShared";
 
-type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application" | "favorites";
+type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application" | "favorites" | "masters";
 
 // Кабинет клиента объединяет заказы, оплаты, профиль, отзывы, избранное и поддержку.
 export default function ClientDashboard() {
@@ -49,6 +52,7 @@ export default function ClientDashboard() {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [shopSpent, setShopSpent] = useState(0);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
+  const [repeatOrder, setRepeatOrder] = useState<any>(null);
 
   const [myApplication, setMyApplication] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
@@ -288,6 +292,7 @@ export default function ClientDashboard() {
     { key: "active", label: t("tabActive"), icon: Clock, count: activeOrders.length },
     { key: "completed", label: t("tabCompleted"), icon: CheckCircle, count: completedOrders.length },
     { key: "payments", label: t("tabPayments"), icon: CreditCard, count: paidOrders.length },
+    { key: "masters", label: "Мои мастера", icon: UsersIcon },
     ...(myApplication ? [{ key: "application" as Tab, label: t("clientMenuMasterApplication"), icon: FileText }] : []),
     { key: "profile", label: t("dashProfile"), icon: User },
     { key: "notifications", label: t("clientMenuNotifications"), icon: Bell, count: unreadCount },
@@ -588,6 +593,11 @@ export default function ClientDashboard() {
             );
           })}
         </div>
+      ) : tab === "masters" ? (
+        <>
+          <h2 className="text-lg font-bold text-foreground mb-4">Мои мастера</h2>
+          <MyMasters orders={orders} />
+        </>
       ) : tab === "favorites" ? (
         <FavoritesSection />
       ) : (
@@ -665,6 +675,16 @@ export default function ClientDashboard() {
                             <Star className="w-3 h-3" /> Оставить отзыв
                           </Button>
                         )}
+                        {["completed", "reviewed", "cancelled"].includes(order.status) && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => (order.master_id ? navigate(`/master/${order.master_id}?book=1`) : setRepeatOrder(order))}
+                            className="rounded-full gap-1 text-xs"
+                          >
+                            <RotateCcw className="w-3 h-3" /> Повторить
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -673,6 +693,17 @@ export default function ClientDashboard() {
             </div>
           )}
         </>
+      )}
+
+      {repeatOrder && (
+        <OrderModal
+          isOpen={!!repeatOrder}
+          onClose={() => setRepeatOrder(null)}
+          category={repeatOrder.service_categories?.name_ru ?? null}
+          categoryId={repeatOrder.category_id ?? undefined}
+          serviceId={repeatOrder.service_id ?? undefined}
+          initialServiceName={repeatOrder.services?.name_ru ?? repeatOrder.service_categories?.name_ru ?? undefined}
+        />
       )}
 
       {reviewOrder && (

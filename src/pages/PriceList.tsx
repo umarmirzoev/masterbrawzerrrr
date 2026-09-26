@@ -153,6 +153,10 @@ export default function PriceList() {
                   {t("priceListHeroDesc")}
                 </p>
 
+                <Link to="/calculator" className="inline-flex items-center gap-2 -mt-6 mb-8 px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-500/30 text-sm font-bold text-emerald-700 dark:text-emerald-300 hover:shadow-md transition-shadow">
+                  🧮 Посчитать стоимость в калькуляторе →
+                </Link>
+
                 <div className="relative max-w-2xl group mb-10">
                   <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
                   <div className="relative flex flex-col sm:flex-row gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">

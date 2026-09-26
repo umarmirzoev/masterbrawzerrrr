@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import { RecipientBadge } from "@/components/RecipientFields";
+import { parseRecipient } from "@/lib/orderRecipient";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -1140,6 +1142,7 @@ export default function AdminDashboard() {
                 <div><span className="text-muted-foreground">Телефон:</span><p className="font-medium">{detailOrder.phone}</p></div>
                 <div><span className="text-muted-foreground">Адрес:</span><p className="font-medium">{detailOrder.address}</p></div>
                 <div><span className="text-muted-foreground">Дата:</span><p className="font-medium">{new Date(detailOrder.created_at).toLocaleDateString("ru-RU")}</p></div>
+                {parseRecipient(detailOrder) && <div className="col-span-2"><RecipientBadge recipient={parseRecipient(detailOrder)} /></div>}
                 <div className="col-span-2"><span className="text-muted-foreground">Описание:</span><p className="font-medium">{detailOrder.description || "—"}</p></div>
               </div>
 

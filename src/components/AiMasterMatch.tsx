@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { buildLocalizedNotification } from "@/lib/notifications";
 import { syncOrderToLegacyBackend } from "@/lib/legacySync";
+import RecipientFields from "@/components/RecipientFields";
+import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
 
 interface AiMasterMatchProps {
   open: boolean;
@@ -118,6 +120,7 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
   const [selectedMaster, setSelectedMaster] = useState<MatchedMaster | null>(null);
   const [selectedService, setSelectedService] = useState<MatchedService | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [recipient, setRecipient] = useState<OrderRecipient>(emptyRecipient);
 
   // Отправляем описание проблемы в edge function и получаем результат интеллектуального подбора.
   // Открыли из поиска на главной — подставляем текст и сразу анализируем.
@@ -251,9 +254,15 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
       return;
     }
 
+    const recipientProblem = recipientError(recipient);
+    if (recipientProblem) {
+      toast({ title: recipientProblem, variant: "destructive" });
+      return;
+    }
+
     setSubmitting(true);
 
-    const { error } = await supabase.from("orders").insert({
+    const orderPayload = withRecipient({
       client_id: user.id,
       master_id: selectedMaster?.id || null,
       category_id: matchResult?.category_id || null,
@@ -262,16 +271,19 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
       phone: phone.trim(),
       address: address.trim(),
       budget: budget ? Number(budget) : 0,
-      status: matchResult?.is_urgent ? "new" : "new",
-    });
+      status: "new",
+    }, recipient, { phone: phone.trim() });
+    const { error } = await insertOrder(orderPayload);
 
     if (error) {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
     } else {
       syncOrderToLegacyBackend({
         title: selectedService?.service_name || matchResult?.category_name || "Заявка с сайта emaster.tj",
-        description: description.trim(),
+        description: String(orderPayload.description ?? ""),
         address: address.trim(),
+        masterName: selectedMaster?.full_name,
+        masterPhone: (selectedMaster as any)?.phone,
       });
       toast({ title: `✅ ${t("qbOrderCreated")}`, description: t("aiMasterNotified") });
       // Notify master
@@ -308,6 +320,7 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
     setMasters([]);
     setSelectedMaster(null);
     setSelectedService(null);
+    setRecipient(emptyRecipient);
     onOpenChange(false);
   };
 
@@ -675,8 +688,9 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
               </Card>
 
               <div className="space-y-3">
+                <RecipientFields value={recipient} onChange={setRecipient} />
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Телефон *</label>
+                  <label className="text-sm font-medium mb-1.5 block">{recipient.forOther ? "Ваш телефон *" : "Телефон *"}</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
@@ -689,7 +703,7 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Адрес *</label>
+                  <label className="text-sm font-medium mb-1.5 block">{recipient.forOther ? "Адрес близкого *" : "Адрес *"}</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input

@@ -1,4 +1,9 @@
 import { SUPPORT_PHONE } from "@/lib/utils";
+import { RecipientBadge } from "@/components/RecipientFields";
+import { parseRecipient } from "@/lib/orderRecipient";
+import { SafeCodeCard } from "@/components/SafeCode";
+import OrderPhotos from "@/components/OrderPhotos";
+import WorkAcceptance from "@/components/WorkAcceptance";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -141,11 +146,21 @@ export default function ClientOrderDetail() {
                 <h1 className="text-2xl font-bold text-foreground mt-1">
                   {order.services?.name_ru || order.service_categories?.name_ru || "Заказ"}
                 </h1>
+                {parseRecipient(order) && (
+                  <div className="mt-2 space-y-1">
+                    <RecipientBadge recipient={parseRecipient(order)} />
+                    <p className="text-xs text-muted-foreground">Мастер позвонит и приедет к этому человеку. Статус заказа вы видите здесь.</p>
+                  </div>
+                )}
               </div>
               <Badge className={statusColors[order.status] || "bg-muted"}>
                 {statusLabels[order.status] || order.status}
               </Badge>
             </div>
+
+            <SafeCodeCard order={order} />
+            <WorkAcceptance order={order} onChanged={loadOrder} />
+            <OrderPhotos orderId={order.id} />
 
             {order.description && (
               <Card>

@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { SAMPLE_SERVICE_CATEGORIES, SAMPLE_SERVICES, SAMPLE_MASTERS } from "@/data/seedData";
 import { syncOrderToLegacyBackend } from "@/lib/legacySync";
+import RecipientFields from "@/components/RecipientFields";
+import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
 import {
   ArrowLeft, Star, MapPin, Clock, Phone,
   Users, Wrench, CheckCircle, Loader2, Filter, Map as MapIcon, List, X,
@@ -89,6 +91,8 @@ export default function ServiceDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [bookingDone, setBookingDone] = useState(false);
   const [bPhone, setBPhone] = useState("");
+  const [bName, setBName] = useState("");
+  const [recipient, setRecipient] = useState<OrderRecipient>(emptyRecipient);
   const [bAddress, setBAddress] = useState("");
   const [bDistrict, setBDistrict] = useState("");
   const [bDesc, setBDesc] = useState("");
@@ -210,8 +214,13 @@ export default function ServiceDetail() {
       navigate("/auth");
       return;
     }
+    const recipientProblem = recipientError(recipient);
+    if (recipientProblem) {
+      toast({ title: recipientProblem, variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
-    const { error } = await supabase.from("orders").insert({
+    const orderPayload = withRecipient({
       client_id: user.id,
       service_id: service?.id || null,
       category_id: category?.id || null,
@@ -220,7 +229,8 @@ export default function ServiceDetail() {
       phone: bPhone,
       preferred_time: bDate,
       status: "new",
-    });
+    }, recipient, { name: bName, phone: bPhone });
+    const { error } = await insertOrder(orderPayload);
     setSubmitting(false);
     if (error) {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
@@ -228,8 +238,10 @@ export default function ServiceDetail() {
     }
     syncOrderToLegacyBackend({
       title: service ? getName(service) : "Заявка с сайта emaster.tj",
-      description: `${service ? getName(service) : ""}${selectedMaster ? ` — Мастер: ${selectedMaster.full_name}` : ""}. ${bDesc}`,
+      description: String(orderPayload.description ?? ""),
       address: `${bDistrict ? bDistrict + ", " : ""}${bAddress}`,
+      masterName: selectedMaster?.full_name,
+      masterPhone: (selectedMaster as any)?.phone,
     });
     setBookingDone(true);
     toast({ title: "Заявка отправлена. Мастер скоро свяжется с вами." });
@@ -237,6 +249,7 @@ export default function ServiceDetail() {
       setBookingOpen(false);
       setBookingDone(false);
       setSelectedMaster(null);
+      setRecipient(emptyRecipient);
     }, 2500);
   };
 
@@ -563,7 +576,8 @@ export default function ServiceDetail() {
             </div>
           ) : (
             <form onSubmit={handleBook} className="space-y-4">
-              <Input placeholder="Ваше имя" className="h-12 text-base" />
+              <RecipientFields value={recipient} onChange={setRecipient} />
+              <Input placeholder="Ваше имя" value={bName} onChange={e => setBName(e.target.value)} className="h-12 text-base" />
               <Input placeholder="Ваш телефон" value={bPhone} onChange={e => setBPhone(e.target.value)} required type="tel" className="h-12 text-base" />
               <Select value={bDistrict} onValueChange={setBDistrict}>
                 <SelectTrigger className="h-12 text-base"><SelectValue placeholder="Район" /></SelectTrigger>

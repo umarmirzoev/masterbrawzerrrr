@@ -12,6 +12,8 @@ import { Zap, Phone, MapPin, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { buildLocalizedNotification } from "@/lib/notifications";
 import { syncOrderToLegacyBackend } from "@/lib/legacySync";
+import RecipientFields from "@/components/RecipientFields";
+import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
 
 interface QuickBookingProps { open: boolean; onOpenChange: (open: boolean) => void; }
 
@@ -28,6 +30,7 @@ export default function QuickBooking({ open, onOpenChange }: QuickBookingProps) 
   const [categories, setCategories] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [recipient, setRecipient] = useState<OrderRecipient>(emptyRecipient);
 
   // Загружаем категории, чтобы пользователь при желании мог уточнить направление работ.
   useEffect(() => {
@@ -43,15 +46,20 @@ export default function QuickBooking({ open, onOpenChange }: QuickBookingProps) 
     if (!description.trim() || !phone.trim() || !address.trim()) {
       toast({ title: t("qbFillAllFields"), variant: "destructive" }); return;
     }
+    const recipientProblem = recipientError(recipient);
+    if (recipientProblem) {
+      toast({ title: recipientProblem, variant: "destructive" }); return;
+    }
     setSubmitting(true);
-    const { error } = await supabase.from("orders").insert({ client_id: user.id, description: description.trim(), phone: phone.trim(), address: address.trim(), category_id: categoryId || null, status: "new", budget: 0 });
+    const orderPayload = withRecipient({ client_id: user.id, description: description.trim(), phone: phone.trim(), address: address.trim(), category_id: categoryId || null, status: "new", budget: 0 }, recipient, { phone: phone.trim() });
+    const { error } = await insertOrder(orderPayload);
     if (error) {
       toast({ title: t("error"), description: error.message, variant: "destructive" });
     } else {
       setSuccess(true);
       syncOrderToLegacyBackend({
         title: "Срочная заявка с сайта emaster.tj",
-        description: description.trim(),
+        description: String(orderPayload.description ?? ""),
         address: address.trim(),
       });
       const { data: admins } = await supabase.from("user_roles").select("user_id").in("role", ["admin", "super_admin"]);
@@ -102,6 +110,7 @@ export default function QuickBooking({ open, onOpenChange }: QuickBookingProps) 
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">{t("qbDescribeProblem")}</p>
             <div className="space-y-3">
+              <RecipientFields value={recipient} onChange={setRecipient} />
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("qbWhatHappened")}</label>
                 <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("qbWhatHappenedPlaceholder")} className="min-h-[80px] rounded-xl" maxLength={500} />
