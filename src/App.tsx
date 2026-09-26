@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -56,19 +57,38 @@ import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
-const PageTransition = ({ children }: { children: React.ReactNode }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-    transition={{ duration: 0.3, ease: "easeInOut" }}
-  >
-    {children}
-  </motion.div>
-);
+// Новая страница всегда открывается сверху (с шапки), а не там, где был скролл на прошлой странице.
+const scrollToTop = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+
+const PageTransition = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    if (!window.location.hash) scrollToTop();
+  }, []);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+
+  // Браузер не должен сам восстанавливать старую позицию скролла.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+  }, []);
+
+  // На любую смену страницы (и для страниц без анимации) — сразу наверх.
+  useEffect(() => {
+    if (!location.hash) scrollToTop();
+  }, [location.pathname, location.hash]);
+
   return (
     <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>

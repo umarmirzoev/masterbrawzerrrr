@@ -67,18 +67,18 @@ const Index = () => {
   };
 
   const services = [
-    { icon: <Zap className="text-amber-500 dark:text-amber-400" />, name: "Электрика", nameKey: "catElectric", priceKey: "catElectricPrice", color: "bg-amber-50 dark:bg-amber-500/10" },
-    { icon: <Droplets className="text-blue-500 dark:text-blue-400" />, name: "Сантехника", nameKey: "catPlumbing", priceKey: "catPlumbingPrice", color: "bg-blue-50 dark:bg-blue-500/10" },
-    { icon: <Hammer className="text-emerald-500 dark:text-emerald-400" />, name: "Отделка и ремонт", nameKey: "catRenovation", priceKey: "catRenovationPrice", color: "bg-emerald-50 dark:bg-emerald-500/10" },
-    { icon: <Sofa className="text-orange-500 dark:text-orange-400" />, name: "Мебель и двери", nameKey: "catFurniture", priceKey: "catFurniturePrice", color: "bg-orange-50 dark:bg-orange-500/10" },
-    { icon: <Cpu className="text-violet-500 dark:text-violet-400" />, name: "Умный дом", nameKey: "catSmartHome", priceKey: "catSmartHomePrice", color: "bg-violet-50 dark:bg-violet-500/10" },
-    { icon: <Waves className="text-sky-500 dark:text-sky-400" />, name: "Водоснабжение", nameKey: "catWaterSupply", priceKey: "catWaterSupplyPrice", color: "bg-sky-50 dark:bg-sky-500/10" },
-    { icon: <Trash2 className="text-green-500 dark:text-green-400" />, name: "Уборка", nameKey: "catCleaning", priceKey: "catCleaningPrice", color: "bg-green-50 dark:bg-green-500/10" },
-    { icon: <Snowflake className="text-cyan-500 dark:text-cyan-400" />, name: "Кондиционеры", nameKey: "catAirConditioners", priceKey: "catAirConditionersPrice", color: "bg-cyan-50 dark:bg-cyan-500/10" },
-    { icon: <Thermometer className="text-red-500 dark:text-red-400" />, name: "Отопление", nameKey: "catHeating", priceKey: "catHeatingPrice", color: "bg-red-50 dark:bg-red-500/10" },
-    { icon: <Construction className="text-pink-500 dark:text-pink-400" />, name: "Мелкие работы", nameKey: "catSmallJobs", priceKey: "catSmallJobsPrice", color: "bg-pink-50 dark:bg-pink-500/10" },
-    { icon: <Layers className="text-orange-600 dark:text-orange-400" />, name: "Полы и ламинат", nameKey: "catFloors", priceKey: "catFloorsPrice", color: "bg-orange-50 dark:bg-orange-500/10" },
-    { icon: <Grid className="text-slate-500 dark:text-slate-400" />, name: "Другие услуги", nameKey: "catOtherServices", priceKey: "catOtherServicesPrice", color: "bg-slate-50 dark:bg-slate-800" },
+    { icon: <Zap className="text-amber-500 dark:text-amber-400" />, name: "Электрика", nameKey: "catElectric", img: "/images/categories/electric.png", priceKey: "catElectricPrice", color: "bg-amber-50 dark:bg-amber-500/10" },
+    { icon: <Droplets className="text-blue-500 dark:text-blue-400" />, name: "Сантехника", nameKey: "catPlumbing", img: "/images/categories/plumbing.png", priceKey: "catPlumbingPrice", color: "bg-blue-50 dark:bg-blue-500/10" },
+    { icon: <Hammer className="text-emerald-500 dark:text-emerald-400" />, name: "Отделка и ремонт", nameKey: "catRenovation", img: "/images/categories/renovation.png", priceKey: "catRenovationPrice", color: "bg-emerald-50 dark:bg-emerald-500/10" },
+    { icon: <Sofa className="text-orange-500 dark:text-orange-400" />, name: "Мебель и двери", nameKey: "catFurniture", img: "/images/categories/furniture.png", priceKey: "catFurniturePrice", color: "bg-orange-50 dark:bg-orange-500/10" },
+    { icon: <Cpu className="text-violet-500 dark:text-violet-400" />, name: "Умный дом", nameKey: "catSmartHome", img: "/images/categories/smarthome.png", priceKey: "catSmartHomePrice", color: "bg-violet-50 dark:bg-violet-500/10" },
+    { icon: <Waves className="text-sky-500 dark:text-sky-400" />, name: "Водоснабжение", nameKey: "catWaterSupply", img: "/images/categories/water.png", priceKey: "catWaterSupplyPrice", color: "bg-sky-50 dark:bg-sky-500/10" },
+    { icon: <Trash2 className="text-green-500 dark:text-green-400" />, name: "Уборка", nameKey: "catCleaning", img: "/images/categories/cleaning.png", priceKey: "catCleaningPrice", color: "bg-green-50 dark:bg-green-500/10" },
+    { icon: <Snowflake className="text-cyan-500 dark:text-cyan-400" />, name: "Кондиционеры", nameKey: "catAirConditioners", img: "/images/categories/ac.png", priceKey: "catAirConditionersPrice", color: "bg-cyan-50 dark:bg-cyan-500/10" },
+    { icon: <Thermometer className="text-red-500 dark:text-red-400" />, name: "Отопление", nameKey: "catHeating", img: "/images/categories/heating.png", priceKey: "catHeatingPrice", color: "bg-red-50 dark:bg-red-500/10" },
+    { icon: <Construction className="text-pink-500 dark:text-pink-400" />, name: "Мелкие работы", nameKey: "catSmallJobs", img: "/images/categories/small.png", priceKey: "catSmallJobsPrice", color: "bg-pink-50 dark:bg-pink-500/10" },
+    { icon: <Layers className="text-orange-600 dark:text-orange-400" />, name: "Полы и ламинат", nameKey: "catFloors", img: "/images/categories/floors.png", priceKey: "catFloorsPrice", color: "bg-orange-50 dark:bg-orange-500/10" },
+    { icon: <Grid className="text-slate-500 dark:text-slate-400" />, name: "Другие услуги", nameKey: "catOtherServices", img: "/images/categories/other.png", priceKey: "catOtherServicesPrice", color: "bg-slate-50 dark:bg-slate-800" },
   ];
 
   const [topMasters, setTopMasters] = useState<TopMasterCard[]>([]);
@@ -338,14 +338,14 @@ const Index = () => {
       </section>
 
       {/* Services Section */}
-      <section className="py-28 bg-white dark:bg-slate-900">
+      <section className="py-16 sm:py-28 bg-[#f6f7f5] dark:bg-slate-950">
         <div className="container px-4 mx-auto max-w-7xl">
            <motion.div 
              {...fadeInUp}
-             className="flex flex-col md:flex-row items-start md:items-center justify-between mb-16 gap-6"
+             className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 sm:mb-12 gap-4 sm:gap-6"
            >
               <div>
-                <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{t("categoriesTitle")}</h2>
+                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-3 sm:mb-4 tracking-tight">{t("categoriesTitle")}</h2>
                 <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">{t("categoriesDescription")}</p>
               </div>
               <Button variant="ghost" onClick={() => navigate("/categories")} className="text-emerald-600 font-black hover:text-emerald-700 hover:bg-emerald-50 px-6 py-6 rounded-2xl flex items-center gap-3 group text-base">
@@ -358,7 +358,7 @@ const Index = () => {
              initial="initial"
              whileInView="whileInView"
              viewport={{ once: true }}
-             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-5"
+             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
            >
               {services.map((service, idx) => (
                 <motion.div 
@@ -367,19 +367,25 @@ const Index = () => {
                     initial: { opacity: 0, scale: 0.9 },
                     whileInView: { opacity: 1, scale: 1 }
                   }}
-                  whileHover={{ 
-                    y: -10, 
-                    boxShadow: "0 25px 50px -12px rgba(16, 185, 129, 0.15)",
-                    borderColor: "rgba(16, 185, 129, 0.3)"
-                  }}
+                  whileHover={{ y: -4 }}
                   onClick={() => handleCategoryClick(service.name)}
-                  className="group p-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all cursor-pointer text-center md:text-left"
+                  className="group relative flex items-center justify-between gap-2 p-4 sm:p-5 min-h-[128px] sm:min-h-[140px] bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_18px_40px_-12px_rgba(16,185,129,0.25)] hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all cursor-pointer overflow-hidden"
                 >
-                  <div className={`w-14 h-14 rounded-2xl ${service.color} flex items-center justify-center mb-6 mx-auto md:mx-0 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500`}>
-                     {React.cloneElement(service.icon as React.ReactElement, { className: "w-7 h-7" })}
+                  <div className="flex flex-col justify-between self-stretch min-w-0 py-1">
+                    <div className={`w-10 h-10 rounded-xl ${service.color} flex items-center justify-center shrink-0`}>
+                      {React.cloneElement(service.icon as React.ReactElement, { className: `w-5 h-5 ${(service.icon as React.ReactElement).props.className ?? ""}` })}
+                    </div>
+                    <div className="mt-4">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-[15px] leading-tight mb-1 group-hover:text-emerald-600 transition-colors">{t(service.nameKey)}</h3>
+                      <p className="text-[13px] text-slate-500 dark:text-slate-400">{t(service.priceKey)}</p>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2 group-hover:text-emerald-600 transition-colors">{t(service.nameKey)}</h3>
-                  <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t(service.priceKey)}</p>
+                  <img
+                    src={service.img}
+                    alt=""
+                    loading="lazy"
+                    className="w-[110px] h-[100px] sm:w-[120px] sm:h-[110px] object-contain shrink-0 drop-shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3"
+                  />
                 </motion.div>
               ))}
            </motion.div>
