@@ -22,10 +22,64 @@ import {
 } from "lucide-react";
 import { tx } from "@/lib/localizeNames";
 
+// Картинка в шапке категории и в баннере. Для сантехники — свои картинки, для остальных — иллюстрации категорий.
+const CATEGORY_VISUALS: Array<[RegExp, { header?: string; banner: string; text?: [string, string, string, string, string, string]; sub?: [string, string, string]; accent?: "orange" | "violet" }]> = [
+  [/сантех/i, { header: "/images/services/plumbing-header.png", banner: "/images/services/plumbing-banner.png" }],
+  [/отделк/i, { header: "/images/services/finishing-header.png", banner: "/images/services/finishing-banner.png", text: ["Аккуратная отделка", "для вашего дома", "Neat finishing", "for your home", "Ороиши бодиққат", "барои хонаи шумо"] }],
+  [/электр/i, { header: "/images/categories/electric.png", banner: "/images/services/chandelier.png" }],
+  [/уборк|клининг/i, { banner: "/images/services/cleaning-banner.png", sub: ["Чистота дома и офиса", "Clean home and office", "Тозагии хона ва офис"], text: ["Чистый дом", "без лишних забот", "A clean home", "without the hassle", "Хонаи тоза", "бе ташвиши зиёдатӣ"] }],
+  [/кондиц/i, { header: "/images/services/ac-header.png", banner: "/images/services/ac-banner.png", text: ["Прохлада и чистый", "воздух в вашем доме", "Cool and clean air", "in your home", "Салқинӣ ва ҳавои тоза", "дар хонаи шумо"] }],
+  [/отоплен/i, { header: "/images/services/heating-header.png", banner: "/images/services/heating-banner.png", accent: "orange", text: ["Тепло и комфорт", "в вашем доме", "Warmth and comfort", "in your home", "Гармӣ ва бароҳатӣ", "дар хонаи шумо"] }],
+  [/мебел|двер/i, { banner: "/images/services/furniture-banner.png", text: ["Соберём и установим", "мебель аккуратно", "We assemble and install", "furniture with care", "Мебелро бодиққат", "ҷамъ ва насб мекунем"] }],
+  [/умн/i, { header: "/images/services/smarthome-header.png", banner: "/images/services/smarthome-banner.png", text: ["Сделаем дом умнее", "и безопаснее", "We make your home smarter", "and safer", "Хонаро оқилтар", "ва бехатартар мекунем"] }],
+  [/видео/i, { banner: "/images/services/cctv-banner.png", text: ["Надёжная защита", "для дома и бизнеса", "Reliable protection", "for home and business", "Муҳофизати боэътимод", "барои хона ва тиҷорат"] }],
+  [/пол|ламинат/i, { header: "/images/services/floors-header.png", banner: "/images/services/floors-banner.png", text: ["Красивый и ровный пол", "для вашего дома", "A beautiful, even floor", "for your home", "Фарши зебо ва ҳамвор", "барои хонаи шумо"] }],
+  [/малярн/i, { header: "/images/services/painting-header.png", banner: "/images/services/painting-banner.png", text: ["Свежий цвет и", "аккуратная отделка", "Fresh colour and", "neat finishing", "Ранги тоза ва", "ороиши бодиққат"] }],
+  [/отделк|малярн|ремонт/i, { header: "/images/categories/renovation.png", banner: "/images/categories/renovation.png" }],
+  [/друг/i, { header: "/images/services/other-header.png", banner: "/images/services/other-banner.png", accent: "violet", sub: ["Помощь по дому", "Help around the house", "Кӯмак дар хона"], text: ["Поможем с любыми", "домашними задачами", "We help with any", "household task", "Дар ҳама корҳои", "хона кӯмак мекунем"] }],
+  [/.*/, { header: "/images/categories/other.png", banner: "/images/categories/other.png" }],
+];
+// Цвета карточек: по умолчанию зелёные, для «Отопления» — тёплые оранжевые.
+const CATEGORY_THEMES = {
+  green: {
+    tile: "bg-emerald-50 dark:bg-emerald-950/30",
+    banner: "bg-emerald-50 dark:bg-emerald-950/30",
+    bannerText: "text-teal-800 dark:text-teal-300",
+    card: "border-emerald-100/70 hover:border-emerald-200",
+    price: "text-emerald-600",
+    button: "border-emerald-500 text-emerald-600 hover:bg-emerald-500",
+  },
+  violet: {
+    tile: "bg-emerald-50 dark:bg-emerald-950/30",
+    banner: "bg-gradient-to-r from-emerald-50 to-violet-100 dark:from-emerald-950/30 dark:to-violet-950/30",
+    bannerText: "text-slate-900 dark:text-violet-100",
+    card: "border-emerald-100/70 hover:border-emerald-200",
+    price: "text-emerald-600",
+    button: "border-emerald-500 text-emerald-600 hover:bg-emerald-500",
+  },
+  orange: {
+    tile: "bg-orange-50 dark:bg-orange-950/30",
+    banner: "bg-gradient-to-r from-orange-50 to-amber-100 dark:from-orange-950/30 dark:to-amber-950/20",
+    bannerText: "text-slate-900 dark:text-orange-200",
+    card: "border-orange-100 hover:border-orange-200",
+    price: "text-orange-500",
+    button: "border-orange-400 text-orange-500 hover:bg-orange-500",
+  },
+};
+const pickCategoryTheme = (name: string) => {
+  const accent = pickCategoryVisual(name)?.accent;
+  if (accent === "orange") return CATEGORY_THEMES.orange;
+  if (accent === "violet") return CATEGORY_THEMES.violet;
+  return CATEGORY_THEMES.green;
+};
+
+const pickCategoryVisual = (name: string) => (name ? CATEGORY_VISUALS.find(([re]) => re.test(name))?.[1] : undefined);
+
 const iconMap: Record<string, React.ElementType> = {
   "Электрика": Zap, "Сантехника": Droplets, "Отделка": LayoutGrid, "Мебель и двери": Sofa,
   "Умный дом": Cpu, "Водоснабжение": Droplets, "Уборка": Sparkles, "Кондиционеры": Wind,
   "Отопление": Flame, "Малярные работы": Brush, "Полы и ламинат": Hammer, "Другие услуги": MoreHorizontal,
+  "Видеонаблюдение": Camera,
 };
 
 interface ServiceCategory {
@@ -314,61 +368,77 @@ export default function PriceList() {
                     animate={{ opacity: 1, x: 0 }}
                   >
                     {/* Шапка категории */}
-                    <div className="mb-6 flex items-center gap-3 rounded-3xl bg-emerald-50 p-4 dark:bg-emerald-950/30 sm:gap-4 sm:p-5">
-                      <button
-                        type="button"
-                        aria-label="К категориям"
-                        onClick={() => document.getElementById("categories-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-emerald-600 transition-colors hover:bg-white lg:hidden"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                      </button>
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 sm:h-16 sm:w-16">
-                        {(() => {
-                          const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
-                          return <Icon className="h-7 w-7 sm:h-8 sm:w-8" />;
-                        })()}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="truncate text-xl font-black text-slate-900 dark:text-white sm:text-2xl">
-                          {getName(currentCategory)}
-                        </h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t("priceListCategoryDefaultDesc")}</p>
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      aria-label="К категориям"
+                      onClick={() => document.getElementById("categories-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      className="-ml-2 mb-2 flex h-10 w-10 items-center justify-center rounded-full text-emerald-600 transition-colors hover:bg-emerald-50 lg:hidden"
+                    >
+                      <ArrowLeft className="h-6 w-6" />
+                    </button>
+                    {(() => {
+                      const visual = pickCategoryVisual(currentCategory?.name_ru || "");
+                      const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
+                      return (
+                        <>
+                          <div className="mb-5 flex items-center gap-4">
+                            <div className={`flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl ${pickCategoryTheme(currentCategory?.name_ru || "").tile}`}>
+                              {visual?.header ? (
+                                <img src={visual.header} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <Icon className="h-9 w-9 text-emerald-600" />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="text-2xl font-black text-slate-900 dark:text-white sm:text-3xl">{getName(currentCategory)}</h3>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 sm:text-base">{visual?.sub ? tx(visual.sub[0], visual.sub[1], visual.sub[2]) : t("priceListCategoryDefaultDesc")}</p>
+                            </div>
+                          </div>
 
-                    <h4 className="mb-4 text-xl font-black text-slate-900 dark:text-white sm:text-2xl">{tx("Выберите услугу", "Choose a service", "Хизматро интихоб кунед")}</h4>
+                          <div className={`mb-7 flex min-h-[110px] items-center justify-between gap-4 overflow-hidden rounded-3xl pl-5 pr-2 sm:pl-7 ${pickCategoryTheme(currentCategory?.name_ru || "").banner}`}>
+                            <p className={`py-5 text-base font-bold leading-snug sm:text-2xl ${pickCategoryTheme(currentCategory?.name_ru || "").bannerText}`}>
+                              {visual?.text ? tx(visual.text[0], visual.text[2], visual.text[4]) : tx("Надёжные мастера", "Reliable masters", "Устоҳои боэътимод")}
+                              <br />
+                              {visual?.text ? tx(visual.text[1], visual.text[3], visual.text[5]) : tx("для дома и бизнеса", "for home and business", "барои хона ва тиҷорат")}
+                            </p>
+                            {visual && <img src={visual.banner} alt="" className="h-20 w-auto max-w-[48%] shrink-0 object-contain sm:h-28" />}
+                          </div>
+                        </>
+                      );
+                    })()}
 
-                    <div className="space-y-3 sm:space-y-4">
+                    <h4 className="mb-4 text-2xl font-black text-slate-900 dark:text-white">{tx("Выберите услугу", "Choose a service", "Хизматро интихоб кунед")}</h4>
+
+                    <div className="space-y-3">
                       {(groupedByCategory.get(activeCategory) || []).map((s) => {
                         const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
+                        const theme = pickCategoryTheme(currentCategory?.name_ru || "");
                         return (
                           <div
                             key={s.id}
-                            className="group flex items-stretch gap-3 rounded-3xl border border-slate-100 bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-100 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 sm:gap-5 sm:p-4"
+                            className={`group flex items-center gap-3 rounded-2xl border bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:gap-4 ${theme.card}`}
                           >
                             <ServiceIllustration
                               name={`${s.name_ru || ""} ${getName(s)}`}
-                              fallbackIcon={<Icon className="h-10 w-10 text-slate-500" />}
+                              fallbackIcon={<Icon className="h-9 w-9 text-slate-500" />}
+                              className="h-20 w-20 sm:h-24 sm:w-24"
                             />
-                            <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
-                              <div>
-                                <h5 className="text-base font-extrabold leading-snug text-slate-900 dark:text-white sm:text-lg">{getName(s)}</h5>
-                                <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{s.note || t("priceListServiceDefaultNote")}</p>
-                              </div>
-                              <div className="mt-2 flex items-center justify-between gap-2">
-                                <span className="whitespace-nowrap text-sm font-extrabold text-emerald-600 sm:text-lg">
-                                  {t("fromPrice")} {s.price_min} {t("currencySomoni")}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) })}
-                                  className="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm sm:h-10 sm:px-5 font-bold text-white shadow-md shadow-emerald-500/25 transition-colors hover:bg-emerald-600"
-                                >
-                                  {t("priceListChooseButton")}
-                                </button>
-                              </div>
+                            <div className="min-w-0 flex-1">
+                              <h5 className="text-[15px] font-bold leading-snug text-slate-900 dark:text-white sm:text-lg">{getName(s)}</h5>
+                              <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{s.note || t("priceListServiceDefaultNote")}</p>
+                              <p className={`mt-1 flex items-baseline gap-1 whitespace-nowrap ${theme.price}`}>
+                                <span className="text-sm font-semibold">{t("fromPrice")}</span>
+                                <span className="text-xl font-black sm:text-2xl">{s.price_min}</span>
+                                <span className="text-sm font-semibold">{t("currencySomoni")}</span>
+                              </p>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) })}
+                              className={`inline-flex h-10 shrink-0 items-center justify-center rounded-xl border-2 bg-white px-4 text-sm font-bold transition-colors hover:text-white dark:bg-transparent sm:h-11 sm:px-5 ${theme.button}`}
+                            >
+                              {t("priceListChooseButton")}
+                            </button>
                           </div>
                         );
                       })}
@@ -384,7 +454,7 @@ export default function PriceList() {
       {/* Stats Bar */}
       <section className="py-12 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800">
         <div className="container px-4 mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
             <StatItem icon={<Users className="w-8 h-8 text-emerald-500" />} value="1000+" label={t("priceListStat1")} />
             <StatItem icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />} value="5000+" label={t("priceListStat2")} />
             <StatItem icon={<Star className="w-8 h-8 text-emerald-500" />} value="4.8" label={t("priceListStat3")} />
@@ -517,13 +587,13 @@ function BenefitItem({ icon, title, sub }: { icon: React.ReactNode; title: strin
 
 function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-      <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0">
+    <div className="flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-100 p-4 text-center dark:border-slate-800 sm:flex-row sm:gap-5 sm:border-0 sm:p-0 sm:text-left">
+      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-2">{value}</p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest leading-tight break-words">{label}</p>
+        <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-none mb-1 sm:mb-2">{value}</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium sm:uppercase sm:tracking-widest leading-tight">{label}</p>
       </div>
     </div>
   );
