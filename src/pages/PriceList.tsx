@@ -26,7 +26,7 @@ import { tx } from "@/lib/localizeNames";
 const CATEGORY_VISUALS: Array<[RegExp, { header?: string; banner: string; text?: [string, string, string, string, string, string]; sub?: [string, string, string]; accent?: "orange" | "violet" }]> = [
   [/сантех/i, { header: "/images/services/plumbing-header.png", banner: "/images/services/plumbing-banner.png" }],
   [/отделк/i, { header: "/images/services/finishing-header.png", banner: "/images/services/finishing-banner.png", text: ["Аккуратная отделка", "для вашего дома", "Neat finishing", "for your home", "Ороиши бодиққат", "барои хонаи шумо"] }],
-  [/электр/i, { header: "/images/categories/electric.png", banner: "/images/services/chandelier.png" }],
+  [/электр/i, { header: "/images/services/electric-header.png", banner: "/images/services/electric-banner.png", text: ["Безопасная электрика", "для дома", "Safe electrics", "for your home", "Барқи бехатар", "барои хона"] }],
   [/уборк|клининг/i, { banner: "/images/services/cleaning-banner.png", sub: ["Чистота дома и офиса", "Clean home and office", "Тозагии хона ва офис"], text: ["Чистый дом", "без лишних забот", "A clean home", "without the hassle", "Хонаи тоза", "бе ташвиши зиёдатӣ"] }],
   [/кондиц/i, { header: "/images/services/ac-header.png", banner: "/images/services/ac-banner.png", text: ["Прохлада и чистый", "воздух в вашем доме", "Cool and clean air", "in your home", "Салқинӣ ва ҳавои тоза", "дар хонаи шумо"] }],
   [/отоплен/i, { header: "/images/services/heating-header.png", banner: "/images/services/heating-banner.png", accent: "orange", text: ["Тепло и комфорт", "в вашем доме", "Warmth and comfort", "in your home", "Гармӣ ва бароҳатӣ", "дар хонаи шумо"] }],

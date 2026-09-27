@@ -22,78 +22,16 @@ const box = (x: number, y: number, w: number, h: number, fill: string, r = 4, st
 );
 
 const ART: Record<string, Art> = {
-  socket: { bg: "bg-emerald-50", img: "/images/services/socket.png" },
-  switch: { bg: "bg-sky-50", img: "/images/services/switch.png" },
-  chandelier: { bg: "bg-amber-50", img: "/images/services/chandelier.png" },
-  wiring: { bg: "bg-violet-50", img: "/images/services/wiring.png" },
+  socket: { bg: "bg-sky-50", img: "/images/services/el-socket.png" },
+  switch: { bg: "bg-sky-50", img: "/images/services/el-switch.png" },
+  chandelier: { bg: "bg-sky-50", img: "/images/services/el-chandelier.png" },
+  wiring: { bg: "bg-sky-50", img: "/images/services/el-wiring.png" },
 
   // ---------- Электрика ----------
-  panel: {
-    bg: "bg-emerald-50",
-    svg: (
-      <>
-        {box(18, 12, 64, 76, G, 6)}
-        {box(25, 22, 50, 56, W, 3)}
-        <line x1="25" y1="48" x2="75" y2="48" stroke={S} strokeWidth="2" />
-        {[29, 40, 51, 62].map((x) => (
-          <g key={x}>
-            {box(x, 27, 9, 17, "#F8FAFC", 1.5)}
-            <rect x={x + 2.5} y={30} width="4" height="6" rx="1" fill={x === 51 ? R : E} />
-          </g>
-        ))}
-        {[29, 40, 51, 62].map((x) => (
-          <g key={`b${x}`}>
-            {box(x, 53, 9, 17, "#F8FAFC", 1.5)}
-            <rect x={x + 2.5} y={56} width="4" height="6" rx="1" fill={E} />
-          </g>
-        ))}
-        <circle cx="76" cy="50" r="2" fill={S} />
-      </>
-    ),
-  },
-  breaker: {
-    bg: "bg-sky-50",
-    svg: (
-      <>
-        <rect x="14" y="44" width="72" height="8" rx="2" fill="#94A3B8" />
-        {box(30, 16, 40, 68, W, 5)}
-        <rect x="36" y="22" width="28" height="8" rx="2" fill={E} />
-        {box(42, 38, 16, 22, "#F1F5F9", 3)}
-        <rect x="45" y="40" width="10" height="9" rx="2" fill={S} />
-        <text x="50" y="74" textAnchor="middle" fontSize="9" fontWeight="700" fill={S} fontFamily="sans-serif">C16</text>
-      </>
-    ),
-  },
-  elMeter: {
-    bg: "bg-amber-50",
-    svg: (
-      <>
-        {box(20, 12, 60, 76, W, 6)}
-        {box(28, 22, 44, 18, "#0F172A", 3)}
-        <text x="50" y="35.5" textAnchor="middle" fontSize="11" fontWeight="700" fill="#34D399" fontFamily="monospace">01287</text>
-        <text x="50" y="52" textAnchor="middle" fontSize="8" fontWeight="700" fill={S} fontFamily="sans-serif">кВт·ч</text>
-        <circle cx="38" cy="64" r="4" fill={R} />
-        <rect x="48" y="60" width="22" height="8" rx="2" fill={G} />
-        <rect x="30" y="76" width="40" height="6" rx="2" fill="#94A3B8" />
-      </>
-    ),
-  },
-  multimeter: {
-    bg: "bg-yellow-50",
-    svg: (
-      <>
-        {box(28, 10, 44, 72, O, 8)}
-        {box(34, 16, 32, 18, "#0F172A", 3)}
-        <text x="50" y="29" textAnchor="middle" fontSize="10" fontWeight="700" fill="#34D399" fontFamily="monospace">220V</text>
-        <circle cx="50" cy="52" r="11" fill={W} stroke={S} strokeWidth="2.5" />
-        <line x1="50" y1="52" x2="56" y2="45" stroke={S} strokeWidth="3" strokeLinecap="round" />
-        <circle cx="42" cy="72" r="3" fill={R} />
-        <circle cx="58" cy="72" r="3" fill={S} />
-        <path d="M42 75 C40 88, 22 86, 20 94" fill="none" stroke={R} strokeWidth="3" />
-        <path d="M58 75 C60 88, 78 86, 80 94" fill="none" stroke={S} strokeWidth="3" />
-      </>
-    ),
-  },
+  panel: { bg: "bg-sky-50", img: "/images/services/el-panel.png" },
+  breaker: { bg: "bg-sky-50", img: "/images/services/el-breaker.png" },
+  elMeter: { bg: "bg-sky-50", img: "/images/services/el-meter.png" },
+  multimeter: { bg: "bg-sky-50", img: "/images/services/el-multimeter.png" },
 
   // ---------- Сантехника ----------
   faucet: { bg: "bg-sky-50", img: "/images/services/faucet.png" },
