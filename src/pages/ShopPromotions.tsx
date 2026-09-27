@@ -13,6 +13,8 @@ import { useCart } from "@/hooks/useCart";
 import { FavoriteButton } from "@/components/favorites/FavoritesSection";
 import { isFallbackProductId } from "@/data/shopFallback";
 import { ArrowLeft, ShoppingCart, Tag, TicketPercent, Flame, Clock3 } from "lucide-react";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { productName } from "@/lib/localizeNames";
 
 type PromoCode = {
   id: string;
@@ -40,7 +42,7 @@ export default function ShopPromotions() {
           .eq("is_approved", true)
           .eq("is_discounted", true)
           .order("promotion_end", { ascending: true })
-          .limit(48),
+          .limit(300),
         supabase
           .from("promo_codes")
           .select("*")
@@ -49,8 +51,8 @@ export default function ShopPromotions() {
           .limit(12),
       ]);
 
-      const dbProducts = productsRes.data || [];
-      setProducts(dbProducts.length > 0 ? dbProducts : fallbackShopProducts.filter((item) => item.is_discounted));
+      const dbProducts = withoutHiddenProducts(productsRes.data);
+      setProducts(dbProducts.length > 0 ? dbProducts : withoutHiddenProducts(fallbackShopProducts.filter((item) => item.is_discounted)));
       setPromoCodes((promoRes.data || []) as PromoCode[]);
       setLoading(false);
     };
@@ -182,7 +184,7 @@ function PromoProductCard({ product, onAdd, compact = false }: { product: any; o
       <CardContent className="space-y-3 p-4">
         <p className="text-xs text-muted-foreground">{product.shop_categories?.name || "Акция"}</p>
         <Link to={`/shop/product/${product.id}`}>
-          <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{product.name}</h3>
+          <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{productName(product.name)}</h3>
         </Link>
         <div className="flex items-end gap-2">
           <span className="text-2xl font-bold text-foreground">{product.price} сомонӣ</span>

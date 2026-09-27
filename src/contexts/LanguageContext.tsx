@@ -11,6 +11,7 @@ import {
   type Language,
   type TranslationParams,
 } from "@/lib/i18n";
+import { setActiveLanguage } from "@/lib/localizeNames";
 
 // Контекст локализации хранит текущий язык и функцию перевода всех текстов интерфейса.
 
@@ -2890,6 +2891,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState<Language>(() => readStoredLanguage());
+  // Имена мастеров и товаров (src/lib/localizeNames.ts) берут язык отсюда.
+  setActiveLanguage(language);
   const [userId, setUserId] = useState<string | null>(null);
 
   const applyLanguage = (nextLanguage: Language) => {

@@ -19,6 +19,8 @@ import { useCart } from "@/hooks/useCart";
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
 import { FavoriteButton } from "@/components/favorites/FavoritesSection";
 import { fallbackShopProducts } from "@/data/shopFallback";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { productName } from "@/lib/localizeNames";
 
 export default function Shop() {
   const { t } = useLanguage();
@@ -45,25 +47,14 @@ export default function Shop() {
         )
         .slice(0, 5);
 
-    // Эти 4 демо-товара (плейсхолдеры со стоковыми фото) убраны из блока
-    // "Популярные товары" по просьбе — реальных карточек это не касается.
-    const HIDDEN_PRODUCT_NAMES = new Set([
-      "Стиральная машина",
-      "Микроволновая печь",
-      "Кондиционер",
-      "Пылесос",
-    ]);
-
     const load = async () => {
       const { data, error } = await supabase
         .from("shop_products")
         .select("*, shop_categories(name)")
-        .limit(60);
+        .limit(500);
 
       if (cancelled) return;
-      const rows = (!error && data && data.length ? data : fallbackShopProducts).filter(
-        (item: any) => !HIDDEN_PRODUCT_NAMES.has(item.name),
-      );
+      const rows = withoutHiddenProducts<any>(!error && data && data.length ? data : fallbackShopProducts);
       setPopularProducts(pickTop(rows as any[]));
     };
 
@@ -201,7 +192,7 @@ export default function Shop() {
             <h2 className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
               {t("shopPopularProductsTitle")}
             </h2>
-            <Link to="#" className="group text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-2">
+            <Link to="/shop/search" className="group text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-2">
               {t("shopViewAllProducts")} <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>
@@ -252,7 +243,7 @@ export default function Shop() {
                     <CardContent className="p-3 sm:p-5 flex flex-col flex-1">
                       <Link to={`/shop/product/${p.id}`}>
                         <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 leading-snug h-10 transition-colors duration-300 group-hover:text-emerald-600">
-                          {p.name}
+                          {productName(p.name)}
                         </h3>
                       </Link>
 

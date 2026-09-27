@@ -166,7 +166,7 @@ const About = () => {
 
       <section className="bg-white dark:bg-slate-900 py-8">
         <div className="container mx-auto px-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             {topStats.map((item, i) => {
               const Icon = item.icon;
               return (
@@ -176,9 +176,9 @@ const About = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.06 }}
-                  className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-center shadow-sm hover-soft hover:border-emerald-200"
+                  className={`group rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5 text-center shadow-sm hover-soft hover:border-emerald-200 ${i === topStats.length - 1 && topStats.length % 2 === 1 ? "col-span-2 lg:col-span-1" : ""}`}
                 >
-                  <Icon className="mx-auto mb-2 h-5 w-5 text-emerald-600 transition-transform duration-300 group-hover:scale-110" />
+                  <Icon className="mx-auto mb-2 h-6 w-6 text-emerald-600 transition-transform duration-300 group-hover:scale-110" />
                   <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{item.value}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{item.label}</p>
                 </motion.div>

@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
 import { getFallbackProductById, isFallbackProductId } from "@/data/shopFallback";
+import { personName, personInitials, productName } from "@/lib/localizeNames";
 
 // В избранном добавляем товары "fallback-*" (их не завели в таблице shop_products
 // как настоящие UUID) — вставить такой id в колонку favorites.item_id (тип uuid)
@@ -231,10 +232,10 @@ export default function FavoritesSection() {
                 <Card key={fav.id} className="group hover:shadow-md transition-all">
                   <CardContent className="p-4 flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold shrink-0">
-                      {m.full_name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
+                      {personInitials(m.full_name)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <Link to={`/masters/${m.id}`} className="font-semibold text-foreground hover:text-primary transition-colors truncate block">{m.full_name}</Link>
+                      <Link to={`/masters/${m.id}`} className="font-semibold text-foreground hover:text-primary transition-colors truncate block">{personName(m.full_name)}</Link>
                       <div className="flex items-center gap-1.5 text-sm">
                         <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                         <span>{m.average_rating}</span>
@@ -278,7 +279,7 @@ export default function FavoritesSection() {
                       <SmartProductImage product={p} alt={p.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <Link to={`/shop/product/${p.id}`} className="font-semibold text-foreground hover:text-primary transition-colors truncate block">{p.name}</Link>
+                      <Link to={`/shop/product/${p.id}`} className="font-semibold text-foreground hover:text-primary transition-colors truncate block">{productName(p.name)}</Link>
                       <div className="flex items-center gap-2 text-sm">
                         <span className="font-bold text-foreground">{p.price} сом.</span>
                         {p.old_price && <span className="line-through text-muted-foreground text-xs">{p.old_price}</span>}

@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Award, TrendingUp, ArrowRight, Clock, MapPin, Package } from "lucide-react";
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { personName, personInitials, productName } from "@/lib/localizeNames";
 
 // Эти секции выводят рейтинговые подборки мастеров и товаров для главной страницы.
 export function TopMastersWeek() {
@@ -55,7 +57,7 @@ export function TopMastersWeek() {
 
         <div className="flex flex-wrap justify-start gap-5">
           {masters.map((m, i) => {
-            const initials = m.full_name.split(" ").map((w: string) => w[0]).join("").slice(0, 2);
+            const initials = personInitials(m.full_name);
             const gradient = gradients[i % gradients.length];
             return (
               <motion.div key={m.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
@@ -75,7 +77,7 @@ export function TopMastersWeek() {
                           {initials}
                         </div>
                         <div>
-                          <p className="font-bold text-foreground group-hover:text-primary transition-colors">{m.full_name}</p>
+                          <p className="font-bold text-foreground group-hover:text-primary transition-colors">{personName(m.full_name)}</p>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="font-semibold text-sm">{m.average_rating}</span>
@@ -107,11 +109,11 @@ export function TopProducts() {
   useEffect(() => {
     supabase
       .from("shop_products")
-      .select("id, name, price, old_price, image_url, rating, reviews_count, is_popular")
+      .select("id, name, price, old_price, image_url, rating, reviews_count, is_popular, master_id")
       .eq("in_stock", true)
       .order("rating", { ascending: false })
-      .limit(4)
-      .then(({ data }) => setProducts(data || []));
+      .limit(300)
+      .then(({ data }) => setProducts(withoutHiddenProducts(data).slice(0, 4)));
   }, []);
 
   if (products.length === 0) return null;
@@ -150,7 +152,7 @@ export function TopProducts() {
                     <SmartProductImage product={p} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <CardContent className="p-4">
-                    <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">{p.name}</p>
+                    <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">{productName(p.name)}</p>
                     <div className="flex items-center gap-1 mt-1.5">
                       <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                       <span className="text-xs font-medium">{p.rating}</span>

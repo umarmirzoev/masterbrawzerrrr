@@ -20,6 +20,8 @@ import {
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
 import { FavoriteButton } from "@/components/favorites/FavoritesSection";
 import { useProductComparison } from "@/hooks/useProductComparison";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { productName } from "@/lib/localizeNames";
 
 export default function ShopCategory() {
   const { id } = useParams();
@@ -39,7 +41,7 @@ export default function ShopCategory() {
 
       if (isFallbackCategoryId(id)) {
         setCategory(getFallbackCategoryById(id));
-        setProducts(getFallbackProductsByCategoryId(id));
+        setProducts(withoutHiddenProducts(getFallbackProductsByCategoryId(id)));
         setLoading(false);
         return;
       }
@@ -50,7 +52,7 @@ export default function ShopCategory() {
       ]);
 
       setCategory(catRes.data);
-      setProducts(prodRes.data || []);
+      setProducts(withoutHiddenProducts(prodRes.data));
       setLoading(false);
     };
 
@@ -188,7 +190,7 @@ export default function ShopCategory() {
                   <CardContent className="p-3">
                     <Link to={`/shop/product/${product.id}`}>
                       <h3 className="mb-2 min-h-[2.5rem] line-clamp-2 text-sm font-medium text-foreground transition-colors hover:text-primary">
-                        {product.name}
+                        {productName(product.name)}
                       </h3>
                     </Link>
                     <div className="mb-2 flex items-center gap-1">

@@ -9,6 +9,7 @@ import { FavoriteButton } from "@/components/favorites/FavoritesSection";
 import { ShoppingCart, Star, Package, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { productName } from "@/lib/localizeNames";
 
 interface Props {
   excludeIds?: string[];
@@ -85,7 +86,7 @@ function RecCard({ product: p, onAdd, t }: { product: any; onAdd: (id: string) =
       </Link>
       <CardContent className="p-3 space-y-2">
         <Link to={`/shop/product/${p.id}`}>
-          <h3 className="text-sm font-medium text-foreground hover:text-primary line-clamp-2 min-h-[2.5rem]">{p.name}</h3>
+          <h3 className="text-sm font-medium text-foreground hover:text-primary line-clamp-2 min-h-[2.5rem]">{productName(p.name)}</h3>
         </Link>
         {p.rating && (
           <div className="flex items-center gap-1">

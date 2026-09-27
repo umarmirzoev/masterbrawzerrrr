@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock, CheckCircle, Award, X, Scale } from "lucide-react";
+import { personName } from "@/lib/localizeNames";
 
 interface Master {
   id: string;
@@ -120,7 +121,7 @@ export default function MasterComparisonDialog({ open, onOpenChange, masterIds }
                         <div className={`w-14 h-14 mx-auto rounded-xl bg-gradient-to-br ${gradients[i]} flex items-center justify-center text-white font-bold text-lg mb-2`}>
                           {initials}
                         </div>
-                        <p className="font-bold text-foreground text-sm">{m.full_name}</p>
+                        <p className="font-bold text-foreground text-sm">{personName(m.full_name)}</p>
                       </th>
                     );
                   })}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import ContactMessagesAdmin from "./ContactMessagesAdmin";
 import { RecipientBadge } from "@/components/RecipientFields";
 import { parseRecipient } from "@/lib/orderRecipient";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -1124,7 +1125,13 @@ export default function AdminDashboard() {
       ) : tab === "shop" ? (
         <AdminShopManager />
       ) : tab === "support" ? (
-        <SupportTicketsAdmin />
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-base font-bold text-foreground mb-3">Сообщения с сайта (страница «Контакты»)</h3>
+            <ContactMessagesAdmin />
+          </div>
+          <SupportTicketsAdmin />
+        </div>
       ) : tab === "promo" ? (
         <PromoCodeManager />
       ) : null}

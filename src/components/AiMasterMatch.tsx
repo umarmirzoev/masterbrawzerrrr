@@ -21,6 +21,7 @@ import { buildLocalizedNotification } from "@/lib/notifications";
 import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 import RecipientFields from "@/components/RecipientFields";
 import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
+import { personName, personInitials } from "@/lib/localizeNames";
 
 interface AiMasterMatchProps {
   open: boolean;
@@ -568,7 +569,7 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
                 ) : (
                   <div className="space-y-3">
                     {masters.map((master, i) => {
-                      const initials = master.full_name.split(" ").map((w) => w[0]).join("").slice(0, 2);
+                      const initials = personInitials(master.full_name);
                       const gradient = gradients[i % gradients.length];
 
                       return (
@@ -588,7 +589,7 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">
-                                      {master.full_name}
+                                      {personName(master.full_name)}
                                     </h4>
                                     {master.is_top_master && (
                                       <Badge className="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0 gap-0.5">
@@ -671,10 +672,10 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold">
-                      {selectedMaster.full_name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                      {personInitials(selectedMaster.full_name)}
                     </div>
                     <div>
-                      <p className="font-bold">{selectedMaster.full_name}</p>
+                      <p className="font-bold">{personName(selectedMaster.full_name)}</p>
                       <p className="text-sm text-muted-foreground">
                         {matchResult?.category_name} • {selectedService?.service_name}
                       </p>

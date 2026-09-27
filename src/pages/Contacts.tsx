@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+import { CONTACT_ACCEPT, CONTACT_MAX_FILES, CONTACT_MAX_SIZE, formatSize, sendContactMessage } from "@/lib/contactMessage";
 import { 
   Phone, Mail, Clock, MapPin, MessageCircle, Send, 
   HelpCircle, Paperclip, CheckCircle2, Zap, Trophy, Shield, Headset,
-  Map as MapIcon, ChevronRight, Star, Users
+  Map as MapIcon, ChevronRight, Star, Users, X, FileText, Film, Loader2
 } from "lucide-react";
 
 const Contacts = () => {
@@ -23,14 +24,54 @@ const Contacts = () => {
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [progress, setProgress] = useState<string>("");
+
+  // Превью для картинок; освобождаем память при смене списка.
+  useEffect(() => {
+    const urls = files.map((f) => (f.type.startsWith("image/") ? URL.createObjectURL(f) : ""));
+    setPreviews(urls);
+    return () => urls.forEach((u) => u && URL.revokeObjectURL(u));
+  }, [files]);
+
+  const addFiles = (list: FileList | null) => {
+    if (!list) return;
+    const next = [...files];
+    for (const f of Array.from(list)) {
+      if (next.length >= CONTACT_MAX_FILES) {
+        toast({ title: `Можно прикрепить не больше ${CONTACT_MAX_FILES} файлов`, variant: "destructive" });
+        break;
+      }
+      if (f.size > CONTACT_MAX_SIZE) {
+        toast({ title: `«${f.name}» больше 20 МБ`, description: "Сожмите файл или отправьте его в WhatsApp.", variant: "destructive" });
+        continue;
+      }
+      if (!next.some((x) => x.name === f.name && x.size === f.size)) next.push(f);
+    }
+    setFiles(next);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    setProgress(files.length ? `Загрузка файлов 0/${files.length}…` : "");
+    try {
+      await sendContactMessage(formData, files, (d, t) => setProgress(`Загрузка файлов ${d}/${t}…`));
       toast({ title: "Сообщение отправлено", description: "Мы свяжемся с вами в ближайшее время." });
       setFormData({ name: "", phone: "", email: "", message: "" });
-    }, 1000);
+      setFiles([]);
+    } catch (err) {
+      toast({
+        title: "Не удалось отправить",
+        description: `${(err as Error).message}. Напишите нам в WhatsApp: +992 979 117 007`,
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+      setProgress("");
+    }
   };
 
   const contactCards = [
@@ -251,18 +292,66 @@ const Contacts = () => {
                     />
                   </div>
                   
-                  <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 hover:text-emerald-500 cursor-pointer transition-colors pt-2 group">
-                    <Paperclip className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Прикрепить файл (фото, документ)</span>
-                  </div>
+                  {/* label + скрытый input: надёжно открывает выбор файлов во всех браузерах, включая iPhone */}
+                  <label
+                    htmlFor="contact-files"
+                    className={`flex items-center gap-2 text-left transition-colors pt-2 select-none ${
+                      sending || files.length >= CONTACT_MAX_FILES
+                        ? "opacity-50 pointer-events-none text-slate-400"
+                        : "cursor-pointer text-slate-400 dark:text-slate-500 hover:text-emerald-500"
+                    }`}
+                  >
+                    <Paperclip className="w-4 h-4 shrink-0" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      Прикрепить файл (фото, видео, документ){files.length ? ` · ${files.length}/${CONTACT_MAX_FILES}` : ""}
+                    </span>
+                  </label>
+                  <input
+                    id="contact-files"
+                    ref={fileInput}
+                    type="file"
+                    multiple
+                    accept={CONTACT_ACCEPT}
+                    className="sr-only"
+                    onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }}
+                  />
+                  {files.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {files.map((f, i) => (
+                        <div key={`${f.name}-${i}`} className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                          {previews[i] ? (
+                            <img src={previews[i]} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                          ) : (
+                            <span className="w-10 h-10 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center shrink-0 text-emerald-500">
+                              {f.type.startsWith("video/") ? <Film className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                            </span>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">{f.name}</p>
+                            <p className="text-[11px] text-slate-400">{formatSize(f.size)}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setFiles(files.filter((_, j) => j !== i))}
+                            disabled={sending}
+                            aria-label="Убрать файл"
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[11px] text-slate-400 -mt-1">До {CONTACT_MAX_FILES} файлов, каждый до 20 МБ: фото, видео, PDF, Word, Excel.</p>
 
                   <Button 
                     type="submit" 
                     className="w-full rounded-2xl h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg shadow-lg shadow-emerald-100 transition-all gap-2" 
                     disabled={sending}
                   >
-                    {sending ? "Отправка..." : "Отправить сообщение"}
-                    <Send className="w-5 h-5" />
+                    {sending ? (progress || "Отправка...") : "Отправить сообщение"}
+                    {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                   </Button>
                   <p className="text-[10px] text-center text-slate-400 dark:text-slate-500 mt-4">
                     Отправляя форму, вы соглашаетесь с <span className="underline cursor-pointer">политикой конфиденциальности</span>

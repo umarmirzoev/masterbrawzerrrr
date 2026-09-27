@@ -12,6 +12,8 @@ import {
   Package, Star, User, ShoppingCart, Briefcase, CheckCircle, MapPin,
 } from "lucide-react";
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { personName, productName } from "@/lib/localizeNames";
 
 // Страница магазина мастера показывает его профиль и все опубликованные товары.
 export default function MasterStore() {
@@ -31,7 +33,7 @@ export default function MasterStore() {
           .eq("master_id", masterId).eq("is_approved", true).order("created_at", { ascending: false }),
       ]);
       setMaster(masterRes.data);
-      setProducts(prodsRes.data || []);
+      setProducts(withoutHiddenProducts(prodsRes.data));
       setLoading(false);
     };
     load();
@@ -67,7 +69,7 @@ export default function MasterStore() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h1 className="text-2xl font-bold text-foreground">{master.full_name}</h1>
+                      <h1 className="text-2xl font-bold text-foreground">{personName(master.full_name)}</h1>
                       <Badge className="bg-primary/10 text-primary border-primary/20">Мастер-продавец</Badge>
                     </div>
                     <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -109,7 +111,7 @@ export default function MasterStore() {
                   <CardContent className="p-3">
                     <p className="text-xs text-muted-foreground mb-1">{p.shop_categories?.name}</p>
                     <Link to={`/shop/product/${p.id}`}>
-                      <h3 className="text-sm font-medium text-foreground line-clamp-2 hover:text-primary mb-2 min-h-[2.5rem]">{p.name}</h3>
+                      <h3 className="text-sm font-medium text-foreground line-clamp-2 hover:text-primary mb-2 min-h-[2.5rem]">{productName(p.name)}</h3>
                     </Link>
                     <div className="flex items-end gap-2 mb-3">
                       <span className="text-lg font-bold text-foreground">{p.price} с.</span>

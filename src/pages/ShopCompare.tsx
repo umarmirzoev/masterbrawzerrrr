@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Scale, ShoppingCart, Trash2, Wrench } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { isFallbackProductId } from "@/data/shopFallback";
+import { productName } from "@/lib/localizeNames";
 
 export default function ShopCompare() {
   const { compareIds, clearCompare, toggleCompare } = useProductComparison();
@@ -128,7 +129,7 @@ export default function ShopCompare() {
                   <CardContent className="space-y-3 p-4">
                     <p className="text-xs text-muted-foreground">{product.shop_categories?.name || "Товар"}</p>
                     <Link to={`/shop/product/${product.id}`}>
-                      <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{product.name}</h3>
+                      <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{productName(product.name)}</h3>
                     </Link>
                     <div className="flex gap-2">
                       <Button
@@ -155,7 +156,7 @@ export default function ShopCompare() {
                       <th className="p-4 text-left text-sm font-semibold text-foreground">Параметр</th>
                       {products.map((product) => (
                         <th key={product.id} className="p-4 text-left text-sm font-semibold text-foreground">
-                          {product.name}
+                          {productName(product.name)}
                         </th>
                       ))}
                     </tr>

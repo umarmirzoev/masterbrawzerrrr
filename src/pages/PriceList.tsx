@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import OrderModal from "@/components/OrderModal";
+import { ServiceIllustration } from "@/components/services/ServiceIllustration";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,8 +18,9 @@ import {
   Camera, Flame, Home, Cpu, MoreHorizontal, Wind, ChevronRight, ChevronDown,
   Sparkles, Shield, TrendingUp, HelpCircle, DollarSign, MapPin, Ruler, 
   CheckCircle2, Headset, Users, Trophy, MessageCircle, Phone, 
-  LayoutGrid, Settings, Brush
+  LayoutGrid, Settings, Brush, ArrowLeft
 } from "lucide-react";
+import { tx } from "@/lib/localizeNames";
 
 const iconMap: Record<string, React.ElementType> = {
   "Электрика": Zap, "Сантехника": Droplets, "Отделка": LayoutGrid, "Мебель и двери": Sofa,
@@ -120,6 +122,14 @@ export default function PriceList() {
     { name: t("priceListPopular6"), price: "100", icon: Clock, color: "bg-blue-700" },
   ];
 
+  // Кнопка «Заказать» у популярных услуг раньше ничего не делала — открываем форму заказа
+  // и по возможности подставляем подходящую категорию.
+  const openPopularOrder = (name: string) => {
+    const key = name.toLowerCase().split(/\s+/)[0].slice(0, 6);
+    const match = categories.find((c) => getName(c).toLowerCase().includes(key));
+    setOrderModal({ open: true, categoryId: match?.id, name });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -205,9 +215,13 @@ export default function PriceList() {
               <TrendingUp className="w-6 h-6 text-emerald-500" />
               {t("priceListPopularTitle")}
             </h2>
-            <Link to="#" className="text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => document.getElementById("all-services")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
+            >
               {t("priceListViewAll")} <ChevronRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -219,14 +233,33 @@ export default function PriceList() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="group h-full border-slate-100 dark:border-slate-800 hover:border-emerald-100 hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer hover-lift">
+                <Card
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openPopularOrder(s.name)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openPopularOrder(s.name);
+                    }
+                  }}
+                  className="group h-full border-slate-100 dark:border-slate-800 hover:border-emerald-100 hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer hover-lift"
+                >
                   <CardContent className="p-5 flex flex-col items-center text-center">
                     <div className={`w-12 h-12 rounded-2xl ${s.color} flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform`}>
                       <s.icon className="w-6 h-6" />
                     </div>
                     <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1 leading-tight">{s.name}</h3>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">{t("fromPrice")} {s.price} {t("currencySomoni")}</p>
-                    <Button variant="ghost" className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 group-hover:text-emerald-500 transition-colors">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openPopularOrder(s.name);
+                      }}
+                      className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors"
+                    >
                       {t("priceListOrderButton")}
                     </Button>
                   </CardContent>
@@ -238,13 +271,13 @@ export default function PriceList() {
       </section>
 
       {/* All Services with Sidebar */}
-      <section className="py-16 bg-background">
+      <section id="all-services" className="scroll-mt-20 py-16 bg-background">
         <div className="container px-4 mx-auto max-w-7xl">
           <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-10">{t("priceListAllCategoriesTitle")}</h2>
           
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
-            <div className="w-full lg:w-1/4 space-y-2">
+            <div id="categories-list" className="w-full lg:w-1/4 space-y-2 scroll-mt-24">
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-3 shadow-sm border border-slate-100 dark:border-slate-800 sticky top-24">
                 {categories.map((cat) => {
                   const Icon = iconMap[cat.name_ru] || Wrench;
@@ -272,62 +305,74 @@ export default function PriceList() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1">
-              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800 min-h-[600px]">
+            <div className="flex-1 min-w-0">
+              <div className="sm:bg-white sm:dark:bg-slate-900 sm:rounded-[2rem] sm:p-6 md:p-8 sm:shadow-sm sm:border sm:border-slate-100 sm:dark:border-slate-800 sm:min-h-[400px]">
                 {activeCategory && (
                   <motion.div
                     key={activeCategory}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                   >
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+                    {/* Шапка категории */}
+                    <div className="mb-6 flex items-center gap-3 rounded-3xl bg-emerald-50 p-4 dark:bg-emerald-950/30 sm:gap-4 sm:p-5">
+                      <button
+                        type="button"
+                        aria-label="К категориям"
+                        onClick={() => document.getElementById("categories-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-emerald-600 transition-colors hover:bg-white lg:hidden"
+                      >
+                        <ArrowLeft className="h-5 w-5" />
+                      </button>
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 sm:h-16 sm:w-16">
                         {(() => {
                           const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
-                          return <Icon className="w-8 h-8" />;
+                          return <Icon className="h-7 w-7 sm:h-8 sm:w-8" />;
                         })()}
                       </div>
-                      <div>
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-xl font-black text-slate-900 dark:text-white sm:text-2xl">
                           {getName(currentCategory)}
                         </h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400">{t("priceListCategoryDefaultDesc")}</p>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      {(groupedByCategory.get(activeCategory) || []).map((s) => (
-                        <div key={s.id} className="group flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl border border-transparent hover:border-slate-100 dark:hover:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-all">
-                          <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0 border border-slate-50 dark:border-slate-800 group-hover:scale-110 transition-transform">
-                             {(() => {
-                               const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
-                               return <Icon className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-emerald-500" />;
-                             })()}
-                          </div>
-                          <div className="flex-1 text-center sm:text-left">
-                            <h4 className="font-bold text-slate-900 dark:text-white mb-0.5">{getName(s)}</h4>
-                            <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">{s.note || t("priceListServiceDefaultNote")}</p>
-                          </div>
-                          {/* Цена одной строкой: «от 30 сомони», всё по общей базовой линии. */}
-                          <div className="flex min-w-[130px] shrink-0 items-baseline justify-center gap-1.5 whitespace-nowrap sm:justify-end">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">{t("fromPrice")}</span>
-                            <span className="text-lg font-black text-slate-900 dark:text-white">{s.price_min}</span>
-                            <span className="text-xs font-normal text-slate-400 dark:text-slate-500">{t("currencySomoni")}</span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            className="rounded-xl px-6 border-slate-200 dark:border-slate-700 font-bold hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shrink-0"
-                            onClick={() => setOrderModal({ open: true, serviceId: s.id, name: getName(s) })}
+                    <h4 className="mb-4 text-xl font-black text-slate-900 dark:text-white sm:text-2xl">{tx("Выберите услугу", "Choose a service", "Хизматро интихоб кунед")}</h4>
+
+                    <div className="space-y-3 sm:space-y-4">
+                      {(groupedByCategory.get(activeCategory) || []).map((s) => {
+                        const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
+                        return (
+                          <div
+                            key={s.id}
+                            className="group flex items-stretch gap-3 rounded-3xl border border-slate-100 bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-100 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 sm:gap-5 sm:p-4"
                           >
-                            {t("priceListChooseButton")}
-                          </Button>
-                        </div>
-                      ))}
+                            <ServiceIllustration
+                              name={`${s.name_ru || ""} ${getName(s)}`}
+                              fallbackIcon={<Icon className="h-10 w-10 text-slate-500" />}
+                            />
+                            <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
+                              <div>
+                                <h5 className="text-base font-extrabold leading-snug text-slate-900 dark:text-white sm:text-lg">{getName(s)}</h5>
+                                <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{s.note || t("priceListServiceDefaultNote")}</p>
+                              </div>
+                              <div className="mt-2 flex items-center justify-between gap-2">
+                                <span className="whitespace-nowrap text-sm font-extrabold text-emerald-600 sm:text-lg">
+                                  {t("fromPrice")} {s.price_min} {t("currencySomoni")}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) })}
+                                  className="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm sm:h-10 sm:px-5 font-bold text-white shadow-md shadow-emerald-500/25 transition-colors hover:bg-emerald-600"
+                                >
+                                  {t("priceListChooseButton")}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    
-                    <button className="w-full mt-8 py-4 text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 border-t border-slate-50 dark:border-slate-800">
-                      {t("priceListShowMore")} <ChevronDown className="w-4 h-4" />
-                    </button>
                   </motion.div>
                 )}
               </div>
@@ -395,7 +440,7 @@ export default function PriceList() {
                   </AccordionItem>
                 ))}
               </Accordion>
-              <Link to="#" className="inline-block mt-6 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
+              <Link to="/faq" className="inline-block mt-6 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
                 {t("priceListFaqViewAll")} →
               </Link>
             </div>

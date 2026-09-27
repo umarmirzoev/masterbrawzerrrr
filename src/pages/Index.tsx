@@ -22,6 +22,7 @@ import { AI_AGENT_PHONE_LABEL } from "@/lib/utils";
 import AiDispatcherDialog from "@/components/AiDispatcherDialog";
 import VoiceSearchDialog from "@/components/VoiceSearchDialog";
 import LiveStats from "@/components/LiveStats";
+import { personName, personInitials } from "@/lib/localizeNames";
 
 const AVATAR_COLORS = [
   "bg-emerald-500", "bg-blue-500", "bg-orange-500",
@@ -434,13 +435,13 @@ const Index = () => {
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           className={`w-16 h-16 rounded-2xl ${master.color} flex items-center justify-center text-white text-xl font-black shadow-lg shadow-slate-200 transition-transform`}
                         >
-                           {master.initials}
+                           {personInitials(master.name)}
                         </motion.div>
                         <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 p-1 rounded-full shadow-lg">
                            <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
                         </div>
                       </div>
-                      <h3 className="text-base font-black text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-emerald-600 transition-colors">{master.name}</h3>
+                      <h3 className="text-base font-black text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-emerald-600 transition-colors">{personName(master.name)}</h3>
                       <div className="flex items-center gap-1.5 mb-5">
                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                          <span className="text-xs font-black text-slate-900 dark:text-white">{master.rating}</span>

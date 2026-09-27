@@ -30,6 +30,7 @@ import {
   Star,
   XCircle,
 } from "lucide-react";
+import { personName, personInitials } from "@/lib/localizeNames";
 
 // Отдельная страница одного заказа услуги — раньше это было модальное окно
 // внутри кабинета, теперь у заказа есть свой адрес (как у покупок в магазине).
@@ -209,10 +210,10 @@ export default function ClientOrderDetail() {
                   <p className="text-xs font-semibold text-primary mb-2">Назначенный мастер</p>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
-                      {masterInfo.full_name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
+                      {personInitials(masterInfo.full_name)}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-foreground truncate">{masterInfo.full_name}</p>
+                      <p className="font-semibold text-foreground truncate">{personName(masterInfo.full_name)}</p>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         {masterInfo.average_rating && (
                           <span className="flex items-center gap-0.5">

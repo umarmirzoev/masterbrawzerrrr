@@ -30,6 +30,7 @@ import {
   Wrench,
   XCircle,
 } from "lucide-react";
+import { productName } from "@/lib/localizeNames";
 
 type ShopOrder = {
   id: string;
@@ -482,7 +483,7 @@ export default function ShopOrders() {
                                 </div>
                                 <div className="min-w-0 space-y-1">
                                   <p className="font-medium text-foreground">
-                                    {product?.name || "Товар больше недоступен"}
+                                    {productName(product?.name) || "Товар больше недоступен"}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     {item.price} сомонӣ x {item.quantity}

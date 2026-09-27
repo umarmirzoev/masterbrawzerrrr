@@ -11,6 +11,7 @@ import { SmartProductImage } from "@/components/shop/SmartProductImage";
 import { FavoriteButton, useFavoriteContext } from "@/components/favorites/FavoritesSection";
 import { ArrowLeft, Heart, Loader2, ShoppingCart, Star } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import { productName } from "@/lib/localizeNames";
 
 export default function ShopFavorites() {
   const { user } = useAuth();
@@ -121,7 +122,7 @@ export default function ShopFavorites() {
                 <CardContent className="space-y-3 p-4">
                   <p className="text-xs text-muted-foreground">{product.shop_categories?.name || "Избранное"}</p>
                   <Link to={`/shop/product/${product.id}`}>
-                    <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{product.name}</h3>
+                    <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{productName(product.name)}</h3>
                   </Link>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />

@@ -8,6 +8,8 @@ import { SmartProductImage } from "@/components/shop/SmartProductImage";
 import { FavoriteButton } from "@/components/favorites/FavoritesSection";
 import { ShoppingCart, Star, Package, ArrowRight, Clock, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { productName } from "@/lib/localizeNames";
 
 interface Props {
   excludeId?: string;
@@ -19,7 +21,8 @@ export default function RecentlyViewedProducts({ excludeId }: Props) {
   const { addToCart } = useCart();
   const { recentlyViewed } = useRecentlyViewed();
 
-  const items = excludeId ? recentlyViewed.filter((p) => p.id !== excludeId) : recentlyViewed;
+  const visibleViewed = withoutHiddenProducts(recentlyViewed);
+  const items = excludeId ? visibleViewed.filter((p) => p.id !== excludeId) : visibleViewed;
 
   if (items.length === 0) return null;
 
@@ -64,7 +67,7 @@ function RecentCard({ product: p, onAdd, t }: { product: RecentProduct; onAdd: (
       </Link>
       <CardContent className="p-3 space-y-2">
         <Link to={`/shop/product/${p.id}`}>
-          <h3 className="text-sm font-medium text-foreground hover:text-primary line-clamp-2 min-h-[2.5rem]">{p.name}</h3>
+          <h3 className="text-sm font-medium text-foreground hover:text-primary line-clamp-2 min-h-[2.5rem]">{productName(p.name)}</h3>
         </Link>
         {p.rating && (
           <div className="flex items-center gap-1">

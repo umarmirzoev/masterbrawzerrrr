@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useCart } from "@/hooks/useCart";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
 
 // Хук рекомендаций подбирает товары по просмотрам, корзине и популярности магазина.
 export interface RecommendedProduct {
@@ -108,7 +109,7 @@ export function useRecommendations(excludeIds: string[] = [], limit = 8) {
         if (topRated) results = [...results, ...(topRated as RecommendedProduct[])];
       }
 
-      setRecommendations(results.slice(0, limit));
+      setRecommendations(withoutHiddenProducts(results).slice(0, limit));
       setLoading(false);
     };
 

@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { personName } from "@/lib/localizeNames";
 
 const districts = ["Сино", "Фирдавси", "Шохмансур", "Исмоили Сомони", "Пригород"];
 
@@ -88,7 +89,7 @@ export default function MasterBookingDialog({ open, onOpenChange, master }: Prop
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[100dvh] sm:max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Фармоиши мастер: {master?.full_name}</DialogTitle>
+          <DialogTitle>Фармоиши мастер: {personName(master?.full_name)}</DialogTitle>
         </DialogHeader>
         {done ? (
           <div className="flex flex-col items-center py-8 gap-3">

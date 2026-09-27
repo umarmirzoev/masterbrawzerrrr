@@ -27,6 +27,7 @@ import {
   Wrench,
   XCircle,
 } from "lucide-react";
+import { productName } from "@/lib/localizeNames";
 
 type ShopOrder = {
   id: string;
@@ -333,7 +334,7 @@ export default function ShopOrderDetail() {
                               )}
                             </div>
                             <div>
-                              <p className="font-medium text-foreground">{product?.name || "Товар недоступен"}</p>
+                              <p className="font-medium text-foreground">{productName(product?.name) || "Товар недоступен"}</p>
                               <p className="text-sm text-muted-foreground">{item.price} сомонӣ x {item.quantity}</p>
                               {item.include_installation && (
                                 <p className="mt-1 inline-flex items-center gap-1 text-sm text-emerald-700">

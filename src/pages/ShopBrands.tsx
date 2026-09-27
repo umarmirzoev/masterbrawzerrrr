@@ -12,6 +12,8 @@ import { SmartProductImage } from "@/components/shop/SmartProductImage";
 import { useCart } from "@/hooks/useCart";
 import { FavoriteButton } from "@/components/favorites/FavoritesSection";
 import { ArrowLeft, Building2, ShoppingCart } from "lucide-react";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { productName } from "@/lib/localizeNames";
 
 export default function ShopBrands() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,7 +31,7 @@ export default function ShopBrands() {
         .eq("is_approved", true)
         .limit(300);
 
-      setProducts((data && data.length > 0 ? data : fallbackShopProducts) as any[]);
+      setProducts(withoutHiddenProducts((data && data.length > 0 ? data : fallbackShopProducts) as any[]));
       setLoading(false);
     };
 
@@ -132,7 +134,7 @@ export default function ShopBrands() {
                   <CardContent className="space-y-3 p-4">
                     <p className="text-xs text-muted-foreground">{product.shop_categories?.name || selectedBrand}</p>
                     <Link to={`/shop/product/${product.id}`}>
-                      <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{product.name}</h3>
+                      <h3 className="line-clamp-2 font-semibold text-foreground hover:text-primary">{productName(product.name)}</h3>
                     </Link>
                     <div className="flex items-end gap-2">
                       <span className="text-2xl font-bold text-foreground">{product.price} сомонӣ</span>

@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import HeaderNav from "@/components/HeaderNav";
+import { FlagIcon } from "@/components/FlagIcon";
 
 const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=tj.masterchas.masterchas_app";
 
@@ -42,7 +43,7 @@ function AndroidGlyph({ className }: { className?: string }) {
 }
 
 export default function Header() {
-  const { languageShortLabel, setLanguage, t } = useLanguage();
+  const { language, languageShortLabel, setLanguage, t } = useLanguage();
   const { user, signOut, loading, getDashboardPath } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -141,14 +142,14 @@ export default function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-1.5 rounded-xl px-2.5 h-10 hover:bg-slate-50 dark:hover:bg-slate-800">
-                  <Languages className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                  <FlagIcon code={(language === "tj" || language === "en" ? language : "ru") as "ru" | "tj" | "en"} className="h-3.5 w-5" />
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{languageShortLabel}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[130px] rounded-xl">
-                <DropdownMenuItem onClick={() => setLanguage("ru")} className="cursor-pointer font-medium">🇷🇺 {t("languageOptionRu")}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage("tj")} className="cursor-pointer font-medium">🇹🇯 {t("languageOptionTj")}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage("en")} className="cursor-pointer font-medium">🇬🇧 {t("languageOptionEn")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("ru")} className={`cursor-pointer gap-2.5 font-medium ${language === "ru" ? "bg-emerald-50 text-emerald-700" : ""}`}><FlagIcon code="ru" /> {t("languageOptionRu")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("tj")} className={`cursor-pointer gap-2.5 font-medium ${language === "tj" ? "bg-emerald-50 text-emerald-700" : ""}`}><FlagIcon code="tj" /> {t("languageOptionTj")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("en")} className={`cursor-pointer gap-2.5 font-medium ${language === "en" ? "bg-emerald-50 text-emerald-700" : ""}`}><FlagIcon code="en" /> {t("languageOptionEn")}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 

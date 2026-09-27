@@ -32,7 +32,17 @@ import { motion } from "framer-motion";
 import {
   ShoppingCart, Star, Package, Phone, Minus, Plus,
   CheckCircle, Wrench, Truck, User, Award, ArrowRight, MessageCircle, Heart, Scale, Building2,
+  ChevronRight, ShieldCheck, Zap,
 } from "lucide-react";
+import { withoutHiddenProducts } from "@/lib/hiddenProducts";
+import { personName, productName, tx, getActiveLanguage, shopCategoryName } from "@/lib/localizeNames";
+
+// Товары стартового каталога (id "fallback-...") не лежат в shop_products,
+// поэтому их отзывы хранятся в отдельной таблице с текстовым ключом.
+const getReviewTarget = (productId: string) =>
+  isFallbackProductId(productId)
+    ? { table: "shop_catalog_reviews", column: "product_key" }
+    : { table: "shop_product_reviews", column: "product_id" };
 
 // Category cross-sell mapping: categoryId → array of related categoryIds
 const CROSS_SELL_MAP: Record<string, string[]> = {
@@ -81,7 +91,7 @@ function ProductCard({ product, onAddToCart, t }: { product: any; onAddToCart: (
       </Link>
       <CardContent className="p-3 space-y-2">
         <Link to={`/shop/product/${product.id}`}>
-          <h3 className="text-sm font-medium text-foreground hover:text-primary line-clamp-2 min-h-[2.5rem]">{product.name}</h3>
+          <h3 className="text-sm font-medium text-foreground hover:text-primary line-clamp-2 min-h-[2.5rem]">{productName(product.name)}</h3>
         </Link>
         <div className="flex items-center gap-1">
           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -145,14 +155,14 @@ export default function ProductDetail() {
         setProduct(fallbackProduct);
         setActiveImage(0);
         setSeller(null);
-        setRelated(
-          getFallbackProductsByCategoryId(fallbackProduct.category_id)
-            .filter((item) => item.id !== fallbackProduct.id)
-            .slice(0, 8)
-        );
+        const fallbackRelated = withoutHiddenProducts(
+          getFallbackProductsByCategoryId(fallbackProduct.category_id).filter((item) => item.id !== fallbackProduct.id)
+        ).slice(0, 8);
+        const relatedIds = new Set(fallbackRelated.map((item) => item.id));
+        setRelated(fallbackRelated);
         setBoughtTogether(
-          fallbackShopProducts
-            .filter((item) => item.category_id !== fallbackProduct.category_id && (item.is_popular || item.is_discounted))
+          withoutHiddenProducts(fallbackShopProducts)
+            .filter((item) => item.id !== fallbackProduct.id && !relatedIds.has(item.id))
             .slice(0, 8)
         );
         setLoading(false);
@@ -194,8 +204,8 @@ export default function ProductDetail() {
           .eq("category_id", data.category_id)
           .neq("id", id!)
           .order("rating", { ascending: false })
-          .limit(8);
-        setRelated(rel || []);
+          .limit(100);
+        setRelated(withoutHiddenProducts(rel).slice(0, 8));
 
         // Frequently bought together: from cross-sell categories
         const crossCats = CROSS_SELL_MAP[data.category_id] || [];
@@ -206,8 +216,8 @@ export default function ProductDetail() {
             .in("category_id", crossCats)
             .eq("in_stock", true)
             .order("is_popular", { ascending: false })
-            .limit(8);
-          setBoughtTogether(cross || []);
+            .limit(100);
+          setBoughtTogether(withoutHiddenProducts(cross).slice(0, 8));
         } else {
           setBoughtTogether([]);
         }
@@ -231,16 +241,17 @@ export default function ProductDetail() {
 
   useEffect(() => {
     const loadReviews = async () => {
-      if (!id || isFallbackProductId(id)) {
+      if (!id) {
         setProductReviews([]);
         setReviewProfiles({});
         return;
       }
 
+      const target = getReviewTarget(id);
       const { data, error } = await supabase
-        .from("shop_product_reviews" as any)
+        .from(target.table as any)
         .select("*")
-        .eq("product_id", id)
+        .eq(target.column, id)
         .eq("is_approved", true)
         .order("created_at", { ascending: false });
 
@@ -305,7 +316,11 @@ export default function ProductDetail() {
     );
   }
 
-  const galleryImages = getProductGallery(product);
+  // У товаров стартового каталога доп. фото — случайные стоковые (дрель у рулетки и т.п.),
+  // поэтому показываем только главное фото.
+  const galleryImages = isFallbackProductId(product.id)
+    ? getProductGallery(product).slice(0, 1)
+    : getProductGallery(product);
 
   const discount = product.old_price ? Math.round((1 - product.price / product.old_price) * 100) : 0;
   const totalPrice = product.price * qty + (withInstall && product.installation_price ? product.installation_price : 0);
@@ -320,20 +335,26 @@ export default function ProductDetail() {
   const sizeMatch = detectValue(/\d+\s?(мм|см|м|дюйм|")/i);
   const brandMatch = detectProductBrand(product);
   const stockCount = product.stock_qty ?? product.stock_quantity ?? product.quantity ?? (product.in_stock ? Math.max(3, ((product.reviews_count || 0) % 9) + 2) : 0);
+  // Понятный артикул вместо обрезанного id (раньше было "FALLBACK").
+  const productSku = (() => {
+    let hash = 0;
+    for (const ch of String(product.id)) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+    return `MT-${String(hash % 1000000).padStart(6, "0")}`;
+  })();
   const compareActive = isComparing(product.id);
   const compareDisabled = !compareActive && compareIds.length >= maxCompareItems;
-  const fallbackSpecs: Record<string, string> = {};
+  const fallbackSpecs: Record<string, string> = { [tx("Артикул", "SKU", "Артикул")]: productSku };
 
-  if (product.brand || brandMatch) fallbackSpecs["Бренд"] = product.brand || brandMatch;
-  if (product.shop_categories?.name) fallbackSpecs[t("shopCategory")] = product.shop_categories.name;
-  if (powerMatch) fallbackSpecs["Мощность"] = powerMatch;
-  if (sizeMatch) fallbackSpecs["Размер"] = sizeMatch;
-  if (materialMatch) fallbackSpecs["Материал"] = materialMatch;
-  if (stockCount) fallbackSpecs["В наличии"] = `${stockCount} шт.`;
+  if (product.brand || brandMatch) fallbackSpecs[tx("Бренд", "Brand", "Бренд")] = product.brand || brandMatch;
+  if (product.shop_categories?.name) fallbackSpecs[t("shopCategory")] = shopCategoryName(product.shop_categories.name);
+  if (powerMatch) fallbackSpecs[tx("Мощность", "Power", "Қувва")] = powerMatch;
+  if (sizeMatch) fallbackSpecs[tx("Размер", "Size", "Андоза")] = sizeMatch;
+  if (materialMatch) fallbackSpecs[tx("Материал", "Material", "Мавод")] = materialMatch;
+  if (stockCount) fallbackSpecs[tx("В наличии", "In stock", "Дар анбор")] = `${stockCount} ${tx("шт.", "pcs", "дона")}`;
   if (product.installation_price) fallbackSpecs[t("shopMasterInstall")] = `${product.installation_price} ${t("currencySomoni")}`;
   if (product.old_price) fallbackSpecs[t("shopOldPrice")] = `${product.old_price} ${t("currencySomoni")}`;
   if (product.rating) fallbackSpecs[t("shopRating")] = `${product.rating} / 5`;
-  if (product.reviews_count) fallbackSpecs[t("shopReviews")] = String(product.reviews_count);
+  if (product.reviews_count) fallbackSpecs[tx("Отзывы", "Reviews", "Шарҳҳо")] = String(product.reviews_count);
   if (product.seller_type) fallbackSpecs[t("productFromMaster")] = product.seller_type === "master" ? t("yes") : t("no");
 
   const displaySpecs = Object.keys(specs).length > 0 ? specs : fallbackSpecs;
@@ -414,14 +435,15 @@ export default function ProductDetail() {
     // Demo mode restriction removed: we now allow adding fallback items to cart.
 
     setSubmittingReview(true);
+    const target = getReviewTarget(product.id);
     const payload = {
-      product_id: product.id,
+      [target.column]: product.id,
       user_id: user.id,
       rating: reviewForm.rating,
       comment: reviewForm.comment.trim() || null,
     };
 
-    const table = "shop_product_reviews" as any;
+    const table = target.table as any;
     const existingReview = productReviews.find((review) => review.user_id === user.id);
     const request = existingReview
       ? supabase.from(table).update(payload).eq("id", existingReview.id)
@@ -429,7 +451,14 @@ export default function ProductDetail() {
 
     const { error } = await request;
     if (error) {
-      toast({ title: "Не удалось сохранить отзыв", description: error.message, variant: "destructive" });
+      const tableMissing = /does not exist|schema cache|PGRST205|42P01/i.test(`${error.message} ${(error as any).code || ""}`);
+      toast({
+        title: "Не удалось сохранить отзыв",
+        description: tableMissing
+          ? "Таблица отзывов ещё не создана в базе. Примените миграцию 20260927100000_shop_catalog_reviews.sql в Supabase."
+          : error.message,
+        variant: "destructive",
+      });
       setSubmittingReview(false);
       return;
     }
@@ -437,7 +466,7 @@ export default function ProductDetail() {
     const { data: freshReviews } = await supabase
       .from(table)
       .select("*")
-      .eq("product_id", product.id)
+      .eq(target.column, product.id)
       .eq("is_approved", true)
       .order("created_at", { ascending: false });
 
@@ -454,296 +483,286 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50/60 dark:bg-background">
       <Header />
-      <div className="container px-4 mx-auto py-8">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:py-8">
         {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <Link to="/shop" className="hover:text-primary">{t("navShop")}</Link>
-          <span>/</span>
-          <Link to={`/shop/category/${product.category_id}`} className="hover:text-primary">{product.shop_categories?.name}</Link>
-          <span>/</span>
-          <span className="text-foreground truncate max-w-[200px]">{product.name}</span>
-        </div>
+        <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
+          <Link to="/shop" className="rounded-full px-2 py-1 hover:bg-white hover:text-emerald-600">{t("navShop")}</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
+          <Link to="/shop/search" className="rounded-full px-2 py-1 hover:bg-white hover:text-emerald-600">{shopCategoryName(product.shop_categories?.name || "Каталог")}</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
+          <span className="max-w-[220px] truncate px-2 py-1 font-medium text-slate-900 dark:text-white">{productName(product.name)}</span>
+        </nav>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Image Gallery */}
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3">
-            <div className="aspect-square bg-muted/20 rounded-2xl border border-border flex items-center justify-center overflow-hidden relative">
+        <div className="grid items-start gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+          {/* Галерея */}
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3 lg:sticky lg:top-24">
+            <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
               {galleryImages.length > 0 ? (
                 <SmartProductImage
                   product={{ ...product, image_url: galleryImages[activeImage] || galleryImages[0], images: galleryImages }}
                   alt={product.name}
-                  className="w-full h-full object-cover transition-all duration-300"
+                  className="relative h-full w-full rounded-2xl object-contain transition-all duration-300"
                 />
               ) : (
-                <Package className="w-32 h-32 text-muted-foreground/20" />
+                <Package className="h-32 w-32 text-slate-200" />
               )}
-              {discount > 0 && <Badge className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm px-3">-{discount}%</Badge>}
+              <div className="absolute left-5 top-5 flex flex-wrap gap-1.5">
+                {discount > 0 && (
+                  <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white shadow">−{discount}%</span>
+                )}
+                {product.is_popular && (
+                  <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-950 shadow">{tx("Хит продаж", "Bestseller", "Хити фурӯш")}</span>
+                )}
+              </div>
               {product.seller_type === "master" && (
-                <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs gap-1"><Award className="w-3 h-3" /> {t("shopFromMaster")}</Badge>
+                <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white">
+                  <Award className="h-3 w-3" /> {t("shopFromMaster")}
+                </span>
               )}
             </div>
             {galleryImages.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1">
-                  {galleryImages.map((img, i) => (
-                    <button key={i} onClick={() => setActiveImage(i)} className={`w-16 h-16 md:w-20 md:h-20 rounded-xl border-2 overflow-hidden shrink-0 transition-all ${activeImage === i ? "border-primary shadow-md" : "border-border hover:border-primary/50"}`}>
+                {galleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImage(i)}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 bg-white p-1 transition-all md:h-20 md:w-20 ${
+                      activeImage === i ? "border-emerald-500 shadow-md" : "border-transparent opacity-70 hover:opacity-100"
+                    }`}
+                  >
                     <SmartProductImage
                       product={{ ...product, image_url: img, images: [img] }}
                       alt=""
-                      className="w-full h-full object-cover"
+                      className="h-full w-full rounded-xl object-cover"
                     />
-                    </button>
-                  ))}
+                  </button>
+                ))}
               </div>
             )}
           </motion.div>
 
-          {/* Info */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
-            <div>
-              <p className="text-sm text-primary font-medium mb-1">{product.shop_categories?.name}</p>
-              <div className="flex items-start justify-between gap-4">
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">{product.name}</h1>
+          {/* Информация и покупка */}
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+            <div className="rounded-[2rem] border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-7">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  {shopCategoryName(product.shop_categories?.name || "Каталог")}
+                </span>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className={`rounded-full ${compareActive ? "border-primary text-primary" : ""}`}
+                  <button
+                    type="button"
+                    title="Сравнить"
                     onClick={() => toggleCompare(product.id)}
                     disabled={compareDisabled}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border transition-colors disabled:opacity-40 ${
+                      compareActive ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-500 hover:border-emerald-300 hover:text-emerald-700 dark:border-slate-700"
+                    }`}
                   >
-                    <Scale className="w-4 h-4" />
-                  </Button>
+                    <Scale className="h-4 w-4" />
+                  </button>
                   <FavoriteButton itemType="product" itemId={product.id} size="default" />
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.rating || 0) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} />
-                ))}
+              <h1 className="text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-white sm:text-4xl">{productName(product.name)}</h1>
+
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`h-4 w-4 ${i < Math.round(product.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-200"}`} />
+                    ))}
+                  </span>
+                  <span className="font-bold text-slate-900 dark:text-white">{product.rating || "—"}</span>
+                  <span className="text-slate-400">· {product.reviews_count || 0} {tx("отзывов", "reviews", "шарҳ")}</span>
+                </span>
+                <span className="text-slate-400">{tx("Артикул", "SKU", "Артикул")}: <span className="font-semibold text-slate-600 dark:text-slate-300">{productSku}</span></span>
               </div>
-              <span className="text-sm text-muted-foreground">{product.rating} ({product.reviews_count} {t("shopReviews")})</span>
-            </div>
 
-            <div className="flex items-end gap-3">
-              <span className="text-3xl font-bold text-foreground">{product.price} {t("currencySomoni")}</span>
-              {product.old_price && <span className="text-lg text-muted-foreground line-through">{product.old_price} с.</span>}
-            </div>
+              {/* Цена */}
+              <div className="mt-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-5 dark:from-emerald-950/30 dark:to-teal-950/20">
+                <div className="flex flex-wrap items-end gap-3">
+                  <span className="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                    {product.price} <span className="text-xl font-bold text-slate-500">{t("currencySomoni")}</span>
+                  </span>
+                  {discount > 0 && (
+                    <>
+                      <span className="pb-1 text-lg text-slate-400 line-through">{product.old_price}</span>
+                      <span className="mb-1 rounded-full bg-red-500 px-2.5 py-0.5 text-xs font-bold text-white">
+                        {tx("Экономия", "You save", "Сарфа")} {product.old_price - product.price} {t("currencySomoni")}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
+                  {product.in_stock ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-emerald-700 shadow-sm dark:bg-slate-900">
+                      <CheckCircle className="h-3.5 w-3.5" /> {tx("В наличии", "In stock", "Дар анбор")}: {stockCount} {tx("шт.", "pcs", "дона")}
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-white px-2.5 py-1 text-slate-500 shadow-sm dark:bg-slate-900">{t("shopOutOfStock")}</span>
+                  )}
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-slate-600 shadow-sm dark:bg-slate-900 dark:text-slate-300">
+                    <Truck className="h-3.5 w-3.5" /> {tx("Доставка по Душанбе", "Delivery in Dushanbe", "Расонидан дар Душанбе")}
+                  </span>
+                  {product.promotion_label && (
+                    <span className="rounded-full bg-white px-2.5 py-1 text-slate-600 shadow-sm dark:bg-slate-900">{product.promotion_label}</span>
+                  )}
+                </div>
+                {product.promotion_end && new Date(product.promotion_end) > new Date() && (
+                  <div className="mt-3">
+                    <CountdownTimer endDate={product.promotion_end} />
+                  </div>
+                )}
+              </div>
 
-            {product.promotion_end && new Date(product.promotion_end) > new Date() && (
-              <CountdownTimer endDate={product.promotion_end} />
-            )}
-
-            <div className="flex items-center gap-2 flex-wrap">
-              {product.in_stock ? (
-                <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><CheckCircle className="w-3 h-3 mr-1" />{t("shopInStock")}</Badge>
-              ) : (
-                <Badge variant="secondary">{t("shopOutOfStock")}</Badge>
-              )}
-              <Badge variant="outline" className="gap-1"><Truck className="w-3 h-3" />{t("shopDelivery")}</Badge>
-              {product.seller_type === "master" && (
-                <Badge className="bg-primary/10 text-primary border border-primary/20 gap-1"><Award className="w-3 h-3" />{t("shopFromMaster")}</Badge>
-              )}
               {product.installation_price && (
-                <Badge className="bg-primary text-primary-foreground gap-1"><Wrench className="w-3 h-3" />Можно с установкой мастером</Badge>
+                <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/20">
+                  <Checkbox checked={withInstall} onCheckedChange={(v) => setWithInstall(!!v)} className="mt-1" />
+                  <div>
+                    <p className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+                      <Wrench className="h-4 w-4 text-emerald-600" /> {t("shopNeedInstall")}
+                    </p>
+                    <p className="mt-0.5 text-sm text-slate-500">
+                      {t("shopProfInstall")} — <span className="font-bold text-emerald-700">{product.installation_price} {t("currencySomoni")}</span>
+                    </p>
+                  </div>
+                </label>
               )}
-              {product.promotion_label && (
-                <Badge variant="outline">{product.promotion_label}</Badge>
-              )}
+
+              {/* Количество и итог */}
+              <div className="mt-5 flex items-center justify-between gap-4">
+                <div className="flex items-center rounded-full border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800">
+                  <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700" aria-label="Меньше">
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-10 text-center font-bold text-slate-900 dark:text-white">{qty}</span>
+                  <button type="button" onClick={() => setQty(qty + 1)} className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700" aria-label="Больше">
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-400">{t("shopTotal")}</p>
+                  <p className="text-2xl font-black text-emerald-600">{totalPrice} {t("currencySomoni")}</p>
+                </div>
+              </div>
+
+              {/* Кнопки */}
+              <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => addToCart(product.id, withInstall)}
+                  disabled={!product.in_stock}
+                  className="inline-flex h-13 min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 text-base font-bold text-white shadow-lg shadow-emerald-600/25 transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+                >
+                  <ShoppingCart className="h-5 w-5" /> {t("shopAddToCart")}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  disabled={!product.in_stock}
+                  className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 text-base font-bold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900"
+                >
+                  {t("shopBuyNow")} <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={handleQuickBuyOpen}
+                className="mt-2.5 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-200 text-sm font-bold text-emerald-700 transition-colors hover:border-emerald-400 hover:bg-emerald-50 dark:border-emerald-900/50 dark:hover:bg-emerald-950/30"
+              >
+                <Zap className="h-4 w-4" /> {tx("Купить в 1 клик", "Buy in 1 click", "Харид бо 1 клик")}<span className="hidden sm:inline"> — {tx("перезвоним за 5 минут", "we call back in 5 minutes", "дар 5 дақиқа занг мезанем")}</span>
+              </button>
+
+              <div className="mt-4 grid grid-cols-2 gap-2.5">
+                <a href="tel:+992979117007" className="flex items-center justify-center gap-2 rounded-2xl bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-200">
+                  <Phone className="h-4 w-4 text-emerald-600" /> {tx("Позвонить", "Call", "Занг задан")}
+                </a>
+                <a
+                  href={`https://wa.me/992979117007?text=${encodeURIComponent(`Здравствуйте! Хочу уточнить по товару: ${product.name} (${productSku})`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-200"
+                >
+                  <MessageCircle className="h-4 w-4 text-emerald-600" /> WhatsApp
+                </a>
+              </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="text-xs text-muted-foreground mb-1">Остаток</p>
-                <p className="text-lg font-bold text-foreground">{stockCount} шт.</p>
-              </div>
-              <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="text-xs text-muted-foreground mb-1">Артикул</p>
-                <p className="text-lg font-bold text-foreground">{String(product.id).slice(0, 8).toUpperCase()}</p>
-              </div>
-              <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="text-xs text-muted-foreground mb-1">Продажа</p>
-                <p className="text-lg font-bold text-foreground">{product.seller_type === "master" ? "Мастер" : "Магазин"}</p>
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Link to="/shop/brands" className="rounded-2xl border border-border bg-background p-4 transition-colors hover:border-primary/40">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-primary/10 p-2"><Building2 className="w-4 h-4 text-primary" /></div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Бренд</p>
-                    <p className="font-semibold text-foreground">{brandMatch || "Не указан"}</p>
+            {/* Преимущества */}
+            <div className="grid grid-cols-3 gap-2.5">
+              {[
+                { icon: Truck, title: tx("Доставка", "Delivery", "Расонидан"), text: tx("по Душанбе", "in Dushanbe", "дар Душанбе") },
+                { icon: ShieldCheck, title: tx("Гарантия", "Warranty", "Кафолат"), text: tx("от магазина", "from the store", "аз мағоза") },
+                { icon: Wrench, title: tx("Установка", "Installation", "Насб"), text: tx("мастером", "by a pro", "аз ҷониби усто") },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl border border-slate-100 bg-white p-3 text-center dark:border-slate-800 dark:bg-slate-900 sm:p-4">
+                  <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-900/30">
+                    <item.icon className="h-5 w-5 text-emerald-600" />
                   </div>
-                </div>
-              </Link>
-              <Link to="/shop/promotions" className="rounded-2xl border border-border bg-background p-4 transition-colors hover:border-primary/40">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-destructive/10 p-2"><Heart className="w-4 h-4 text-destructive" /></div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Акции</p>
-                    <p className="font-semibold text-foreground">{product.promotion_label || "Смотреть скидки"}</p>
-                  </div>
-                </div>
-              </Link>
-              <Link to="/shop/compare" className="rounded-2xl border border-border bg-background p-4 transition-colors hover:border-primary/40">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-amber-500/10 p-2"><Scale className="w-4 h-4 text-amber-600" /></div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Сравнение</p>
-                    <p className="font-semibold text-foreground">{compareActive ? "Добавлен" : `${compareIds.length}/4 выбрано`}</p>
-                  </div>
-                </div>
-              </Link>
-            </div>
-
-            {seller && (
-              <Card className="border-primary/20 bg-primary/5">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      {seller.avatar_url ? (
-                        <img src={seller.avatar_url} alt={seller.full_name} className="w-full h-full object-cover rounded-xl" />
-                      ) : (
-                        <User className="w-6 h-6 text-primary" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-foreground text-sm">{seller.full_name}</p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" />{seller.average_rating || "—"}</span>
-                        <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" />{seller.completed_orders || 0} {t("sellerOrders")}</span>
-                      </div>
-                    </div>
-                    <Link to={`/master-store/${seller.user_id}`}>
-                      <Button size="sm" variant="outline" className="rounded-full text-xs">{t("navShop")}</Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {product.description && (
-              <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
-            )}
-
-            {Object.keys(displaySpecs).length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-foreground">{t("shopSpecs")}</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {Object.entries(displaySpecs).map(([key, val]) => (
-                    <div key={key} className="flex justify-between text-sm py-1.5 px-3 bg-muted/50 rounded-lg">
-                      <span className="text-muted-foreground">{key}</span>
-                      <span className="font-medium text-foreground">{String(val)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              {productHighlights.map((item) => (
-                <div key={item.title} className="rounded-2xl border border-border bg-background p-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-                    <item.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <p className="font-semibold text-sm text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.text}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">{item.title}</p>
+                  <p className="text-xs text-slate-500">{item.text}</p>
                 </div>
               ))}
             </div>
 
-            {product.installation_price && (
-              <Card className="border-primary/30 bg-primary/5">
-                <CardContent className="p-4">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <Checkbox checked={withInstall} onCheckedChange={(v) => setWithInstall(!!v)} className="mt-1" />
-                    <div>
-                      <p className="font-medium text-foreground flex items-center gap-2">
-                        <Wrench className="w-4 h-4 text-primary" /> {t("shopNeedInstall")}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-0.5">
-                        {t("shopProfInstall")} — <span className="font-semibold text-primary">{product.installation_price} {t("currencySomoni")}</span>
-                      </p>
-                    </div>
-                  </label>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-foreground">{t("shopQuantity")}:</span>
-              <div className="flex items-center border border-border rounded-full overflow-hidden">
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none" onClick={() => setQty(Math.max(1, qty - 1))}><Minus className="w-4 h-4" /></Button>
-                <span className="w-10 text-center font-medium">{qty}</span>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none" onClick={() => setQty(qty + 1)}><Plus className="w-4 h-4" /></Button>
-              </div>
-            </div>
-
-            <div className="p-4 bg-muted/50 rounded-xl">
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-muted-foreground">{t("shopProduct")} ({qty} {t("shopPcs")})</span>
-                <span>{product.price * qty} с.</span>
-              </div>
-              {withInstall && product.installation_price && (
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">{t("shopMasterInstall")}</span>
-                  <span>{product.installation_price} с.</span>
+            {seller && (
+              <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-50">
+                  {seller.avatar_url ? (
+                    <img src={seller.avatar_url} alt={seller.full_name} className="h-full w-full object-cover" />
+                  ) : (
+                    <User className="h-6 w-6 text-emerald-600" />
+                  )}
                 </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">{personName(seller.full_name)}</p>
+                  <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+                    <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-amber-400 text-amber-400" />{seller.average_rating || "—"}</span>
+                    <span className="flex items-center gap-1"><CheckCircle className="h-3 w-3" />{seller.completed_orders || 0} {t("sellerOrders")}</span>
+                  </div>
+                </div>
+                <Link to={`/master-store/${seller.user_id}`}>
+                  <Button size="sm" variant="outline" className="rounded-full text-xs">{t("navShop")}</Button>
+                </Link>
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Описание и характеристики */}
+        <div className="mt-8 grid items-start gap-4 lg:grid-cols-[1fr_1.1fr]">
+          <div className="rounded-[2rem] border border-slate-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h2 className="mb-3 text-lg font-black text-slate-900 dark:text-white">{tx("Описание", "Description", "Тавсиф")}</h2>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              {getActiveLanguage() === "ru" && product.description ? product.description : tx(`${product.description || `${product.name} — качественный товар для дома и ремонта.`}`, `${productName(product.name)} — quality product for home and renovation.`, `${productName(product.name)} — маҳсулоти босифат барои хона ва таъмир.`)}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-slate-50 px-3 py-1.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                {tx("Продавец", "Seller", "Фурӯшанда")}: <b>{product.seller_type === "master" ? tx("Мастер", "Master", "Усто") : tx("Магазин Master.TJ", "Master.TJ Store", "Мағозаи Master.TJ")}</b>
+              </span>
+              {brandMatch && (
+                <span className="rounded-full bg-slate-50 px-3 py-1.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  {tx("Бренд", "Brand", "Бренд")}: <b>{brandMatch}</b>
+                </span>
               )}
-              <div className="flex justify-between font-bold text-lg pt-2 border-t border-border mt-2">
-                <span>{t("shopTotal")}</span>
-                <span className="text-primary">{totalPrice} {t("currencySomoni")}</span>
+            </div>
+          </div>
+          {Object.keys(displaySpecs).length > 0 && (
+            <div className="rounded-[2rem] border border-slate-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="mb-3 text-lg font-black text-slate-900 dark:text-white">{t("shopSpecs")}</h2>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {Object.entries(displaySpecs).map(([key, val]) => (
+                  <div key={key} className="flex items-center justify-between gap-4 py-2.5 text-sm">
+                    <span className="text-slate-500">{key}</span>
+                    <span className="text-right font-semibold text-slate-900 dark:text-white">{String(val)}</span>
+                  </div>
+                ))}
               </div>
             </div>
-
-            <div className="flex gap-3">
-              <Button
-                size="lg"
-                className="flex-1 rounded-full gap-2"
-                onClick={() => addToCart(product.id, withInstall)}
-                disabled={!product.in_stock}
-              >
-                <ShoppingCart className="w-5 h-5" /> {t("shopAddToCart")}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="flex-1 rounded-full"
-                onClick={handleBuyNow}
-                disabled={!product.in_stock}
-              >
-                {t("shopBuyNow")}
-              </Button>
-            </div>
-
-            <Button
-              size="lg"
-              variant="secondary"
-              className="w-full rounded-full gap-2"
-              onClick={handleQuickBuyOpen}
-            >
-              <Heart className="w-5 h-5" /> Купить в 1 клик
-            </Button>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <a href="tel:+992979117007" className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary rounded-2xl border border-border px-4 py-3">
-                <Phone className="w-4 h-4" /> +992 979 117 007
-              </a>
-              <a
-                href={`https://wa.me/992979117007?text=${encodeURIComponent(`Здравствуйте! Хочу уточнить по товару: ${product.name}`)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary rounded-2xl border border-border px-4 py-3"
-              >
-                <MessageCircle className="w-4 h-4" /> WhatsApp
-              </a>
-            </div>
-          </motion.div>
+          )}
         </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-12">
@@ -905,7 +924,7 @@ export default function ProductDetail() {
         <div className="rounded-3xl border border-border bg-background/95 backdrop-blur p-3 shadow-2xl">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div>
-              <p className="text-xs text-muted-foreground">{product.name}</p>
+              <p className="text-xs text-muted-foreground">{productName(product.name)}</p>
               <p className="text-lg font-bold text-foreground">{totalPrice} {t("currencySomoni")}</p>
             </div>
             <FavoriteButton itemType="product" itemId={product.id} size="default" />
@@ -925,12 +944,12 @@ export default function ProductDetail() {
           <DialogHeader>
             <DialogTitle>Купить в 1 клик</DialogTitle>
             <DialogDescription>
-              Отправьте заявку в WhatsApp, и мы быстро свяжемся по товару {product.name}.
+              Отправьте заявку в WhatsApp, и мы быстро свяжемся по товару {productName(product.name)}.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="rounded-2xl bg-muted/40 p-4 text-sm">
-              <p className="font-semibold text-foreground">{product.name}</p>
+              <p className="font-semibold text-foreground">{productName(product.name)}</p>
               <p className="text-muted-foreground mt-1">
                 {qty} шт. • {product.price} {t("currencySomoni")} {withInstall && product.installation_price ? `• + установка ${product.installation_price} ${t("currencySomoni")}` : ""}
               </p>

@@ -23,6 +23,7 @@ import {
   ArrowLeft, Star, MapPin, Clock, Phone,
   Users, Wrench, CheckCircle, Loader2, Filter, Map as MapIcon, List, X,
 } from "lucide-react";
+import { personName } from "@/lib/localizeNames";
 
 interface Service {
   id: string;
@@ -506,7 +507,7 @@ export default function ServiceDetail() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <Link to={`/masters/${master.id}`} className="font-bold text-foreground hover:text-primary transition-colors truncate block">
-                                    {master.full_name}
+                                    {personName(master.full_name)}
                                   </Link>
                                   <div className="flex items-center gap-1.5 mt-0.5">
                                     <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
@@ -567,7 +568,7 @@ export default function ServiceDetail() {
       <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
         <DialogContent className="sm:max-w-md max-h-[100dvh] sm:max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Заказать: {selectedMaster?.full_name}</DialogTitle>
+            <DialogTitle>Заказать: {personName(selectedMaster?.full_name)}</DialogTitle>
           </DialogHeader>
           {bookingDone ? (
             <div className="flex flex-col items-center py-8 gap-3">
@@ -643,7 +644,7 @@ function MastersMap({ masters, onBookMaster, gradients }: { masters: MasterListi
               <Marker key={master.id} position={[master.latitude!, master.longitude!]}>
                 <Popup>
                   <div className="text-sm min-w-[180px]">
-                    <p className="font-bold">{master.full_name}</p>
+                    <p className="font-bold">{personName(master.full_name)}</p>
                     <div className="flex items-center gap-1 my-1">
                       <span className="text-yellow-500">★</span>
                       <span>{master.average_rating}</span>

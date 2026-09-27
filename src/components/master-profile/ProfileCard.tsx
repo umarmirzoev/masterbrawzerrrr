@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Star, MapPin, Clock, Phone, MessageCircle, CheckCircle, Briefcase, TrendingUp } from "lucide-react";
+import { personName, personInitials } from "@/lib/localizeNames";
 
 interface Props {
   master: any;
@@ -20,7 +21,7 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
     ? (reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length).toFixed(1)
     : master.average_rating || "5.0";
 
-  const initials = master.full_name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2) || "М";
+  const initials = personInitials(master.full_name) || "М";
   const totalReviews = reviews.length || master.total_reviews || 0;
   const isTopRated = Number(avgRating) >= 4.5;
 
@@ -55,7 +56,7 @@ export default function MasterProfileCard({ master, reviews, completedOrders, on
             <div className="min-w-0 sm:pb-1.5">
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
                 <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight break-words">
-                  {master.full_name}
+                  {personName(master.full_name)}
                 </h1>
                 <Badge className="shrink-0 border-white/35 bg-white/20 text-white backdrop-blur-sm">
                   <CheckCircle className="w-3 h-3 mr-1" /> {t("mpVerified")}

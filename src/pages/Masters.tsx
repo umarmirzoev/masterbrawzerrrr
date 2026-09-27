@@ -22,6 +22,7 @@ import OrderModal from "@/components/OrderModal";
 import QuickBooking from "@/components/QuickBooking";
 import AiMasterMatch from "@/components/AiMasterMatch";
 import { SAMPLE_MASTERS } from "@/data/seedData";
+import { personName, personInitials } from "@/lib/localizeNames";
 
 interface MasterListing {
   id: string;
@@ -496,11 +497,7 @@ function getDisplayCategories(categories: string[], search: string) {
 
 function MasterCard({ master, index, search, isComparing, onToggleCompare, compareDisabled }: { master: MasterListing; index: number; search: string; isComparing: boolean; onToggleCompare: () => void; compareDisabled: boolean }) {
   const { t } = useLanguage();
-  const initials = master.full_name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2);
+  const initials = personInitials(master.full_name);
 
   const colors = [
     "bg-emerald-500",
@@ -532,7 +529,7 @@ function MasterCard({ master, index, search, isComparing, onToggleCompare, compa
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1">
                   <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-emerald-600 transition-colors truncate">
-                    {master.full_name}
+                    {personName(master.full_name)}
                   </h3>
                   {master.is_top_master && (
                     <Award className="w-4 h-4 text-amber-500 shrink-0" />

@@ -38,6 +38,7 @@ import {
   Truck,
   Wrench,
 } from "lucide-react";
+import { productName } from "@/lib/localizeNames";
 
 type PromoCode = {
   id: string;
@@ -422,7 +423,7 @@ export default function CartPage() {
                           <div className="min-w-0 flex-1">
                             <Link to={`/shop/product/${product.id}`}>
                               <h3 className="line-clamp-2 text-sm font-medium text-foreground hover:text-primary">
-                                {product.name}
+                                {productName(product.name)}
                               </h3>
                             </Link>
                             <p className="mt-1 text-lg font-bold text-foreground">
