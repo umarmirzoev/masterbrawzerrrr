@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Phone, Mail, MapPin, MessageCircle, Facebook, Send, Instagram } from "lucide-react";
+import { tx } from "@/lib/localizeNames";
 
 export const Footer = () => {
   const { t } = useLanguage();
@@ -67,9 +68,9 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-medium uppercase tracking-wider text-slate-500">
           <p>{t("footerRights")}</p>
-          <div className="flex items-center gap-8">
-            <a href="#" className="hover:text-emerald-500 transition-colors">{t("footerPrivacy")}</a>
-            <a href="#" className="hover:text-emerald-500 transition-colors">{t("footerTerms")}</a>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+            <a href="/privacy-policy.html" className="hover:text-emerald-500 transition-colors">{t("footerPrivacy")}</a>
+            <a href="/delete-account.html" className="hover:text-emerald-500 transition-colors">{tx("Удаление аккаунта", "Delete account", "Нест кардани аккаунт")}</a>
           </div>
         </div>
       </div>
