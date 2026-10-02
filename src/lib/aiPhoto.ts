@@ -2,17 +2,18 @@ import { supabase } from "@/integrations/supabase/client";
 
 // Категории должны совпадать со списком на странице /masters.
 export const PHOTO_CATEGORIES = [
-  "Электрика", "Сантехника", "Отделка", "Мебель и двери", "Умный дом",
-  "Видеонаблюдение", "Сад и двор", "Сварочные работы", "Подвалы и гаражи",
-  "Уборка", "Ремонт под ключ", "Аварийные 24/7", "Ремонт техники",
+  "Электрика", "Сантехника", "Отделка", "Мебель и двери", "Умный дом", "Видеонаблюдение",
+  "Уборка", "Кондиционеры", "Отопление", "Малярные работы", "Полы и ламинат", "Другие услуги",
 ] as const;
 
 export interface PhotoDiagnosis {
+  /** broken — нашли поломку; ok — ничего не сломано; unclear — фото непонятное */
+  status: "broken" | "ok" | "unclear";
   recognized: boolean;
   problem: string;
   details: string;
-  category: string;
-  urgency: "low" | "medium" | "high";
+  category: string | null;
+  urgency: "low" | "medium" | "high" | null;
   priceMin: number | null;
   priceMax: number | null;
   advice: string;
@@ -54,12 +55,27 @@ export async function diagnosePhoto(base64: string, note: string, language: stri
   });
 
   if (error) {
-    const status = (error as { context?: Response }).context?.status;
+    const ctx = (error as { context?: Response }).context;
+    const status = ctx?.status;
     // 404 — функция ещё не задеплоена, 503 — нет ключа.
     if (status === 404 || status === 503) throw new AiNotConfiguredError();
-    throw new Error(error.message || "Ошибка анализа фото");
+    let reason = "";
+    try {
+      reason = (await ctx?.clone().json())?.reason ?? "";
+    } catch {
+      /* тело ответа не JSON */
+    }
+    const messages: Record<string, string> = {
+      bad_key: "ИИ не подключён: неверный API-ключ. Проверьте ANTHROPIC_API_KEY в Supabase.",
+      bad_model: "ИИ не подключён: неверное имя модели. Проверьте AI_VISION_MODEL в Supabase.",
+      no_credits: "На счёте Claude API закончились деньги. Пополните баланс в Claude Console.",
+    };
+    throw new Error(messages[reason] || "Не удалось проанализировать фото. Попробуйте ещё раз.");
   }
   if (data?.error === "not_configured") throw new AiNotConfiguredError();
   if (!data?.diagnosis) throw new Error(data?.error || "Пустой ответ от ИИ");
-  return data.diagnosis as PhotoDiagnosis;
+  const d = data.diagnosis as PhotoDiagnosis;
+  // Совместимость со старой версией функции без поля status.
+  if (!d.status) d.status = d.recognized ? "broken" : "unclear";
+  return d;
 }

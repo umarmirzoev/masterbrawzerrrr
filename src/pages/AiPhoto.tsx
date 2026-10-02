@@ -16,9 +16,9 @@ import {
   type PhotoDiagnosis,
 } from "@/lib/aiPhoto";
 
-type Step = "pick" | "analyzing" | "result" | "manual" | "error";
+type Step = "pick" | "analyzing" | "result" | "ok" | "manual" | "error";
 
-const URGENCY_LABEL: Record<PhotoDiagnosis["urgency"], { text: string; cls: string }> = {
+const URGENCY_LABEL: Record<"low" | "medium" | "high", { text: string; cls: string }> = {
   low: { text: "Не срочно", cls: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300" },
   medium: { text: "Желательно сегодня", cls: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" },
   high: { text: "Срочно", cls: "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300" },
@@ -63,7 +63,7 @@ export default function AiPhoto() {
     try {
       const diagnosis = await diagnosePhoto(base64, note.trim(), language);
       setResult(diagnosis);
-      setStep(diagnosis.recognized ? "result" : "manual");
+      setStep(diagnosis.status === "broken" ? "result" : diagnosis.status === "ok" ? "ok" : "manual");
     } catch (e) {
       if (e instanceof AiNotConfiguredError) {
         setStep("manual");
@@ -149,7 +149,7 @@ export default function AiPhoto() {
               {step === "result" && result && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 mt-1" />
+                    <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0 mt-1" />
                     <div>
                       <h2 className="text-2xl font-black text-slate-900 dark:text-white">{result.problem}</h2>
                       <p className="text-slate-500 dark:text-slate-400 mt-1">{result.details}</p>
@@ -157,11 +157,13 @@ export default function AiPhoto() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span className="px-3 py-1 rounded-full text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                      Мастер: {result.category}
+                      Нужен мастер: {result.category}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${URGENCY_LABEL[result.urgency].cls}`}>
-                      {URGENCY_LABEL[result.urgency].text}
-                    </span>
+                    {result.urgency && (
+                      <span className={`px-3 py-1 rounded-full text-sm font-bold ${URGENCY_LABEL[result.urgency].cls}`}>
+                        {URGENCY_LABEL[result.urgency].text}
+                      </span>
+                    )}
                     {result.priceMin != null && result.priceMax != null && (
                       <span className="px-3 py-1 rounded-full text-sm font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                         ≈ {result.priceMin}–{result.priceMax} сомони
@@ -180,7 +182,7 @@ export default function AiPhoto() {
                   )}
                   <p className="text-xs text-slate-400">Оценка ИИ примерная — точную цену назовёт мастер после осмотра.</p>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button onClick={() => findMasters(result.category)} className="flex-1 h-12 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-bold">
+                    <Button onClick={() => findMasters(result.category || "Другие услуги")} className="flex-1 h-12 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-bold">
                       <Search className="w-4 h-4 mr-2" /> Найти мастера
                     </Button>
                     <Button variant="outline" asChild className="h-12 rounded-xl">
@@ -191,11 +193,42 @@ export default function AiPhoto() {
                 </motion.div>
               )}
 
+              {step === "ok" && result && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                  <div className="flex items-start gap-4 rounded-2xl bg-emerald-50 p-5 dark:bg-emerald-500/10">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
+                      <CheckCircle2 className="h-7 w-7" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-black text-emerald-800 dark:text-emerald-200">
+                        {result.problem || "Ничего не сломано"}
+                      </h2>
+                      <p className="mt-1 text-emerald-900/80 dark:text-emerald-100/80">{result.details}</p>
+                    </div>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300">На фото поломки не видно — мастер, скорее всего, не нужен.</p>
+                  {result.advice && (
+                    <p className="text-sm rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-3">💡 {result.advice}</p>
+                  )}
+                  <p className="text-xs text-slate-400">
+                    Если проблема всё же есть (не включается, шумит, капает) — опишите её в комментарии и отправьте фото ещё раз.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button onClick={() => setStep("pick")} className="flex-1 h-12 rounded-xl bg-violet-600 hover:bg-violet-700 font-bold">
+                      <Sparkles className="w-4 h-4 mr-2" /> Добавить комментарий и проверить ещё раз
+                    </Button>
+                    <Button variant="outline" onClick={reset} className="h-12 rounded-xl">
+                      <RotateCcw className="w-4 h-4 mr-2" /> Другое фото
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+
               {step === "manual" && (
                 <div className="space-y-4">
                   <p className="text-slate-600 dark:text-slate-300">
-                    {result && !result.recognized
-                      ? result.details || "ИИ не смог распознать проблему на фото."
+                    {result && result.status === "unclear"
+                      ? result.details || "ИИ не смог понять, что на фото. Сфотографируйте поломку ближе и при хорошем свете."
                       : "ИИ-анализ скоро заработает. Пока выберите, какой мастер нужен:"}
                   </p>
                   <div className="flex flex-wrap gap-2">
