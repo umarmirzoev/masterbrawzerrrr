@@ -33,6 +33,7 @@ import HeaderNav from "@/components/HeaderNav";
 import { FlagIcon } from "@/components/FlagIcon";
 
 const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=tj.masterchas.masterchas_app";
+const APP_STORE_URL = "https://apps.apple.com/app/id6810603725";
 
 function AndroidGlyph({ className }: { className?: string }) {
   return (
@@ -55,7 +56,7 @@ export default function Header() {
   };
 
   const handleDownloadIphone = () => {
-    navigate("/install-app");
+    window.open(APP_STORE_URL, "_blank", "noopener,noreferrer");
   };
 
   useEffect(() => {
