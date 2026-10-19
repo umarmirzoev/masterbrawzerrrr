@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -13,7 +13,7 @@ import { CONTACT_ACCEPT, CONTACT_MAX_FILES, CONTACT_MAX_SIZE, formatSize, sendCo
 import { 
   Phone, Mail, Clock, MapPin, MessageCircle, Send, 
   HelpCircle, Paperclip, CheckCircle2, Zap, Trophy, Shield, Headset,
-  Map as MapIcon, ChevronRight, Star, Users, X, FileText, Film, Loader2
+  Map as MapIcon, ChevronRight, Star, Users, X, FileText, Film, Loader2, Copy, Check, ArrowUp, UploadCloud
 } from "lucide-react";
 
 const Contacts = () => {
@@ -28,6 +28,12 @@ const Contacts = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [progress, setProgress] = useState<string>("");
+  const [sent, setSent] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const waFallback = `https://wa.me/992979117007?text=${encodeURIComponent(
+    `Здравствуйте! Меня зовут ${formData.name || "—"}, телефон ${formData.phone || "—"}.\n${formData.message}`,
+  )}`;
 
   // Превью для картинок; освобождаем память при смене списка.
   useEffect(() => {
@@ -55,14 +61,26 @@ const Contacts = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.phone.replace(/\D/g, "").length < 9) {
+      toast({ title: "Проверьте номер телефона", description: "Нужно минимум 9 цифр, например +992 900 000 000", variant: "destructive" });
+      return;
+    }
     setSending(true);
+    setFailed(false);
     setProgress(files.length ? `Загрузка файлов 0/${files.length}…` : "");
     try {
-      await sendContactMessage(formData, files, (d, t) => setProgress(`Загрузка файлов ${d}/${t}…`));
+      // Если сервер не отвечает — не крутим кнопку бесконечно.
+      const limit = files.length ? 90000 : 15000;
+      await Promise.race([
+        sendContactMessage(formData, files, (d, t) => setProgress(`Загрузка файлов ${d}/${t}…`)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Сервер не отвечает")), limit)),
+      ]);
       toast({ title: "Сообщение отправлено", description: "Мы свяжемся с вами в ближайшее время." });
       setFormData({ name: "", phone: "", email: "", message: "" });
       setFiles([]);
+      setSent(true);
     } catch (err) {
+      setFailed(true);
       toast({
         title: "Не удалось отправить",
         description: `${(err as Error).message}. Напишите нам в WhatsApp: +992 979 117 007`,
@@ -99,18 +117,20 @@ const Contacts = () => {
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-green-100 dark:border-emerald-900/30 bg-[#eefbf5] dark:bg-emerald-950/20 pt-12 pb-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.12),transparent_28%),linear-gradient(135deg,#f7fffb_0%,#eefbf5_52%,#f8fafc_100%)] dark:opacity-0" />
-        <div className="absolute -left-16 top-10 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" />
-        <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" />
+        <ScrollExtras />
+        <motion.div aria-hidden className="absolute -left-16 top-10 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" animate={{ x: [0, 60, 0], y: [0, 40, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div aria-hidden className="absolute right-0 top-0 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" animate={{ x: [0, -50, 0], y: [0, 40, 0] }} transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }} />
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="relative flex flex-col lg:flex-row items-start gap-10">
             
             {/* Left Content */}
             <div className="flex-1 text-left">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="mb-5 inline-flex rounded-full border border-emerald-200 bg-white/80 dark:bg-slate-900/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400 shadow-sm backdrop-blur">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}>
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/80 dark:bg-slate-900/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400 shadow-sm backdrop-blur">
+                  <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" /></span>
                   Контакты 24/7
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Свяжитесь с нами</h1>
+                <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Свяжитесь <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 bg-[length:200%_auto] bg-clip-text text-transparent animate-[shine_4s_linear_infinite]">с нами</span></h1>
                 <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-xl font-medium">
                   Звоните, пишите в WhatsApp или Telegram — мы на связи 24/7.
                 </p>
@@ -135,7 +155,7 @@ const Contacts = () => {
                           <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600 mb-1">Master.TJ</p>
                           <p className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Быстрый выезд по Душанбе</p>
                         </div>
-                        <div className="bg-emerald-500 p-3 rounded-2xl shadow-lg shadow-emerald-200 transition-colors group-hover:bg-emerald-600">
+                        <div className="bg-emerald-500 p-3 rounded-2xl shadow-lg shadow-emerald-200 transition-all duration-300 group-hover:bg-emerald-600 group-hover:rotate-12 group-hover:scale-110">
                           <Zap className="h-6 w-6 text-white" />
                         </div>
                       </div>
@@ -143,10 +163,13 @@ const Contacts = () => {
                   </div>
                 </div>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <a href="https://wa.me/992979117007" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 hover-soft">
-                    Написать в WhatsApp
+                  <a href="https://wa.me/992979117007" target="_blank" rel="noopener noreferrer" className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-300 active:scale-95">
+                    <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                    <MessageCircle className="relative h-4 w-4 transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
+                    <span className="relative">Написать в WhatsApp</span>
                   </a>
-                  <a href="tel:+992979117007" className="inline-flex items-center justify-center rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/85 dark:bg-slate-900/85 px-6 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 backdrop-blur transition-all hover:border-emerald-300 hover:text-emerald-700 hover-soft">
+                  <a href="tel:+992979117007" className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/85 dark:bg-slate-900/85 px-6 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-400 hover:text-emerald-700 hover:shadow-lg active:scale-95">
+                    <Phone className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
                     Позвонить сейчас
                   </a>
                 </div>
@@ -167,12 +190,19 @@ const Contacts = () => {
                 {contactCards.map((card, i) => (
                   <motion.div 
                     key={i} 
-                    initial={{ opacity: 0, scale: 0.9 }} 
-                    animate={{ opacity: 1, scale: 1 }} 
-                    transition={{ delay: i * 0.05 }}
+                    initial={{ opacity: 0, scale: 0.9, y: 16 }} 
+                    animate={{ opacity: 1, scale: 1, y: 0 }} 
+                    transition={{ delay: 0.1 + i * 0.07, type: "spring", stiffness: 220, damping: 20 }}
+                    whileHover={{ y: -6 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="h-full"
                   >
                     {card.href ? (
-                      <a href={card.href} target="_blank" rel="noopener noreferrer" className="block">
+                      <a
+                        href={card.href}
+                        {...(card.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        className="block h-full"
+                      >
                         <ContactCard card={card} />
                       </a>
                     ) : (
@@ -186,11 +216,11 @@ const Contacts = () => {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="mt-4 rounded-[1.75rem] bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6 text-white shadow-lg shadow-emerald-200/50"
+                className="relative overflow-hidden mt-4 rounded-[1.75rem] bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6 text-white shadow-lg shadow-emerald-200/50"
               >
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                    <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center shrink-0 animate-pulse">
                       <Zap className="w-5 h-5" />
                     </div>
                     <div>
@@ -221,7 +251,7 @@ const Contacts = () => {
                   href="https://wa.me/992979117007"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover-soft w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-black text-emerald-700 shadow-lg transition-all hover:bg-emerald-50 active:scale-95"
+                  className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-black text-emerald-700 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-emerald-50 active:scale-95"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Написать сейчас
@@ -245,19 +275,33 @@ const Contacts = () => {
               viewport={{ once: true }}
               className="lg:col-span-5"
             >
-              <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800">
+              <div className="relative overflow-hidden bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 transition-shadow duration-500 hover:shadow-2xl hover:shadow-emerald-100/50">
+                <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-500 to-sky-400" />
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Напишите нам</h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">Заполните форму и мы ответим вам в ближайшее время</p>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
+
+                <AnimatePresence mode="wait">
+                {sent ? (
+                  <motion.div key="sent" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-3 py-12 text-center">
+                    <motion.div initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 260, damping: 14 }} className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-xl shadow-emerald-300/50">
+                      <Check className="h-10 w-10" />
+                    </motion.div>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">Сообщение отправлено!</p>
+                    <p className="max-w-xs text-sm text-slate-500 dark:text-slate-400">Мы свяжемся с вами в ближайшее время. Обычно отвечаем за 5–15 минут.</p>
+                    <Button variant="outline" className="mt-2 rounded-2xl border-emerald-300 text-emerald-700 transition-all hover:-translate-y-0.5 hover:bg-emerald-50" onClick={() => setSent(false)}>
+                      Написать ещё
+                    </Button>
+                  </motion.div>
+                ) : (
+                <motion.form key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase ml-2">Ваше имя</label>
                     <Input 
-                      placeholder="Иван Иванов" 
+                      placeholder="Фирдавс Каримов" 
                       value={formData.name} 
                       onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} 
                       required 
-                      className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500" 
+                      className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none transition-all duration-300 hover:bg-slate-100 focus-visible:bg-white focus-visible:shadow-lg focus-visible:shadow-emerald-100 focus-visible:ring-emerald-500 dark:hover:bg-slate-700" 
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -268,7 +312,7 @@ const Contacts = () => {
                       value={formData.phone} 
                       onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))} 
                       required 
-                      className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500" 
+                      className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none transition-all duration-300 hover:bg-slate-100 focus-visible:bg-white focus-visible:shadow-lg focus-visible:shadow-emerald-100 focus-visible:ring-emerald-500 dark:hover:bg-slate-700" 
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -278,7 +322,7 @@ const Contacts = () => {
                       type="email" 
                       value={formData.email} 
                       onChange={e => setFormData(p => ({ ...p, email: e.target.value }))} 
-                      className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500" 
+                      className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none transition-all duration-300 hover:bg-slate-100 focus-visible:bg-white focus-visible:shadow-lg focus-visible:shadow-emerald-100 focus-visible:ring-emerald-500 dark:hover:bg-slate-700" 
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -288,22 +332,28 @@ const Contacts = () => {
                       value={formData.message} 
                       onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} 
                       required 
-                      className="min-h-[120px] rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus-visible:ring-emerald-500 resize-none p-4" 
+                      maxLength={2000}
+                      className="min-h-[120px] rounded-2xl bg-slate-50 dark:bg-slate-800 border-none transition-all duration-300 hover:bg-slate-100 focus-visible:bg-white focus-visible:shadow-lg focus-visible:shadow-emerald-100 focus-visible:ring-emerald-500 resize-none p-4 dark:hover:bg-slate-700" 
                     />
                   </div>
                   
                   {/* label + скрытый input: надёжно открывает выбор файлов во всех браузерах, включая iPhone */}
                   <label
                     htmlFor="contact-files"
-                    className={`flex items-center gap-2 text-left transition-colors pt-2 select-none ${
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={(e) => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files); }}
+                    className={`group flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-4 text-center transition-all duration-300 select-none ${
                       sending || files.length >= CONTACT_MAX_FILES
-                        ? "opacity-50 pointer-events-none text-slate-400"
-                        : "cursor-pointer text-slate-400 dark:text-slate-500 hover:text-emerald-500"
+                        ? "opacity-50 pointer-events-none border-slate-200 text-slate-400"
+                        : dragOver
+                          ? "cursor-pointer border-emerald-500 bg-emerald-50 text-emerald-600 scale-[1.02]"
+                          : "cursor-pointer border-slate-200 text-slate-400 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-600 dark:border-slate-700 dark:text-slate-500"
                     }`}
                   >
-                    <Paperclip className="w-4 h-4 shrink-0" />
+                    {dragOver ? <UploadCloud className="w-5 h-5 shrink-0 animate-bounce" /> : <Paperclip className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:-rotate-45" />}
                     <span className="text-xs font-bold uppercase tracking-wider">
-                      Прикрепить файл (фото, видео, документ){files.length ? ` · ${files.length}/${CONTACT_MAX_FILES}` : ""}
+                      {dragOver ? "Отпустите файлы здесь" : "Прикрепить файл или перетащить сюда"}{files.length ? ` · ${files.length}/${CONTACT_MAX_FILES}` : ""}
                     </span>
                   </label>
                   <input
@@ -318,7 +368,7 @@ const Contacts = () => {
                   {files.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {files.map((f, i) => (
-                        <div key={`${f.name}-${i}`} className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                        <motion.div key={`${f.name}-${f.size}`} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 transition-colors hover:border-emerald-200">
                           {previews[i] ? (
                             <img src={previews[i]} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                           ) : (
@@ -339,7 +389,7 @@ const Contacts = () => {
                           >
                             <X className="w-4 h-4" />
                           </button>
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
                   )}
@@ -347,16 +397,34 @@ const Contacts = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full rounded-2xl h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg shadow-lg shadow-emerald-100 transition-all gap-2" 
+                    className="group relative w-full overflow-hidden rounded-2xl h-16 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg shadow-lg shadow-emerald-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-300 active:scale-[0.98] gap-2" 
                     disabled={sending}
                   >
-                    {sending ? (progress || "Отправка...") : "Отправить сообщение"}
-                    {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                    <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                    <span className="relative">{sending ? (progress || "Отправка...") : "Отправить сообщение"}</span>
+                    {sending ? <Loader2 className="relative w-5 h-5 animate-spin" /> : <Send className="relative w-5 h-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />}
                   </Button>
+                  <AnimatePresence>
+                    {failed && (
+                      <motion.a
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        href={waFallback}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 rounded-2xl border-2 border-green-500 bg-green-50 py-3 text-sm font-bold text-green-700 transition-all hover:bg-green-500 hover:text-white"
+                      >
+                        <MessageCircle className="h-4 w-4" /> Отправить это сообщение в WhatsApp
+                      </motion.a>
+                    )}
+                  </AnimatePresence>
                   <p className="text-[10px] text-center text-slate-400 dark:text-slate-500 mt-4">
                     Отправляя форму, вы соглашаетесь с <span className="underline cursor-pointer">политикой конфиденциальности</span>
                   </p>
-                </form>
+                </motion.form>
+                )}
+                </AnimatePresence>
               </div>
             </motion.div>
 
@@ -365,7 +433,7 @@ const Contacts = () => {
               initial={{ opacity: 0, x: 20 }} 
               whileInView={{ opacity: 1, x: 0 }} 
               viewport={{ once: true }}
-              className="lg:col-span-7 h-full min-h-[500px] lg:min-h-[600px] relative rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm"
+              className="group lg:col-span-7 h-full min-h-[500px] lg:min-h-[600px] relative rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm transition-shadow duration-500 hover:shadow-2xl hover:shadow-emerald-100/50"
             >
               <iframe 
                 src="https://www.openstreetmap.org/export/embed.html?bbox=68.7038%2C38.5198%2C68.8438%2C38.5998&layer=mapnik&marker=38.5598%2C68.7738" 
@@ -378,22 +446,29 @@ const Contacts = () => {
               
               {/* Custom Map Marker Overlay */}
               <div className="absolute top-10 left-10 z-10">
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 flex items-center gap-4 animate-bounce-slow">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-100">
-                    <MapPin className="w-5 h-5 text-white" />
+                <motion.div
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 flex items-center gap-4"
+                >
+                  <div className="relative w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-100">
+                    <span className="absolute inset-0 rounded-2xl bg-emerald-400/60 animate-ping" />
+                    <MapPin className="relative w-5 h-5 text-white" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-900 dark:text-white">Наш офис</p>
                     <p className="text-[10px] text-slate-400 dark:text-slate-500">Душанбе, Тоҷикистон</p>
                     <p className="text-[10px] text-emerald-500 font-bold mt-1">Мы находимся в центре города</p>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-2">
-                <Button size="sm" className="hover-soft rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-800 h-10 px-4 font-bold text-xs gap-2 active:scale-95">
-                  <MapIcon className="w-4 h-4 text-emerald-500" />
-                  Построить маршрут
+                <Button asChild size="sm" className="group/route rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-emerald-500 hover:text-white shadow-lg border border-slate-100 dark:border-slate-800 h-10 px-4 font-bold text-xs gap-2 transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=38.5598,68.7738" target="_blank" rel="noopener noreferrer">
+                    <MapIcon className="w-4 h-4 text-emerald-500 transition-colors group-hover/route:text-white" />
+                    Построить маршрут
+                  </a>
                 </Button>
               </div>
             </motion.div>
@@ -435,9 +510,9 @@ const Contacts = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <div className="w-16 h-16 rounded-3xl bg-emerald-50 flex items-center justify-center mx-auto mb-4">
+            <motion.div whileHover={{ rotate: [0, -12, 12, 0], scale: 1.1 }} transition={{ duration: 0.5 }} className="w-16 h-16 rounded-3xl bg-emerald-50 flex items-center justify-center mx-auto mb-4 cursor-default">
               <HelpCircle className="w-8 h-8 text-emerald-500" />
-            </div>
+            </motion.div>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">Часто задаваемые вопросы</h2>
             <p className="text-slate-500 dark:text-slate-400">Ответы на популярные вопросы наших клиентов</p>
           </motion.div>
@@ -450,8 +525,8 @@ const Contacts = () => {
             >
             <Accordion type="single" collapsible className="w-full space-y-4">
               {faqs.slice(0, 3).map((faq, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="border-none bg-white dark:bg-slate-900 rounded-[2rem] px-6 shadow-sm">
-                  <AccordionTrigger className="text-left font-bold text-slate-900 dark:text-white hover:no-underline py-6">
+                <AccordionItem key={i} value={`faq-${i}`} className="border border-transparent bg-white dark:bg-slate-900 rounded-[2rem] px-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg data-[state=open]:border-emerald-300 data-[state=open]:shadow-lg data-[state=open]:shadow-emerald-100/60">
+                  <AccordionTrigger className="text-left font-bold text-slate-900 dark:text-white hover:no-underline hover:text-emerald-600 py-6 transition-colors">
                     {faq.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-500 dark:text-slate-400 leading-relaxed pb-6">
@@ -468,8 +543,8 @@ const Contacts = () => {
             >
             <Accordion type="single" collapsible className="w-full space-y-4">
               {faqs.slice(3).map((faq, i) => (
-                <AccordionItem key={i+3} value={`faq-${i+3}`} className="border-none bg-white dark:bg-slate-900 rounded-[2rem] px-6 shadow-sm">
-                  <AccordionTrigger className="text-left font-bold text-slate-900 dark:text-white hover:no-underline py-6">
+                <AccordionItem key={i+3} value={`faq-${i+3}`} className="border border-transparent bg-white dark:bg-slate-900 rounded-[2rem] px-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg data-[state=open]:border-emerald-300 data-[state=open]:shadow-lg data-[state=open]:shadow-emerald-100/60">
+                  <AccordionTrigger className="text-left font-bold text-slate-900 dark:text-white hover:no-underline hover:text-emerald-600 py-6 transition-colors">
                     {faq.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-500 dark:text-slate-400 leading-relaxed pb-6">
@@ -489,17 +564,39 @@ const Contacts = () => {
 };
 
 function ContactCard({ card }: { card: any }) {
+  const [copied, setCopied] = useState(false);
+  const canCopy = card.href && (card.href.startsWith("tel:") || card.href.startsWith("mailto:") || card.label === "Telegram");
+  const copy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard?.writeText(card.value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  };
   return (
-    <Card className="group border-none shadow-sm rounded-[1.75rem] overflow-hidden hover-soft hover:shadow-md transition-all cursor-pointer h-full">
-      <CardContent className="p-6 flex items-center gap-4">
-        <div className={`w-14 h-14 rounded-2xl ${card.color} ${card.hoverBg} flex items-center justify-center shrink-0 transition-colors duration-300`}>
+    <Card className={`group relative border border-transparent shadow-sm rounded-[1.75rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-slate-100 dark:hover:border-slate-700 h-full ${card.href ? "cursor-pointer" : "cursor-default"}`}>
+      <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-slate-50/80 to-transparent transition-transform duration-700 group-hover:translate-x-full dark:via-white/5" />
+      <CardContent className="relative p-6 flex items-center gap-4">
+        <div className={`w-14 h-14 rounded-2xl ${card.color} ${card.hoverBg} flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-8deg] group-hover:shadow-lg`}>
           {card.icon}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mb-0.5">{card.label}</p>
           <p className="text-base font-bold text-slate-900 dark:text-white truncate">{card.value}</p>
           <p className="text-xs text-slate-400 dark:text-slate-500">{card.sub}</p>
         </div>
+        {canCopy && (
+          <button
+            type="button"
+            onClick={copy}
+            aria-label="Скопировать"
+            title="Скопировать"
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${copied ? "bg-emerald-500 text-white scale-110" : "text-slate-300 opacity-0 hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100 dark:hover:bg-slate-800"}`}
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          </button>
+        )}
       </CardContent>
     </Card>
   );
@@ -507,13 +604,47 @@ function ContactCard({ card }: { card: any }) {
 
 function FeatureItem({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="group flex flex-col items-center text-center gap-2.5 cursor-default">
-      <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:bg-emerald-100">
+    <div className="group flex flex-col items-center text-center gap-2.5 cursor-default transition-transform duration-300 hover:-translate-y-1.5">
+      <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1 transition-all duration-500 group-hover:scale-110 group-hover:rotate-[360deg] group-hover:bg-emerald-100 group-hover:shadow-lg group-hover:shadow-emerald-100">
         {icon}
       </div>
-      <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">{title}</h4>
+      <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider transition-colors group-hover:text-emerald-600">{title}</h4>
       <p className="text-xs text-slate-400 dark:text-slate-500">{sub}</p>
     </div>
+  );
+}
+
+function ScrollExtras() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 25, restDelta: 0.001 });
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 700);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <>
+      <motion.div style={{ scaleX }} className="fixed left-0 right-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600" />
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            type="button"
+            aria-label="Наверх"
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            whileHover={{ scale: 1.1, y: -3 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-xl shadow-emerald-300/50"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

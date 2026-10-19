@@ -32,6 +32,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
   const [open, setOpen] = useState(false);
   const { notifications, unreadCount, markAllRead } = useNotifications(user?.id);
   const [showNotifs, setShowNotifs] = useState(false);
+  // ref на обёртку (колокольчик + панель): иначе клик по колокольчику сначала закрывал, а потом снова открывал панель.
   const notifRef = useRef<HTMLDivElement>(null);
 
   // Закрываем панель уведомлений при клике вне неё.
@@ -53,7 +54,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       {/* Logo */}
       <div className="p-5 border-b border-border/50">
         <Link to="/" className="group flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg shadow-emerald-200/60 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-8deg]">
             М
           </div>
           <div>
@@ -66,8 +67,9 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       {/* Profile mini */}
       {profile?.full_name && (
         <div className="px-5 py-3 border-b border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/10">
+          <div className="group flex items-center gap-3 rounded-xl p-1 -m-1 transition-colors hover:bg-accent/60">
+            <div className="relative w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center ring-2 ring-emerald-100 transition-transform duration-300 group-hover:scale-110 [&>span]:text-white">
+              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-400" />
               <span className="text-sm font-bold text-primary">
                 {profile.full_name.split(" ").map(w => w[0]).join("").slice(0, 2)}
               </span>
@@ -84,7 +86,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       <nav className="flex-1 p-3 space-y-0.5 overflow-auto">
         <Link
           to="/"
-          className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground transition-all text-sm"
+          className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground hover:translate-x-1 transition-all duration-300 text-sm"
         >
           <Home className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
           <span>{t("dashboardHomeLabel")}</span>
@@ -104,17 +106,24 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
               key={item.path}
               to={item.path}
               onClick={() => setOpen(false)}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-sm group ${
+              className={`relative flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 text-sm group ${
                 active
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-muted-foreground hover:bg-accent hover:translate-x-0.5"
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground hover:translate-x-1"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+              {active && (
+                <motion.span
+                  layoutId="dash-nav-pill"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-emerald-500 shadow-md shadow-emerald-200/60"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+              <div className="relative flex items-center gap-3">
+                <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-8deg]" />
                 <span className="font-medium">{item.label}</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="relative flex items-center gap-1.5">
                 {item.badge && item.badge > 0 && (
                   <Badge className={`h-5 min-w-[20px] px-1.5 text-[10px] ${active ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
                     {item.badge}
@@ -130,7 +139,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
       {/* Sign out */}
       <div className="p-3 border-t border-border/50">
         <Button variant="ghost" onClick={signOut} className="group w-full justify-start gap-3 text-muted-foreground rounded-xl transition-colors hover:text-destructive hover:bg-destructive/10">
-          <LogOut className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
+          <LogOut className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" />
           {t("logout")}
         </Button>
       </div>
@@ -159,15 +168,15 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
                 <SidebarContent />
               </SheetContent>
             </Sheet>
-            <h1 className="text-lg font-bold text-foreground">{title}</h1>
+            <motion.h1 key={title} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="text-lg font-bold text-foreground">{title}</motion.h1>
           </div>
 
           <div className="flex items-center gap-2">
             {/* Notification bell */}
-            <div className="relative">
+            <div className="relative" ref={notifRef}>
               <Button
                 variant="ghost" size="icon"
-                className="h-9 w-9 relative"
+                className={`h-9 w-9 relative rounded-full transition-all duration-300 hover:bg-emerald-50 hover:text-emerald-600 ${unreadCount > 0 ? "[&>svg]:animate-[wiggle_1.2s_ease-in-out_infinite]" : ""}`}
                 onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && unreadCount > 0) markAllRead(); }}
               >
                 <Bell className="w-5 h-5" />
@@ -183,7 +192,6 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
               <AnimatePresence>
               {showNotifs && (
                 <motion.div
-                  ref={notifRef}
                   initial={{ opacity: 0, y: -8, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
@@ -204,7 +212,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
                         const content = resolveNotificationText(notification, t);
 
                         return (
-                        <div key={notification.id} className={`p-3 ${!notification.read ? "bg-primary/5" : ""}`}>
+                        <div key={notification.id} className={`p-3 transition-colors hover:bg-accent/60 ${!notification.read ? "bg-primary/5" : ""}`}>
                           <p className="text-sm font-medium text-foreground">{content.title}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">{content.message}</p>
                           <p className="text-[10px] text-muted-foreground/60 mt-1">
@@ -228,7 +236,9 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
         </header>
 
         <main className="flex-1 min-w-0 p-4 md:p-6 overflow-y-auto overflow-x-hidden pb-20 md:pb-6">
-          {children}
+          <motion.div key={location.pathname} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: "easeOut" }}>
+            {children}
+          </motion.div>
         </main>
       </div>
     </div>

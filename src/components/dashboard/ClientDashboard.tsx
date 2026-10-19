@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,16 +33,18 @@ import LanguagePreferenceSelect from "@/components/LanguagePreferenceSelect";
 import { getLanguageLocale } from "@/lib/i18n";
 import { resolveNotificationText } from "@/lib/notifications";
 import { getLocalShopOrdersByUser, mergeShopOrders } from "@/lib/localShopOrders";
+import { ShopOrdersList } from "@/pages/ShopOrders";
 
 import { allStatuses, statusColors, statusLabels, OrderTimeline } from "./OrderStatusShared";
 
-type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application" | "favorites" | "masters";
+type Tab = "purchases" | "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application" | "favorites" | "masters";
 
 // Кабинет клиента объединяет заказы, оплаты, профиль, отзывы, избранное и поддержку.
 export default function ClientDashboard() {
   const { user, profile, refetchUserData, hasRole } = useAuth();
   const { language, t } = useLanguage();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const theme = resolvedTheme;
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -75,13 +77,21 @@ export default function ClientDashboard() {
 
   const fetchOrders = async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("orders")
-      .select("*, service_categories(name_ru), services(name_ru)")
-      .eq("client_id", user.id)
-      .order("created_at", { ascending: false });
-    setOrders(data || []);
-    setLoading(false);
+    try {
+      // Не даём кабинету висеть на скелетоне, если база не отвечает.
+      const res: any = await Promise.race([
+        supabase
+          .from("orders")
+          .select("*, service_categories(name_ru), services(name_ru)")
+          .eq("client_id", user.id)
+          .order("created_at", { ascending: false }),
+        new Promise((resolve) => setTimeout(() => resolve({ data: null, timeout: true }), 10000)),
+      ]);
+      if (res?.data) setOrders(res.data);
+      else if (res?.timeout) toast({ title: "Сервер отвечает медленно", description: "Заказы обновятся автоматически, когда связь восстановится.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchFavoritesCount = async () => {
@@ -129,6 +139,7 @@ export default function ClientDashboard() {
   const TAB_ROUTES: Record<string, Tab> = {
     "/dashboard": "orders",
     "/dashboard/favorites": "favorites",
+    "/dashboard/purchases": "purchases",
     "/dashboard/payments": "payments",
     "/dashboard/profile": "profile",
     "/dashboard/notifications": "notifications",
@@ -158,7 +169,7 @@ export default function ClientDashboard() {
   }, [user]);
 
   const formatCardNumber = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 12);
+    const digits = value.replace(/\D/g, "").slice(0, 16);
     return digits.replace(/(.{4})/g, "$1 ").trim();
   };
 
@@ -172,8 +183,8 @@ export default function ClientDashboard() {
     const digits = cardNumber.replace(/\D/g, "");
     const [month, year] = cardExpiry.split("/");
 
-    if (digits.length !== 12) {
-      toast({ title: "Проверьте номер карты", description: "Номер карты должен содержать 12 цифр", variant: "destructive" });
+    if (digits.length !== 16) {
+      toast({ title: "Проверьте номер карты", description: "Номер карты должен содержать 16 цифр", variant: "destructive" });
       return;
     }
     if (!month || !year || year.length !== 2 || Number(month) < 1 || Number(month) > 12) {
@@ -257,10 +268,22 @@ export default function ClientDashboard() {
 
   const saveProfile = async () => {
     if (!user) return;
+    if (!editName.trim()) {
+      toast({ title: "Введите имя", variant: "destructive" });
+      return;
+    }
     setSavingProfile(true);
-    await supabase.from("profiles").update({ full_name: editName, phone: editPhone }).eq("user_id", user.id);
-    setSavingProfile(false);
-    toast({ title: t("profileUpdated") });
+    try {
+      const { error } = await supabase.from("profiles").update({ full_name: editName.trim(), phone: editPhone.trim() }).eq("user_id", user.id);
+      if (error) throw error;
+      await refetchUserData();
+      toast({ title: t("profileUpdated") });
+      setEditingProfile(false);
+    } catch (e: any) {
+      toast({ title: "Не удалось сохранить", description: e?.message || "Попробуйте ещё раз", variant: "destructive" });
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   const activeOrders = orders.filter(o => !["completed", "cancelled", "reviewed"].includes(o.status));
@@ -273,7 +296,7 @@ export default function ClientDashboard() {
 
   const navItems = [
     { path: "/dashboard", label: t("navMyOrders"), icon: ClipboardList, badge: activeOrders.length },
-    { path: "/shop/orders", label: "Мои покупки", icon: ShoppingBag },
+    { path: "/dashboard/purchases", label: "Мои покупки", icon: ShoppingBag },
     { path: "/dashboard/favorites", label: t("favorites"), icon: Heart },
     { path: "/dashboard/payments", label: t("navPayments"), icon: CreditCard },
     { path: "/dashboard/profile", label: t("dashProfile"), icon: User },
@@ -292,6 +315,7 @@ export default function ClientDashboard() {
     { key: "active", label: t("tabActive"), icon: Clock, count: activeOrders.length },
     { key: "completed", label: t("tabCompleted"), icon: CheckCircle, count: completedOrders.length },
     { key: "payments", label: t("tabPayments"), icon: CreditCard, count: paidOrders.length },
+    { key: "purchases", label: "Мои покупки", icon: ShoppingBag },
     { key: "masters", label: "Мои мастера", icon: UsersIcon },
     ...(myApplication ? [{ key: "application" as Tab, label: t("clientMenuMasterApplication"), icon: FileText }] : []),
     { key: "profile", label: t("dashProfile"), icon: User },
@@ -303,21 +327,23 @@ export default function ClientDashboard() {
   return (
     <DashboardLayout title={t("clientCabinet")} navItems={navItems}>
       {/* Stats (hidden on the profile landing screen, which has its own stat cards) */}
-      {tab !== "profile" && (
+      {tab !== "profile" && tab !== "purchases" && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {stats.map((s, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: i * 0.07, type: "spring", stiffness: 220, damping: 20 }}
+              whileHover={{ y: -5 }}
             >
-              <Card className={`group bg-gradient-to-br ${s.gradient} border-0 shadow-sm hover-soft transition-shadow`}>
-                <CardContent className="p-4">
-                  <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2 transition-transform duration-300 group-hover:scale-110`}>
+              <Card className={`group relative overflow-hidden bg-gradient-to-br ${s.gradient} border-0 shadow-sm transition-shadow duration-300 hover:shadow-xl cursor-default`}>
+                <span aria-hidden className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/40 transition-transform duration-500 group-hover:scale-150 dark:bg-white/5" />
+                <CardContent className="relative p-4">
+                  <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-10deg]`}>
                     <s.icon className={`w-5 h-5 ${s.iconColor}`} />
                   </div>
-                  <p className="text-2xl font-bold text-foreground">{s.value}</p>
+                  <motion.p key={s.value} initial={{ scale: 1.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-2xl font-bold text-foreground">{s.value}</motion.p>
                   <p className="text-xs text-muted-foreground">{s.label}</p>
                 </CardContent>
               </Card>
@@ -331,29 +357,51 @@ export default function ClientDashboard() {
         {tabs.map((tb) => {
           const Icon = tb.icon;
           return (
-            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => goToTab(tb.key)} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs transition-transform hover:scale-105 active:scale-95">
-              <Icon className="w-3.5 h-3.5" />
-              {tb.label}
-              {tb.count !== undefined && tb.count > 0 && (
-                <Badge variant="secondary" className="h-4 min-w-[16px] px-1 text-[10px] ml-0.5">{tb.count}</Badge>
+            <button
+              key={tb.key}
+              type="button"
+              onClick={() => goToTab(tb.key)}
+              className={`relative inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs font-medium transition-all duration-300 active:scale-95 ${tab === tb.key ? "text-white" : "text-muted-foreground hover:bg-accent hover:text-foreground hover:-translate-y-0.5"}`}
+            >
+              {tab === tb.key && (
+                <motion.span layoutId="client-tab-pill" className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-emerald-500 shadow-md shadow-emerald-200/60" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
               )}
-            </Button>
+              <Icon className="relative w-3.5 h-3.5" />
+              <span className="relative">{tb.label}</span>
+              {tb.count !== undefined && tb.count > 0 && (
+                <Badge variant="secondary" className={`relative h-4 min-w-[16px] px-1 text-[10px] ml-0.5 ${tab === tb.key ? "bg-white/25 text-white" : ""}`}>{tb.count}</Badge>
+              )}
+            </button>
           );
         })}
       </div>
 
       {/* Content */}
+      <AnimatePresence mode="wait">
+      <motion.div key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
       {tab === "profile" ? (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 -mt-2">
           {/* Profile header card */}
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 pt-10 pb-16 px-5">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 via-emerald-500 to-teal-500 pt-10 pb-16 px-5">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]" />
+            <motion.div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15" animate={{ scale: [1, 1.25, 1], rotate: [0, 25, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
+            <motion.div aria-hidden className="pointer-events-none absolute -bottom-12 left-1/4 h-32 w-32 rounded-full bg-white/10 blur-xl" animate={{ x: [0, 50, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
+            <p className="relative text-sm font-semibold text-white/90">
+              {(() => { const h = new Date().getHours(); return h < 12 ? "Доброе утро" : h < 18 ? "Добрый день" : "Добрый вечер"; })()}{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} 👋
+            </p>
           </div>
-          <Card className="-mt-14 border-0 shadow-md">
+          <Card className="-mt-14 border-0 shadow-md transition-shadow duration-300 hover:shadow-xl">
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 border-4 border-white shadow flex items-center justify-center shrink-0 -mt-10 ring-2 ring-emerald-100">
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.1 }}
+                whileHover={{ scale: 1.08, rotate: -6 }}
+                className="relative w-16 h-16 rounded-full bg-gradient-to-br from-emerald-50 to-teal-50 border-4 border-white shadow-lg flex items-center justify-center shrink-0 -mt-10 ring-2 ring-emerald-100 cursor-default"
+              >
                 <span className="text-xl font-black text-emerald-600">{initials}</span>
-              </div>
+                <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400" />
+              </motion.div>
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-foreground truncate">{profile?.full_name || t("clientProfileNoName")}</p>
                 <p className="text-sm text-muted-foreground truncate">{profile?.phone || user?.email}</p>
@@ -361,7 +409,7 @@ export default function ClientDashboard() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full gap-1.5 shrink-0"
+                className="rounded-full gap-1.5 shrink-0 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700"
                 onClick={() => setEditingProfile((v) => !v)}
               >
                 {editingProfile ? t("clientProfileClose") : t("clientProfileEdit")}
@@ -369,45 +417,49 @@ export default function ClientDashboard() {
             </CardContent>
           </Card>
 
+          <AnimatePresence initial={false}>
           {editingProfile && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
             <Card>
               <CardContent className="p-5 space-y-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground mb-1 block">{t("clientProfileNameLabel")}</label>
-                  <Input value={editName} onChange={e => setEditName(e.target.value)} className="h-11" />
+                  <Input value={editName} onChange={e => setEditName(e.target.value)} className="h-11 rounded-xl transition-shadow focus-visible:shadow-lg focus-visible:shadow-emerald-100" />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground mb-1 block">{t("clientProfilePhoneLabel")}</label>
-                  <Input value={editPhone} onChange={e => setEditPhone(e.target.value)} className="h-11" />
+                  <Input type="tel" inputMode="tel" value={editPhone} onChange={e => setEditPhone(e.target.value)} className="h-11 rounded-xl transition-shadow focus-visible:shadow-lg focus-visible:shadow-emerald-100" />
                 </div>
                 <LanguagePreferenceSelect />
-                <Button onClick={() => { saveProfile(); setEditingProfile(false); }} disabled={savingProfile} className="rounded-full">
+                <Button onClick={saveProfile} disabled={savingProfile} className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg shadow-emerald-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-emerald-300 active:scale-95">
                   {savingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   {t("clientProfileSave")}
                 </Button>
               </CardContent>
             </Card>
+            </motion.div>
           )}
+          </AnimatePresence>
 
           {/* Real stats */}
           <div className="grid grid-cols-3 gap-3">
-            <Card className="group border-0 shadow-sm bg-blue-50/60 dark:bg-blue-500/10 hover-soft transition-shadow cursor-default">
+            <Card className="group border-0 shadow-sm bg-blue-50/60 dark:bg-blue-500/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-default">
               <CardContent className="p-4 text-center">
-                <ClipboardList className="w-5 h-5 text-blue-600 dark:text-blue-400 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
+                <ClipboardList className="w-5 h-5 text-blue-600 dark:text-blue-400 mx-auto mb-1.5 transition-transform duration-500 group-hover:scale-125 group-hover:rotate-[-12deg]" />
                 <p className="text-xl font-black text-foreground">{orders.length}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatOrders")}</p>
               </CardContent>
             </Card>
-            <Card className="group border-0 shadow-sm bg-rose-50/60 dark:bg-rose-500/10 hover-soft transition-shadow cursor-default">
+            <Card className="group border-0 shadow-sm bg-rose-50/60 dark:bg-rose-500/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-default">
               <CardContent className="p-4 text-center">
-                <Heart className="w-5 h-5 text-rose-500 dark:text-rose-400 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
+                <Heart className="w-5 h-5 text-rose-500 dark:text-rose-400 mx-auto mb-1.5 transition-transform duration-500 group-hover:scale-125 group-hover:rotate-[-12deg]" />
                 <p className="text-xl font-black text-foreground">{favoritesCount}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatFavorites")}</p>
               </CardContent>
             </Card>
-            <Card className="group border-0 shadow-sm bg-amber-50/60 dark:bg-amber-500/10 hover-soft transition-shadow cursor-default">
+            <Card className="group border-0 shadow-sm bg-amber-50/60 dark:bg-amber-500/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-default">
               <CardContent className="p-4 text-center">
-                <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400 mx-auto mb-1.5 transition-transform duration-300 group-hover:scale-110" />
+                <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400 mx-auto mb-1.5 transition-transform duration-500 group-hover:scale-125 group-hover:rotate-[-12deg]" />
                 <p className="text-xl font-black text-foreground">{totalSpent.toLocaleString()}</p>
                 <p className="text-[11px] text-muted-foreground">{t("clientStatSpent")}</p>
               </CardContent>
@@ -415,10 +467,10 @@ export default function ClientDashboard() {
           </div>
 
           {/* Quick menu */}
-          <Card className="border-0 shadow-sm divide-y divide-border/60">
+          <Card className="overflow-hidden border-0 shadow-sm divide-y divide-border/60">
             {[
               { label: t("clientMenuOrderHistory"), icon: ClipboardList, action: () => goToTab("orders") },
-              { label: "Мои покупки", icon: ShoppingBag, action: () => navigate("/shop/orders") },
+              { label: "Мои покупки", icon: ShoppingBag, action: () => goToTab("purchases") },
               { label: t("clientMenuPaymentMethods"), icon: CreditCard, action: () => goToTab("payments") },
               { label: t("clientMenuFavorites"), icon: Heart, action: () => navigate("/dashboard/favorites") },
               ...(myApplication ? [{ label: t("clientMenuMasterApplication"), icon: FileText, action: () => setTab("application") }] : []),
@@ -428,13 +480,15 @@ export default function ClientDashboard() {
               <button
                 key={i}
                 onClick={item.action}
-                className="group w-full flex items-center justify-between px-5 py-4 hover:bg-accent/50 transition-colors text-left"
+                className="group w-full flex items-center justify-between px-5 py-4 hover:bg-emerald-50/60 dark:hover:bg-emerald-500/10 transition-colors text-left"
               >
-                <div className="flex items-center gap-3">
-                  <item.icon className="w-4.5 h-4.5 text-muted-foreground transition-colors duration-300 group-hover:text-emerald-500" />
+                <div className="flex items-center gap-3 transition-transform duration-300 group-hover:translate-x-1">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted transition-all duration-300 group-hover:bg-emerald-500 group-hover:shadow-md group-hover:shadow-emerald-200">
+                    <item.icon className="w-4 h-4 text-muted-foreground transition-colors duration-300 group-hover:text-white" />
+                  </span>
                   <span className="text-sm font-medium text-foreground">{item.label}</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground/50 transition-transform duration-300 group-hover:translate-x-0.5" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 transition-all duration-300 group-hover:translate-x-1 group-hover:text-emerald-500" />
               </button>
             ))}
           </Card>
@@ -443,14 +497,16 @@ export default function ClientDashboard() {
           <Card className="border-0 shadow-sm">
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-full flex items-center justify-between px-5 py-4 text-left"
+              className="group w-full flex items-center justify-between px-5 py-4 text-left transition-colors hover:bg-accent/40"
             >
               <div className="flex items-center gap-3">
-                {theme === "dark" ? <Moon className="w-4.5 h-4.5 text-muted-foreground" /> : <Sun className="w-4.5 h-4.5 text-muted-foreground" />}
+                <motion.span key={theme} initial={{ rotate: -90, scale: 0 }} animate={{ rotate: 0, scale: 1 }} className="inline-flex">
+                  {theme === "dark" ? <Moon className="w-4.5 h-4.5 text-emerald-400" /> : <Sun className="w-4.5 h-4.5 text-amber-500" />}
+                </motion.span>
                 <span className="text-sm font-medium text-foreground">{t("darkThemeLabel")}</span>
               </div>
-              <div className={`w-11 h-6 rounded-full transition-colors relative ${theme === "dark" ? "bg-emerald-500" : "bg-slate-200"}`}>
-                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${theme === "dark" ? "translate-x-5" : "translate-x-0.5"}`} />
+              <div className={`w-11 h-6 rounded-full transition-colors duration-300 relative flex items-center px-0.5 ${theme === "dark" ? "bg-emerald-500 justify-end" : "bg-slate-200 justify-start"}`}>
+                <motion.div layout transition={{ type: "spring", stiffness: 600, damping: 30 }} className="w-5 h-5 rounded-full bg-white shadow" />
               </div>
             </button>
           </Card>
@@ -459,8 +515,8 @@ export default function ClientDashboard() {
         <div className="space-y-3">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-base font-semibold">Способы оплаты</h3>
-            <Button size="sm" variant="outline" className="rounded-full gap-1.5" onClick={() => setAddCardOpen(true)}>
-              <Plus className="w-3.5 h-3.5" /> Добавить карту
+            <Button size="sm" variant="outline" className="group rounded-full gap-1.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-emerald-500 hover:text-white" onClick={() => setAddCardOpen(true)}>
+              <Plus className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-90" /> Добавить карту
             </Button>
           </div>
           {savedCards.length === 0 ? (
@@ -473,7 +529,8 @@ export default function ClientDashboard() {
           ) : (
             <div className="grid sm:grid-cols-2 gap-3">
               {savedCards.map((card) => (
-                <Card key={card.id}>
+                <motion.div key={card.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ y: -4 }}>
+                <Card className="group overflow-hidden bg-gradient-to-br from-card to-emerald-50/40 transition-shadow duration-300 hover:shadow-xl dark:to-emerald-500/5">
                   <CardContent className="p-4 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
@@ -489,6 +546,7 @@ export default function ClientDashboard() {
                     </Button>
                   </CardContent>
                 </Card>
+                </motion.div>
               ))}
             </div>
           )}
@@ -497,7 +555,7 @@ export default function ClientDashboard() {
           {orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").length === 0 ? (
             <Card><CardContent className="py-12 text-center"><CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" /><p className="text-muted-foreground">Нет оплат</p></CardContent></Card>
           ) : orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").map(o => (
-            <Card key={o.id} className="hover:shadow-sm transition-shadow">
+            <Card key={o.id} className="transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
               <CardContent className="p-4 flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm truncate">{(o as any).services?.name_ru || "Заказ"}</p>
@@ -521,7 +579,7 @@ export default function ClientDashboard() {
             <>
               <h3 className="text-base font-semibold mt-6 mb-2">Ожидает оплаты</h3>
               {completedOrders.filter(o => !(o as any).payment_status || (o as any).payment_status === "unpaid").map(o => (
-                <Card key={o.id} className="border-amber-200 bg-amber-50/50">
+                <Card key={o.id} className="border-amber-200 bg-amber-50/50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-amber-100">
                   <CardContent className="p-4 flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-sm truncate">{(o as any).services?.name_ru || "Заказ"}</p>
@@ -581,7 +639,7 @@ export default function ClientDashboard() {
             const content = resolveNotificationText(notification, t);
 
             return (
-            <Card key={notification.id} className={!notification.read ? "border-primary/30 bg-primary/5" : ""}>
+            <Card key={notification.id} className={`transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${!notification.read ? "border-primary/30 bg-primary/5" : ""}`}>
               <CardContent className="p-4">
                 <p className="font-medium text-sm text-foreground">{content.title}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{content.message}</p>
@@ -600,14 +658,16 @@ export default function ClientDashboard() {
         </>
       ) : tab === "favorites" ? (
         <FavoritesSection />
+      ) : tab === "purchases" ? (
+        <ShopOrdersList embedded />
       ) : (
         <>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-foreground">
               {tab === "active" ? "Активные заказы" : tab === "completed" ? "Завершённые заказы" : "Мои заказы"}
             </h2>
-            <Button onClick={() => navigate("/categories")} size="sm" className="rounded-full gap-2">
-              <Plus className="w-4 h-4" /> Новый заказ
+            <Button onClick={() => navigate("/categories")} size="sm" className="group rounded-full gap-2 bg-gradient-to-r from-primary to-emerald-500 shadow-md shadow-emerald-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-300 active:scale-95">
+              <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" /> Новый заказ
             </Button>
           </div>
 
@@ -616,7 +676,9 @@ export default function ClientDashboard() {
           ) : displayOrders.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
+                  <ClipboardList className="w-12 h-12 text-emerald-300 mx-auto mb-3" />
+                </motion.div>
                 <p className="text-muted-foreground mb-4">Заказы не найдены</p>
                 <Button onClick={() => navigate("/categories")} className="rounded-full">
                   <Plus className="w-4 h-4 mr-2" /> Создать заказ
@@ -625,7 +687,7 @@ export default function ClientDashboard() {
             </Card>
           ) : (
             <div className="space-y-3">
-              {displayOrders.map(order => {
+              {displayOrders.map((order, idx) => {
                 const isActive = !["completed", "cancelled", "reviewed"].includes(order.status);
                 const liveStatuses: Record<string, string> = {
                   on_the_way: "🚗 Мастер в пути",
@@ -634,11 +696,13 @@ export default function ClientDashboard() {
                 };
 
                 return (
-                  <Card key={order.id} className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/dashboard/orders/${order.id}`)}>
-                    <CardContent className="p-4">
+                  <motion.div key={order.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(idx, 10) * 0.05 }} whileHover={{ y: -3 }}>
+                  <Card className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-emerald-100/50 hover:border-emerald-200 ${isActive ? "border-l-4 border-l-emerald-500" : ""}`} onClick={() => navigate(`/dashboard/orders/${order.id}`)}>
+                    <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-emerald-50/60 to-transparent transition-transform duration-1000 group-hover:translate-x-full dark:via-emerald-500/5" />
+                    <CardContent className="relative p-4">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-foreground truncate">
+                          <p className="font-semibold text-foreground truncate transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
                             {order.services?.name_ru || order.service_categories?.name_ru || "Заказ"}
                           </p>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
@@ -652,7 +716,7 @@ export default function ClientDashboard() {
                           <Badge className={statusColors[order.status] || "bg-muted"}>
                             {statusLabels[order.status] || order.status}
                           </Badge>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          <ChevronRight className="w-4 h-4 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-emerald-500" />
                         </div>
                       </div>
 
@@ -688,12 +752,15 @@ export default function ClientDashboard() {
                       </div>
                     </CardContent>
                   </Card>
+                  </motion.div>
                 );
               })}
             </div>
           )}
         </>
       )}
+      </motion.div>
+      </AnimatePresence>
 
       {repeatOrder && (
         <OrderModal
@@ -744,10 +811,11 @@ export default function ClientDashboard() {
               <label className="text-xs font-semibold text-muted-foreground uppercase">Номер карты</label>
               <Input
                 inputMode="numeric"
-                placeholder="0000 0000 0000"
+                placeholder="0000 0000 0000 0000"
+                autoComplete="cc-number"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                maxLength={14}
+                maxLength={19}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -785,9 +853,11 @@ export default function ClientDashboard() {
 
       {/* Support button (floating) */}
       <div className="fixed bottom-24 right-4 z-40">
-        <Button onClick={() => setSupportOpen(true)} size="lg" className="rounded-full shadow-xl gap-2 bg-gradient-to-r from-primary to-emerald-500">
-          <HelpCircle className="w-5 h-5" /> {t("supportBtn")}
-        </Button>
+        <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.6, type: "spring" }} whileHover={{ scale: 1.06, y: -2 }} whileTap={{ scale: 0.94 }}>
+          <Button onClick={() => setSupportOpen(true)} size="lg" className="group rounded-full shadow-xl shadow-emerald-300/40 gap-2 bg-gradient-to-r from-primary to-emerald-500">
+            <HelpCircle className="w-5 h-5 transition-transform duration-500 group-hover:rotate-[360deg]" /> {t("supportBtn")}
+          </Button>
+        </motion.div>
       </div>
       <SupportTicketDialog open={supportOpen} onOpenChange={setSupportOpen} />
     </DashboardLayout>

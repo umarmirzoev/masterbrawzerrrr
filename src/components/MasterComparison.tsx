@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock, CheckCircle, Award, X, Scale } from "lucide-react";
 import { personName } from "@/lib/localizeNames";
+import { SAMPLE_MASTERS } from "@/data/seedData";
 
 interface Master {
   id: string;
@@ -46,7 +47,7 @@ export function CompareBar({ compareIds, onOpen, onClear }: { compareIds: string
   if (compareIds.length === 0) return null;
 
   return (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-card border-2 border-primary shadow-2xl rounded-2xl px-6 py-3 flex items-center gap-4">
+    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-card border-2 border-emerald-500 shadow-2xl shadow-emerald-200/60 rounded-2xl px-6 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-6 fade-in duration-300">
       <Scale className="w-5 h-5 text-primary" />
       <span className="text-sm font-medium">{t("compareSelected")}: {compareIds.length}/3</span>
       <Button size="sm" onClick={onOpen} disabled={compareIds.length < 2} className="rounded-full">
@@ -67,11 +68,26 @@ export default function MasterComparisonDialog({ open, onOpenChange, masterIds }
   // При открытии загружаем данные только для тех мастеров, которых пользователь выбрал к сравнению.
   useEffect(() => {
     if (!open || masterIds.length === 0) return;
-    supabase
+    // Демо-мастера (m1..m12) берём сразу из локальных данных, остальных — из Supabase с таймаутом.
+    const samples = SAMPLE_MASTERS.filter((m) => masterIds.includes(m.id)) as unknown as Master[];
+    const realIds = masterIds.filter((id) => !samples.some((m) => m.id === id));
+    if (realIds.length === 0) { setMasters(samples); return; }
+    let alive = true;
+    const query = supabase
       .from("master_listings")
       .select("id, full_name, average_rating, total_reviews, experience_years, service_categories, working_districts, price_min, price_max, completed_orders, response_time_avg, is_top_master")
-      .in("id", masterIds)
-      .then(({ data }) => setMasters((data as any[]) || []));
+      .in("id", realIds);
+    Promise.race([
+      query,
+      new Promise((resolve) => setTimeout(() => resolve({ data: null }), 6000)),
+    ])
+      .then((res: any) => {
+        if (!alive) return;
+        const data = ((res?.data as any[]) || []) as Master[];
+        setMasters([...data, ...samples]);
+      })
+      .catch(() => alive && setMasters(samples));
+    return () => { alive = false; };
   }, [open, masterIds]);
 
   const gradients = ["from-primary to-emerald-400", "from-blue-500 to-cyan-400", "from-violet-500 to-purple-400"];
@@ -107,7 +123,10 @@ export default function MasterComparisonDialog({ open, onOpenChange, masterIds }
         </DialogHeader>
 
         {masters.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">{t("loading")}</div>
+          <div className="flex items-center justify-center gap-3 py-8 text-muted-foreground">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-500" />
+            {t("loading")}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -115,7 +134,7 @@ export default function MasterComparisonDialog({ open, onOpenChange, masterIds }
                 <tr>
                   <th className="p-3 text-left text-sm font-medium text-muted-foreground w-40"></th>
                   {masters.map((m, i) => {
-                    const initials = m.full_name.split(" ").map(w => w[0]).join("").slice(0, 2);
+                    const initials = (m.full_name || "").split(" ").map(w => w[0]).join("").slice(0, 2);
                     return (
                       <th key={m.id} className="p-3 text-center">
                         <div className={`w-14 h-14 mx-auto rounded-xl bg-gradient-to-br ${gradients[i]} flex items-center justify-center text-white font-bold text-lg mb-2`}>

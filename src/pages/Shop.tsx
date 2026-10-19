@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { SUPPORT_WHATSAPP } from "@/lib/utils";
+import { tx } from "@/lib/localizeNames";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -13,7 +16,7 @@ import {
   Package, ArrowRight, Percent, Shield, Truck,
   ChevronRight, Sparkles, Heart, Plus, CheckCircle2,
   Headset, Users, Award, Trophy, MessageCircle, Clock,
-  CreditCard, RotateCcw, HelpCircle
+  CreditCard, RotateCcw, HelpCircle, Search, Tag, Scale, ArrowUp, Check, ClipboardList
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { SmartProductImage } from "@/components/shop/SmartProductImage";
@@ -33,29 +36,38 @@ export default function Shop() {
   // Раньше здесь был захардкоженный список с id "1".."5" — из-за него корзина падала
   // с "invalid input syntax for type uuid". Берём настоящие товары, а если база
   // недоступна — локальный каталог, у которого id понимает и корзина, и избранное.
-  const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [addedId, setAddedId] = useState<string | null>(null);
+  const goSearch = () => navigate(query.trim() ? `/shop/search?q=${encodeURIComponent(query.trim())}` : "/shop/search");
+  const handleAdd = async (id: string) => {
+    setAddedId(id);
+    try { await addToCart(id); } finally { setTimeout(() => setAddedId((cur) => (cur === id ? null : cur)), 1400); }
+  };
+
+  // Сразу показываем локальный каталог, чтобы блок не был пустым, пока база отвечает.
+  const [popularProducts, setPopularProducts] = useState<any[]>(() => pickTop(withoutHiddenProducts<any>(fallbackShopProducts as any[]) as any[]));
 
   useEffect(() => {
     let cancelled = false;
 
-    const pickTop = (list: any[]) =>
-      [...list]
-        .sort(
-          (a, b) =>
-            (b.is_popular ? 1 : 0) - (a.is_popular ? 1 : 0) ||
-            (b.rating || 0) - (a.rating || 0),
-        )
-        .slice(0, 5);
-
     const load = async () => {
-      const { data, error } = await supabase
-        .from("shop_products")
-        .select("*, shop_categories(name)")
-        .limit(500);
+      let data: any[] | null = null;
+      let error: any = null;
+      try {
+        const res: any = await Promise.race([
+          supabase.from("shop_products").select("*, shop_categories(name)").limit(500),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000)),
+        ]);
+        data = res?.data ?? null;
+        error = res?.error ?? null;
+      } catch (e) {
+        error = e;
+      }
 
       if (cancelled) return;
-      const rows = withoutHiddenProducts<any>(!error && data && data.length ? data : fallbackShopProducts);
-      setPopularProducts(pickTop(rows as any[]));
+      if (error || !data || !data.length) return; // оставляем локальный каталог
+      setPopularProducts(pickTop(withoutHiddenProducts<any>(data) as any[]));
     };
 
     load();
@@ -64,29 +76,63 @@ export default function Shop() {
     };
   }, []);
 
+  const quickLinks = [
+    { to: "/shop/search", icon: Search, label: tx("Все товары", "All products", "Ҳама молҳо"), color: "from-emerald-500 to-teal-500" },
+    { to: "/shop/promotions", icon: Percent, label: tx("Акции", "Deals", "Аксияҳо"), color: "from-rose-500 to-orange-500" },
+    { to: "/shop/brands", icon: Tag, label: tx("Бренды", "Brands", "Брендҳо"), color: "from-violet-500 to-purple-500" },
+    { to: "/shop/favorites", icon: Heart, label: tx("Избранное", "Favorites", "Интихобшуда"), color: "from-pink-500 to-rose-500" },
+    { to: "/shop/compare", icon: Scale, label: tx("Сравнение", "Compare", "Муқоиса"), color: "from-blue-500 to-cyan-500" },
+    { to: "/shop/orders", icon: ClipboardList, label: tx("Мои заказы", "My orders", "Фармоишҳои ман"), color: "from-amber-500 to-yellow-500" },
+    { to: "/cart", icon: ShoppingCart, label: tx("Корзина", "Cart", "Сабад"), color: "from-emerald-600 to-green-500" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <ScrollExtras />
 
       {/* Hero Section */}
-      <section className="relative py-12 bg-slate-50/30 dark:bg-slate-800/30">
+      <section className="relative overflow-hidden py-12 bg-slate-50/30 dark:bg-slate-800/30">
+        <motion.div aria-hidden className="pointer-events-none absolute -top-20 left-10 h-72 w-72 rounded-full bg-emerald-300/25 blur-3xl" animate={{ x: [0, 60, 0], y: [0, 30, 0] }} transition={{ duration: 13, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div aria-hidden className="pointer-events-none absolute bottom-0 right-1/3 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl" animate={{ x: [0, -50, 0], y: [0, -30, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} />
         <div className="container px-4 mx-auto max-w-[1600px]">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden bg-white dark:bg-slate-900 rounded-[3.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/40 min-h-[750px] flex flex-col lg:flex-row items-stretch"
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="group/hero relative overflow-hidden bg-white dark:bg-slate-900 rounded-[3.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/40 min-h-[750px] flex flex-col lg:flex-row items-stretch"
           >
             {/* Left Content Column */}
             <div className="w-full lg:w-[65%] relative z-20 py-16 px-8 md:py-24 md:px-24 flex items-center">
               <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 mb-8">
-                   <Clock className="w-3.5 h-3.5" />
+                <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, type: "spring" }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 mb-8 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                   <Clock className="w-3.5 h-3.5 animate-[spin_6s_linear_infinite]" />
                    <span className="text-[11px] font-black uppercase tracking-widest">{t("shopAboutBadge")}</span>
-                </div>
+                </motion.div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
-                  {t("shopAboutTitle")} <span className="text-emerald-500">Master.TJ</span>
+                  {t("shopAboutTitle")} <span className="bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 bg-[length:200%_auto] bg-clip-text text-transparent animate-[shine_4s_linear_infinite]">Master.TJ</span>
                 </h1>
+
+                {/* Поиск по магазину */}
+                <div className="group relative mb-10 max-w-xl">
+                  <div className="absolute inset-0 rounded-2xl bg-emerald-500/15 opacity-0 blur-xl transition-opacity duration-300 group-focus-within:opacity-100" />
+                  <div className="relative flex gap-2 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl transition-all duration-300 group-focus-within:border-emerald-300 group-hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-emerald-500" />
+                      <Input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && goSearch()}
+                        placeholder={tx("Найти смеситель, розетку, кабель...", "Find a faucet, socket, cable...", "Ҷустуҷӯи смеситель, розетка, сим...")}
+                        className="h-12 border-none pl-12 text-base shadow-none focus-visible:ring-0"
+                      />
+                    </div>
+                    <Button onClick={goSearch} className="h-12 rounded-xl bg-emerald-500 px-6 font-bold text-white shadow-lg shadow-emerald-100 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-emerald-300 active:scale-95">
+                      {tx("Найти", "Search", "Ёфтан")}
+                    </Button>
+                  </div>
+                </div>
 
                 <div className="space-y-6 mb-12 text-slate-500 dark:text-slate-400">
                   <p className="text-base md:text-lg leading-relaxed">
@@ -116,7 +162,7 @@ export default function Shop() {
                <img 
                  src={heroImage} 
                  alt="Workshop" 
-                 className="absolute inset-0 w-full h-full object-cover object-center"
+                 className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1500ms] group-hover/hero:scale-105"
                />
                {/* Mask for smooth transition */}
                <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-slate-900 via-white/5 dark:via-slate-900/5 to-transparent z-10" />
@@ -143,7 +189,11 @@ export default function Shop() {
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-2">
                           <div className="flex gap-0.5">
-                            {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
+                            {[...Array(5)].map((_, i) => (
+                              <motion.span key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.7 + i * 0.08, type: "spring", stiffness: 300 }}>
+                                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                              </motion.span>
+                            ))}
                           </div>
                           <span className="text-xs font-bold text-slate-400 dark:text-slate-500 ml-1">{t("shopTrustReviewsCount")}</span>
                        </div>
@@ -162,6 +212,24 @@ export default function Shop() {
                </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Быстрые разделы магазина */}
+      <section className="py-8 bg-white dark:bg-slate-900">
+        <div className="container px-4 mx-auto max-w-7xl">
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:grid lg:grid-cols-7 lg:overflow-visible">
+            {quickLinks.map((l, i) => (
+              <motion.div key={l.to} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} whileHover={{ y: -6 }} whileTap={{ scale: 0.95 }} className="shrink-0">
+                <Link to={l.to} className="group flex w-28 flex-col items-center gap-2 rounded-3xl border border-slate-100 bg-white p-4 text-center shadow-sm transition-shadow duration-300 hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-100/60 dark:border-slate-800 dark:bg-slate-900 lg:w-auto">
+                  <span className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${l.color} text-white shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-8deg]`}>
+                    <l.icon className="h-6 w-6" />
+                  </span>
+                  <span className="text-xs font-bold text-slate-700 transition-colors group-hover:text-emerald-600 dark:text-slate-200">{l.label}</span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -208,22 +276,28 @@ export default function Shop() {
               return (
                 <motion.div
                   key={p.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.08, type: "spring", stiffness: 200, damping: 20 }}
+                  whileHover={{ y: -8 }}
+                  className="h-full"
                 >
-                  <Card className="group h-full border-slate-100 dark:border-slate-800 hover:border-emerald-100 hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden flex flex-col hover-lift">
+                  <Card className="group relative h-full border-slate-100 dark:border-slate-800 hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-500 rounded-[2rem] overflow-hidden flex flex-col">
                     <Link to={`/shop/product/${p.id}`} className="relative aspect-square bg-slate-50 dark:bg-slate-800 p-6 flex items-center justify-center overflow-hidden">
                       <SmartProductImage
                         product={p}
                         alt={p.name}
-                        className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700"
+                        className="max-w-full max-h-full object-contain group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-700"
                       />
+                      <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+                      <span className="absolute bottom-3 left-1/2 -translate-x-1/2 translate-y-4 whitespace-nowrap rounded-full bg-white/95 px-3 py-1 text-[11px] font-bold text-emerald-600 opacity-0 shadow-lg transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-900/95">
+                        {tx("Подробнее →", "Details →", "Муфассал →")}
+                      </span>
 
                       <div className="absolute top-4 left-4 flex max-w-[80%] flex-wrap gap-1.5">
                         {discount > 0 && (
-                          <Badge className="bg-red-500 text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg">
+                          <Badge className="bg-red-500 text-white font-black text-[10px] px-3 py-1 rounded-full shadow-lg animate-pulse">
                             {t("shopBadgeDiscountN", { percent: discount })}
                           </Badge>
                         )}
@@ -261,8 +335,19 @@ export default function Shop() {
 
                         <div className="flex items-center gap-1 shrink-0">
                           <FavoriteButton itemType="product" itemId={p.id} size="sm" />
-                          <Button size="icon" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-100 shrink-0 transition-transform duration-300 hover:scale-110 active:scale-90" onClick={() => addToCart(p.id)}>
-                            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          <Button
+                            size="icon"
+                            aria-label={tx("В корзину", "Add to cart", "Ба сабад")}
+                            className={`h-7 w-7 sm:h-9 sm:w-9 rounded-full text-white shadow-lg shrink-0 transition-all duration-300 hover:scale-110 hover:rotate-6 active:scale-90 ${addedId === p.id ? "bg-teal-500 shadow-teal-200" : "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100"}`}
+                            onClick={() => handleAdd(p.id)}
+                          >
+                            <AnimatePresence mode="wait" initial={false}>
+                              {addedId === p.id ? (
+                                <motion.span key="ok" initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></motion.span>
+                              ) : (
+                                <motion.span key="cart" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}><ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></motion.span>
+                              )}
+                            </AnimatePresence>
                           </Button>
                         </div>
                       </div>
@@ -307,7 +392,7 @@ export default function Shop() {
             viewport={{ once: true }}
             className="bg-[#F1F5F9] dark:bg-slate-800/60 rounded-[3rem] p-8 md:p-16 relative overflow-hidden flex flex-col lg:flex-row items-center gap-12"
           >
-             <div className="absolute top-0 right-0 w-1/3 h-full bg-emerald-500/5 blur-3xl rounded-full" />
+             <motion.div aria-hidden className="pointer-events-none absolute top-0 right-0 w-1/3 h-full bg-emerald-500/10 blur-3xl rounded-full" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
              
              <motion.div
                initial={{ opacity: 0, x: -30 }}
@@ -319,7 +404,7 @@ export default function Shop() {
                <div className="group relative">
                  <div className="absolute -inset-4 bg-emerald-500/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                  <img src={specialistImage} alt="Specialist" className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full border-8 border-white shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105" />
-                 <div className="absolute bottom-4 right-4 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-xl z-20 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
+                 <div className="absolute bottom-4 right-4 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-xl z-20 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110 group-hover:rotate-12">
                    <Wrench className="w-8 h-8 text-emerald-500 transition-colors duration-300 group-hover:text-white" />
                  </div>
                </div>
@@ -343,8 +428,9 @@ export default function Shop() {
                
                <div className="flex flex-col sm:flex-row items-center gap-8">
                  <a href="tel:+992979117007" className="group flex items-center gap-4 text-slate-900 dark:text-white hover-soft rounded-2xl">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-100 transition-transform duration-300 group-hover:scale-110">
-                      <Phone className="w-6 h-6" />
+                    <div className="relative w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-100 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                      <span className="absolute inset-0 rounded-2xl bg-emerald-400/60 animate-ping" />
+                      <Phone className="relative w-6 h-6" />
                     </div>
                     <div>
                       <p className="text-2xl font-black">+992 979 117 007</p>
@@ -352,8 +438,11 @@ export default function Shop() {
                     </div>
                  </a>
 
-                 <Button className="hover-soft bg-[#10B981] hover:bg-[#059669] text-white font-black rounded-2xl px-10 h-16 flex items-center gap-3 shadow-xl shadow-emerald-100 transition-all active:scale-95">
-                   <MessageCircle className="w-6 h-6" /> {t("shopWhatsAppButton")}
+                 <Button asChild className="group/wa relative overflow-hidden bg-[#10B981] hover:bg-[#059669] text-white font-black rounded-2xl px-10 h-16 flex items-center gap-3 shadow-xl shadow-emerald-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-emerald-300 active:scale-95">
+                   <a href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Здравствуйте! Нужна консультация по товарам магазина Master.TJ")}`} target="_blank" rel="noopener noreferrer">
+                     <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover/wa:translate-x-full" />
+                     <MessageCircle className="relative w-6 h-6 transition-transform duration-300 group-hover/wa:-rotate-12 group-hover/wa:scale-110" /> <span className="relative">{t("shopWhatsAppButton")}</span>
+                   </a>
                  </Button>
                </div>
              </motion.div>
@@ -366,10 +455,51 @@ export default function Shop() {
   );
 }
 
+// Топ-5 товаров: сначала популярные, потом по рейтингу.
+function pickTop(list: any[]) {
+  return [...list]
+    .sort((a, b) => (b.is_popular ? 1 : 0) - (a.is_popular ? 1 : 0) || (b.rating || 0) - (a.rating || 0))
+    .slice(0, 5);
+}
+
+function ScrollExtras() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 25, restDelta: 0.001 });
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 700);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <>
+      <motion.div style={{ scaleX }} className="fixed left-0 right-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600" />
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            type="button"
+            aria-label="Наверх"
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            whileHover={{ scale: 1.1, y: -3 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-xl shadow-emerald-300/50"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 function ShopFeatureItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="group flex gap-3 cursor-default transition-transform duration-300 hover:translate-x-1">
-      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
+      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg group-hover:shadow-emerald-200">
         {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
       </div>
       <div>
@@ -383,7 +513,7 @@ function ShopFeatureItem({ icon, title, desc }: { icon: React.ReactNode; title: 
 function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
     <div className="group flex items-center gap-3 sm:gap-5 min-w-0 cursor-default">
-      <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110">
+      <div className="w-16 h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-emerald-500 group-hover:scale-110 group-hover:-rotate-6 group-hover:shadow-lg group-hover:shadow-emerald-200">
         {React.cloneElement(icon as React.ReactElement, { className: "w-8 h-8 text-emerald-500 transition-colors duration-300 group-hover:text-white" })}
       </div>
       <div className="min-w-0">
@@ -396,8 +526,8 @@ function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string
 
 function BenefitSmallItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="group rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-[#fbfcfb] dark:bg-slate-900 p-6 sm:p-7 text-center hover-soft hover:border-emerald-200 hover:bg-white dark:hover:bg-slate-800 transition-colors">
-      <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 transition-colors duration-300 group-hover:bg-emerald-500 group-hover:text-white">
+    <div className="group rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-[#fbfcfb] dark:bg-slate-900 p-6 sm:p-7 text-center hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-100/60 hover:border-emerald-200 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300">
+      <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 transition-all duration-500 group-hover:bg-emerald-500 group-hover:text-white group-hover:rotate-[360deg]">
         {React.cloneElement(icon as React.ReactElement, { className: "h-7 w-7" })}
       </div>
       <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white leading-snug">{text}</p>

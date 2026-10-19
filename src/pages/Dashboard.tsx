@@ -38,8 +38,15 @@ const Dashboard = () => {
     const check = async () => {
       if (!user) return;
       if (hasRole("master")) {
-        const { data } = await supabase.from("profiles").select("approval_status").eq("user_id", user.id).single();
-        setApprovalStatus(data?.approval_status || "active");
+        try {
+          const res: any = await Promise.race([
+            supabase.from("profiles").select("approval_status").eq("user_id", user.id).single(),
+            new Promise((resolve) => setTimeout(() => resolve({ data: null }), 6000)),
+          ]);
+          setApprovalStatus(res?.data?.approval_status || "active");
+        } catch {
+          setApprovalStatus("active");
+        }
       } else {
         setApprovalStatus("active");
       }
@@ -50,8 +57,12 @@ const Dashboard = () => {
 
   if (loading || checkingApproval) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+        <div className="relative h-14 w-14">
+          <div className="absolute inset-0 rounded-2xl bg-emerald-400/30 animate-ping" />
+          <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-xl font-black text-white shadow-xl shadow-emerald-300/50">М</div>
+        </div>
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">Загружаем кабинет…</p>
       </div>
     );
   }

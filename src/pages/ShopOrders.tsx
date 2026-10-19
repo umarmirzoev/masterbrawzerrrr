@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,10 @@ import {
   TicketPercent,
   Wrench,
   XCircle,
+  ChevronDown,
+  ShoppingCart,
+  Store,
+  RefreshCw,
 } from "lucide-react";
 import { productName } from "@/lib/localizeNames";
 
@@ -69,7 +74,7 @@ type ShopOrderProduct = {
 };
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  pending: { label: "Ожидает подтверждения", className: "border-amber-200 bg-amber-100 text-amber-800" },
+  pending: { label: "Ожидает подтверждения", className: "border-amber-200 bg-amber-100 text-amber-800 animate-pulse" },
   confirmed: { label: "Подтвержден", className: "border-sky-200 bg-sky-100 text-sky-800" },
   processing: { label: "Собирается", className: "border-violet-200 bg-violet-100 text-violet-800" },
   shipped: { label: "В пути", className: "border-blue-200 bg-blue-100 text-blue-800" },
@@ -91,7 +96,8 @@ const paymentStatusLabels: Record<string, string> = {
   failed: "Ошибка оплаты",
 };
 
-export default function ShopOrders() {
+// Список покупок. embedded = показываем внутри кабинета (без шапки сайта и без ухода со страницы).
+export function ShopOrdersList({ embedded = false }: { embedded?: boolean }) {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -102,25 +108,30 @@ export default function ShopOrders() {
   const [orders, setOrders] = useState<ShopOrder[]>([]);
   const [orderItems, setOrderItems] = useState<ShopOrderItem[]>([]);
   const [products, setProducts] = useState<Record<string, ShopOrderProduct>>({});
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Запрос к базе с таймаутом: если Supabase не отвечает, показываем то, что сохранено в браузере.
+  const withTimeout = <T,>(p: PromiseLike<T>, ms = 8000): Promise<T> =>
+    Promise.race([Promise.resolve(p), new Promise<T>((resolve) => setTimeout(() => resolve({ data: null, error: { message: "timeout" } } as any), ms))]);
 
   const loadOrders = async () => {
     if (!user) return;
 
-    setLoading(true);
+    setLoading((prev) => prev || orders.length === 0);
+    try {
 
-    const { data: ordersData, error: ordersError } = await supabase
-      .from("shop_orders")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    const { data: ordersData, error: ordersError } = await withTimeout(
+      supabase
+        .from("shop_orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }),
+    );
 
-    if (ordersError) {
-      setLoading(false);
-      return;
-    }
-
+    // Даже если база не ответила — показываем локально сохранённые покупки, а не пустой экран.
     const loadedOrders = mergeShopOrders(
-      (ordersData || []) as ShopOrder[],
+      ((!ordersError && ordersData) || []) as ShopOrder[],
       getLocalShopOrdersByUser(user.id) as ShopOrder[],
     );
     setOrders(loadedOrders);
@@ -133,10 +144,10 @@ export default function ShopOrders() {
     }
 
     const orderIds = loadedOrders.map((order) => order.id);
-    const { data: itemsData } = await supabase
-      .from("shop_order_items")
-      .select("*")
-      .in("order_id", orderIds);
+    const realOrderIds = orderIds.filter((id) => !getLocalShopOrderById(id));
+    const { data: itemsData } = realOrderIds.length
+      ? await withTimeout(supabase.from("shop_order_items").select("*").in("order_id", realOrderIds))
+      : { data: [] as any[] };
 
     const loadedItems = (itemsData || []) as ShopOrderItem[];
     
@@ -152,10 +163,12 @@ export default function ShopOrders() {
     let productsMap: Record<string, ShopOrderProduct> = {};
 
     if (realProductIds.length > 0) {
-      const { data: productsData } = await supabase
-        .from("shop_products")
-        .select("id, name, image_url, images, price, category_id")
-        .in("id", realProductIds);
+      const { data: productsData } = await withTimeout(
+        supabase
+          .from("shop_products")
+          .select("id, name, image_url, images, price, category_id")
+          .in("id", realProductIds),
+      );
 
       productsMap = Object.fromEntries(((productsData || []) as ShopOrderProduct[]).map((product) => [product.id, product]));
     }
@@ -166,8 +179,15 @@ export default function ShopOrders() {
     });
 
     setProducts(productsMap);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setLoading(false);
+  const refresh = async () => {
+    setRefreshing(true);
+    await loadOrders();
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -244,38 +264,51 @@ export default function ShopOrders() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto max-w-5xl px-4 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className={embedded ? "" : "container mx-auto max-w-5xl px-4 py-8"}>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-3">
-            <Link to="/shop" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
-              <ArrowLeft className="h-4 w-4" />
-              В магазин
-            </Link>
+            {!embedded && (
+              <Link to="/shop" className="group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary">
+                <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+                В магазин
+              </Link>
+            )}
             <div>
-              <p className="text-sm text-muted-foreground">Магазин / Мои заказы</p>
-              <h1 className="text-3xl font-bold text-foreground">Мои заказы</h1>
-              <p className="mt-2 text-muted-foreground">
-                Здесь видны ваши покупки, статусы, скидки, оплата и быстрый переход к деталям заказа.
+              {!embedded && <p className="text-sm text-muted-foreground">Магазин / Мои заказы</p>}
+              <h1 className={`${embedded ? "text-xl" : "text-3xl"} font-bold text-foreground flex items-center gap-2`}>
+                {embedded && <ShoppingBag className="h-5 w-5 text-emerald-500" />}
+                {embedded ? "Мои покупки" : "Мои заказы"}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Здесь видны ваши покупки, статусы, скидки, оплата и состав заказа.
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="outline" className="rounded-full">
-              <Link to="/cart">Корзина</Link>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Обновить"
+              onClick={refresh}
+              className="rounded-full transition-colors hover:bg-emerald-50 hover:text-emerald-600"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
             </Button>
-            <Button asChild className="rounded-full">
-              <Link to="/shop">Продолжить покупки</Link>
+            <Button asChild variant="outline" className="group rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-400 hover:text-emerald-700">
+              <Link to="/cart"><ShoppingCart className="mr-1.5 h-4 w-4 transition-transform duration-300 group-hover:-rotate-12" />Корзина</Link>
+            </Button>
+            <Button asChild className="group rounded-full bg-gradient-to-r from-primary to-emerald-500 shadow-md shadow-emerald-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-300">
+              <Link to="/shop"><Store className="mr-1.5 h-4 w-4 transition-transform duration-300 group-hover:scale-110" />Продолжить покупки</Link>
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {!loading && orders.length > 0 && (
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-2">
-            <Card className="border-border/70">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} whileHover={{ y: -4 }}>
+            <Card className="group border-border/70 transition-shadow duration-300 hover:shadow-lg">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="rounded-2xl bg-primary/10 p-2.5">
+                <div className="rounded-2xl bg-primary/10 p-2.5 transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:scale-110">
                   <Package className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -284,9 +317,11 @@ export default function ShopOrders() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-border/70">
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} whileHover={{ y: -4 }}>
+            <Card className="group border-border/70 transition-shadow duration-300 hover:shadow-lg">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="rounded-2xl bg-emerald-100 p-2.5">
+                <div className="rounded-2xl bg-emerald-100 p-2.5 transition-transform duration-500 group-hover:rotate-[12deg] group-hover:scale-110">
                   <CreditCard className="h-5 w-5 text-emerald-700" />
                 </div>
                 <div>
@@ -295,6 +330,7 @@ export default function ShopOrders() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           </div>
         )}
 
@@ -327,25 +363,33 @@ export default function ShopOrders() {
         )}
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="space-y-4">
+            {[1, 2].map((i) => <div key={i} className="h-48 rounded-2xl bg-muted animate-pulse" />)}
           </div>
         ) : orders.length === 0 ? (
-          <Card className="border-dashed border-primary/30 bg-primary/5">
-            <CardContent className="py-16 text-center">
-              <ShoppingBag className="mx-auto mb-4 h-16 w-16 text-primary/40" />
+          <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
+          <Card className="relative overflow-hidden border-dashed border-primary/30 bg-primary/5">
+            <motion.div aria-hidden className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-emerald-200/40 blur-2xl" animate={{ x: [0, 40, 0], y: [0, 20, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
+            <CardContent className="relative py-16 text-center">
+              <motion.div animate={{ y: [0, -10, 0], rotate: [0, -4, 4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+                <ShoppingBag className="mx-auto mb-4 h-16 w-16 text-primary/50" />
+              </motion.div>
               <h2 className="mb-2 text-2xl font-bold text-foreground">У вас пока нет заказов</h2>
               <p className="mx-auto mb-6 max-w-xl text-muted-foreground">
                 Добавьте товары в корзину, оформите покупку и здесь появится история ваших заказов.
               </p>
-              <Button asChild className="rounded-full">
-                <Link to="/shop">Перейти в магазин</Link>
+              <Button asChild className="group relative overflow-hidden rounded-full bg-gradient-to-r from-primary to-emerald-500 px-6 shadow-lg shadow-emerald-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-300">
+                <Link to="/shop">
+                  <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                  <Store className="relative mr-2 h-4 w-4" /><span className="relative">Перейти в магазин</span>
+                </Link>
               </Button>
             </CardContent>
           </Card>
+          </motion.div>
         ) : (
           <div className="space-y-6">
-            {orders.map((order) => {
+            {orders.map((order, idx) => {
               const config = statusConfig[order.status] || {
                 label: order.status,
                 className: "border-border bg-muted text-foreground",
@@ -354,9 +398,9 @@ export default function ShopOrders() {
               const isNewlyCreated = createdOrderId === order.id;
 
               return (
+                <motion.div key={order.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(idx, 8) * 0.06 }} whileHover={{ y: -3 }}>
                 <Card
-                  key={order.id}
-                  className={`overflow-hidden border-border/70 ${isNewlyCreated ? "ring-2 ring-emerald-400/60" : ""}`}
+                  className={`overflow-hidden border-border/70 transition-shadow duration-300 hover:shadow-xl hover:shadow-emerald-100/50 ${isNewlyCreated ? "ring-2 ring-emerald-400/60" : ""}`}
                 >
                   <CardContent className="p-0">
                     <div className="border-b border-border/60 bg-muted/20 p-5">
@@ -387,7 +431,7 @@ export default function ShopOrders() {
                     </div>
 
                     <div className="grid gap-4 border-b border-border/60 p-5 md:grid-cols-2 xl:grid-cols-4">
-                      <div className="rounded-2xl bg-muted/30 p-4">
+                      <div className="rounded-2xl bg-muted/30 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-50/60 hover:shadow-sm dark:hover:bg-emerald-500/10">
                         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Получатель</p>
                         <p className="font-medium text-foreground">{order.customer_name || "Клиент"}</p>
                         <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
@@ -395,14 +439,14 @@ export default function ShopOrders() {
                           {order.phone || "Не указан"}
                         </p>
                       </div>
-                      <div className="rounded-2xl bg-muted/30 p-4">
+                      <div className="rounded-2xl bg-muted/30 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-50/60 hover:shadow-sm dark:hover:bg-emerald-500/10">
                         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Доставка</p>
                         <p className="flex items-start gap-2 text-sm text-foreground">
                           <MapPin className="mt-0.5 h-4 w-4 text-primary" />
                           <span>{order.delivery_address || "Адрес не указан"}</span>
                         </p>
                       </div>
-                      <div className="rounded-2xl bg-muted/30 p-4">
+                      <div className="rounded-2xl bg-muted/30 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-50/60 hover:shadow-sm dark:hover:bg-emerald-500/10">
                         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Оплата</p>
                         <p className="flex items-start gap-2 text-sm text-foreground">
                           <CreditCard className="mt-0.5 h-4 w-4 text-primary" />
@@ -412,7 +456,7 @@ export default function ShopOrders() {
                           {paymentStatusLabels[order.payment_status || "unpaid"] || order.payment_status}
                         </p>
                       </div>
-                      <div className="rounded-2xl bg-muted/30 p-4">
+                      <div className="rounded-2xl bg-muted/30 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-50/60 hover:shadow-sm dark:hover:bg-emerald-500/10">
                         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Скидка</p>
                         {order.discount_amount > 0 ? (
                           <div className="space-y-2">
@@ -442,7 +486,7 @@ export default function ShopOrders() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="rounded-full text-destructive"
+                              className="rounded-full text-destructive transition-all duration-300 hover:-translate-y-0.5 hover:bg-destructive hover:text-white"
                               onClick={() => cancelOrder(order.id)}
                               disabled={cancelId === order.id}
                             >
@@ -450,14 +494,29 @@ export default function ShopOrders() {
                               Отменить
                             </Button>
                           )}
-                          <Button asChild variant="outline" size="sm" className="rounded-full">
-                            <Link to={`/shop/orders/${order.id}`}>Открыть заказ</Link>
-                          </Button>
+                          {embedded ? (
+                            items.length > 2 && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-400 hover:text-emerald-700"
+                                onClick={() => setExpanded((p) => ({ ...p, [order.id]: !p[order.id] }))}
+                              >
+                                {expanded[order.id] ? "Свернуть" : `Все товары (${items.length})`}
+                                <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-300 ${expanded[order.id] ? "rotate-180" : ""}`} />
+                              </Button>
+                            )
+                          ) : (
+                            <Button asChild variant="outline" size="sm" className="rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-400 hover:text-emerald-700">
+                              <Link to={`/shop/orders/${order.id}`}>Открыть заказ</Link>
+                            </Button>
+                          )}
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        {items.slice(0, 2).map((item) => {
+                        <AnimatePresence initial={false}>
+                        {(expanded[order.id] ? items : items.slice(0, 2)).map((item) => {
                           const product = products[item.product_id];
                           const installationTotal = item.include_installation
                             ? (item.installation_price || 0) * item.quantity
@@ -465,12 +524,15 @@ export default function ShopOrders() {
                           const itemTotal = item.price * item.quantity + installationTotal;
 
                           return (
-                            <div
+                            <motion.div
                               key={item.id}
-                              className="flex flex-col gap-4 rounded-2xl border border-border/60 p-4 md:flex-row md:items-center md:justify-between"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="group flex flex-col gap-4 overflow-hidden rounded-2xl border border-border/60 p-4 transition-all duration-300 hover:border-emerald-200 hover:shadow-md md:flex-row md:items-center md:justify-between"
                             >
                               <div className="flex min-w-0 items-center gap-4">
-                                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-muted/30">
+                                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-muted/30 transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-2">
                                   {product ? (
                                     <SmartProductImage
                                       product={product}
@@ -501,11 +563,12 @@ export default function ShopOrders() {
                                 <p className="text-xs text-muted-foreground">Сумма позиции</p>
                                 <p className="text-lg font-bold text-foreground">{itemTotal} сомонӣ</p>
                               </div>
-                            </div>
+                            </motion.div>
                           );
                         })}
+                        </AnimatePresence>
 
-                        {items.length > 2 && (
+                        {items.length > 2 && !expanded[order.id] && (
                           <p className="text-sm text-muted-foreground">
                             И еще {items.length - 2} товар(а) внутри заказа.
                           </p>
@@ -514,11 +577,20 @@ export default function ShopOrders() {
                     </div>
                   </CardContent>
                 </Card>
+                </motion.div>
               );
             })}
           </div>
         )}
       </div>
+  );
+}
+
+export default function ShopOrders() {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <ShopOrdersList />
       <Footer />
     </div>
   );

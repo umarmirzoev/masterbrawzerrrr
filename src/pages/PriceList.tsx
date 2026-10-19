@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -18,7 +18,7 @@ import {
   Camera, Flame, Home, Cpu, MoreHorizontal, Wind, ChevronRight, ChevronDown,
   Sparkles, Shield, TrendingUp, HelpCircle, DollarSign, MapPin, Ruler, 
   CheckCircle2, Headset, Users, Trophy, MessageCircle, Phone, 
-  LayoutGrid, Settings, Brush, ArrowLeft
+  LayoutGrid, Settings, Brush, ArrowLeft, ArrowUp
 } from "lucide-react";
 import { tx } from "@/lib/localizeNames";
 
@@ -210,29 +210,33 @@ export default function PriceList() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <ScrollExtras />
 
       {/* Hero Section */}
       <section className="relative bg-[#F0FDF4] dark:bg-emerald-950/20 pt-12 pb-20 overflow-hidden border-b border-green-100 dark:border-emerald-900/30">
-        <div className="container px-4 mx-auto max-w-7xl">
+        <motion.div aria-hidden className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-300/30 blur-3xl" animate={{ x: [0, 40, 0], y: [0, 30, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div aria-hidden className="pointer-events-none absolute top-1/3 right-1/4 h-56 w-56 rounded-full bg-teal-300/25 blur-3xl" animate={{ x: [0, -30, 0], y: [0, 40, 0] }} transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div aria-hidden className="pointer-events-none absolute -bottom-20 left-1/3 h-64 w-64 rounded-full bg-lime-200/30 blur-3xl" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
+        <div className="relative container px-4 mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-left z-10">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
-                  {t("priceListHeroTitle1")} <br /> {t("priceListHeroTitle2")} <span className="text-emerald-600">{t("priceListHeroCity")}</span>
+                  {t("priceListHeroTitle1")} <br /> {t("priceListHeroTitle2")} <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 bg-[length:200%_auto] bg-clip-text text-transparent animate-[shine_4s_linear_infinite]">{t("priceListHeroCity")}</span>
                 </h1>
                 <p className="text-lg text-slate-600 dark:text-slate-300 mb-10 max-w-xl font-medium">
                   {t("priceListHeroDesc")}
                 </p>
 
-                <Link to="/calculator" className="inline-flex items-center gap-2 -mt-6 mb-8 px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-500/30 text-sm font-bold text-emerald-700 dark:text-emerald-300 hover:shadow-md transition-shadow">
+                <Link to="/calculator" className="inline-flex items-center gap-2 -mt-6 mb-8 px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-500/30 text-sm font-bold text-emerald-700 dark:text-emerald-300 hover:shadow-lg hover:shadow-emerald-200/60 hover:-translate-y-0.5 hover:border-emerald-400 transition-all duration-300">
                   🧮 Посчитать стоимость в калькуляторе →
                 </Link>
 
                 <div className="relative max-w-2xl group mb-10">
                   <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                  <div className="relative flex flex-col sm:flex-row gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+                  <div className="relative flex flex-col sm:flex-row gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 group-focus-within:border-emerald-300 group-focus-within:shadow-2xl group-focus-within:shadow-emerald-200/60 group-hover:shadow-2xl">
                     <div className="relative flex-1">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-emerald-500" />
                       <Input
                         placeholder={t("priceListSearchPlaceholder")}
                         value={search}
@@ -241,7 +245,7 @@ export default function PriceList() {
                         className="pl-12 h-14 border-none shadow-none text-base focus-visible:ring-0"
                       />
                     </div>
-                    <Button onClick={handleSearch} className="h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95">
+                    <Button onClick={handleSearch} className="h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-100 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-emerald-300 active:scale-95">
                       {t("priceListSearchButton")}
                     </Button>
                   </div>
@@ -257,12 +261,17 @@ export default function PriceList() {
             </div>
 
             <div className="hidden lg:block w-1/3">
-              <div className="relative">
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}
+                transition={{ opacity: { duration: 0.6 }, scale: { duration: 0.6 }, y: { duration: 6, repeat: Infinity, ease: "easeInOut" } }}
+              >
                 <div className="absolute -inset-4 bg-emerald-500/10 blur-3xl rounded-full" />
-                <div className="relative hover-lift hover-glow overflow-hidden rounded-[2.5rem] border border-white bg-white dark:bg-slate-900 shadow-2xl">
-                   <img src={heroImage} alt="Master" className="h-[420px] w-full object-cover object-[78%_center]" />
+                <div className="group relative hover-glow overflow-hidden rounded-[2.5rem] border border-white bg-white dark:bg-slate-900 shadow-2xl">
+                   <img src={heroImage} alt="Master" className="h-[420px] w-full object-cover object-[78%_center] transition-transform duration-700 group-hover:scale-105" />
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -289,10 +298,12 @@ export default function PriceList() {
             {popularServicesData.map((s, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
+                transition={{ delay: i * 0.06, type: "spring", stiffness: 220, damping: 20 }}
+                whileHover={{ y: -8, rotate: i % 2 ? 1 : -1 }}
+                whileTap={{ scale: 0.97 }}
               >
                 <Card
                   role="button"
@@ -304,10 +315,11 @@ export default function PriceList() {
                       openPopularOrder(s.name);
                     }
                   }}
-                  className="group h-full border-slate-100 dark:border-slate-800 hover:border-emerald-100 hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer hover-lift"
+                  className="group relative h-full border-slate-100 dark:border-slate-800 hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-100/70 transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer"
                 >
+                  <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-emerald-50/80 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                   <CardContent className="p-5 flex flex-col items-center text-center">
-                    <div className={`w-12 h-12 rounded-2xl ${s.color} flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                    <div className={`w-12 h-12 rounded-2xl ${s.color} flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300`}>
                       <s.icon className="w-6 h-6" />
                     </div>
                     <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1 leading-tight">{s.name}</h3>
@@ -319,7 +331,7 @@ export default function PriceList() {
                         e.stopPropagation();
                         openPopularOrder(s.name);
                       }}
-                      className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors"
+                      className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300"
                     >
                       {t("priceListOrderButton")}
                     </Button>
@@ -347,16 +359,28 @@ export default function PriceList() {
                   return (
                     <button
                       key={cat.id}
-                      onClick={() => setActiveCategory(cat.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all text-left group ${
+                      onClick={() => {
+                        setActiveCategory(cat.id);
+                        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                          setTimeout(() => document.getElementById("category-content")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                        }
+                      }}
+                      className={`relative w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 text-left group ${
                         isActive 
-                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-100" 
-                        : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+                        ? "text-white" 
+                        : "hover:bg-emerald-50/70 dark:hover:bg-slate-800 hover:translate-x-1 text-slate-600 dark:text-slate-300"
                       }`}
                     >
-                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-500"}`} />
-                      <span className="flex-1 font-bold text-sm">{getName(cat)}</span>
-                      <span className={`text-[10px] font-bold ${isActive ? "text-emerald-100" : "text-slate-400 dark:text-slate-500"}`}>
+                      {isActive && (
+                        <motion.span
+                          layoutId="price-cat-pill"
+                          className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg shadow-emerald-200/70"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                      <Icon className={`relative z-10 w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-500"}`} />
+                      <span className="relative z-10 flex-1 font-bold text-sm">{getName(cat)}</span>
+                      <span className={`relative z-10 text-[10px] font-bold ${isActive ? "text-emerald-50" : "text-slate-400 dark:text-slate-500"}`}>
                         {t("priceListMastersCount", { count })}
                       </span>
                     </button>
@@ -366,13 +390,16 @@ export default function PriceList() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 min-w-0">
+            <div id="category-content" className="flex-1 min-w-0 scroll-mt-24">
               <div className="sm:bg-white sm:dark:bg-slate-900 sm:rounded-[2rem] sm:p-6 md:p-8 sm:shadow-sm sm:border sm:border-slate-100 sm:dark:border-slate-800 sm:min-h-[400px]">
+                <AnimatePresence mode="wait">
                 {activeCategory && (
                   <motion.div
                     key={activeCategory}
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: 24 }}
                     animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
                   >
                     {/* Шапка категории */}
                     <button
@@ -391,7 +418,7 @@ export default function PriceList() {
                           <div className="mb-5 flex items-center gap-4">
                             <div className={`flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl ${pickCategoryTheme(currentCategory?.name_ru || "").tile}`}>
                               {visual?.header ? (
-                                <img src={visual.header} alt="" className="h-full w-full object-cover" />
+                                <img src={visual.header} alt="" className="h-full w-full object-cover transition-transform duration-500 hover:scale-110" />
                               ) : (
                                 <Icon className="h-9 w-9 text-emerald-600" />
                               )}
@@ -402,13 +429,13 @@ export default function PriceList() {
                             </div>
                           </div>
 
-                          <div className={`mb-7 flex min-h-[110px] items-center justify-between gap-4 overflow-hidden rounded-3xl pl-5 pr-2 sm:pl-7 ${pickCategoryTheme(currentCategory?.name_ru || "").banner}`}>
+                          <div className={`mb-7 flex min-h-[110px] items-center justify-between gap-4 overflow-hidden rounded-3xl pl-5 pr-2 sm:pl-7 group/banner transition-shadow duration-300 hover:shadow-lg ${pickCategoryTheme(currentCategory?.name_ru || "").banner}`}>
                             <p className={`py-5 text-base font-bold leading-snug sm:text-2xl ${pickCategoryTheme(currentCategory?.name_ru || "").bannerText}`}>
                               {visual?.text ? tx(visual.text[0], visual.text[2], visual.text[4]) : tx("Надёжные мастера", "Reliable masters", "Устоҳои боэътимод")}
                               <br />
                               {visual?.text ? tx(visual.text[1], visual.text[3], visual.text[5]) : tx("для дома и бизнеса", "for home and business", "барои хона ва тиҷорат")}
                             </p>
-                            {visual && <img src={visual.banner} alt="" className="h-20 w-auto max-w-[48%] shrink-0 object-contain sm:h-28" />}
+                            {visual && <motion.img src={visual.banner} alt="" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1, duration: 0.5 }} className="h-20 w-auto max-w-[48%] shrink-0 object-contain transition-transform duration-500 group-hover/banner:scale-105 sm:h-28" />}
                           </div>
                         </>
                       );
@@ -417,21 +444,46 @@ export default function PriceList() {
                     <h4 className="mb-4 text-2xl font-black text-slate-900 dark:text-white">{tx("Выберите услугу", "Choose a service", "Хизматро интихоб кунед")}</h4>
 
                     <div className="space-y-3">
-                      {(groupedByCategory.get(activeCategory) || []).map((s) => {
+                      {(groupedByCategory.get(activeCategory) || []).length === 0 && (
+                        <div className="rounded-2xl border border-dashed border-emerald-200 p-8 text-center text-slate-500">
+                          {tx("Услуги скоро появятся. Оставьте заявку — мастер подберёт решение.", "Services coming soon. Leave a request and a master will help.", "Хизматҳо ба зудӣ илова мешаванд. Дархост гузоред.")}
+                          <div className="mt-4">
+                            <Button onClick={() => setOrderModal({ open: true, categoryId: activeCategory })} className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">{t("priceListCtaButton")}</Button>
+                          </div>
+                        </div>
+                      )}
+                      {(groupedByCategory.get(activeCategory) || []).map((s, idx) => {
                         const Icon = currentCategory ? (iconMap[currentCategory.name_ru] || Wrench) : Wrench;
                         const theme = pickCategoryTheme(currentCategory?.name_ru || "");
                         return (
-                          <div
+                          <motion.div
                             key={s.id}
-                            className={`group flex items-center gap-3 rounded-2xl border bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:gap-4 ${theme.card}`}
+                            role="button"
+                            tabIndex={0}
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: Math.min(idx, 12) * 0.04, duration: 0.3 }}
+                            whileHover={{ y: -3 }}
+                            whileTap={{ scale: 0.99 }}
+                            onClick={() => setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) })}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) });
+                              }
+                            }}
+                            className={`group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border bg-white p-3 shadow-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-emerald-100/60 dark:border-slate-800 dark:bg-slate-900 sm:gap-4 ${theme.card}`}
                           >
-                            <ServiceIllustration
-                              name={`${s.name_ru || ""} ${getName(s)}`}
-                              fallbackIcon={<Icon className="h-9 w-9 text-slate-500" />}
-                              className="h-20 w-20 sm:h-24 sm:w-24"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <h5 className="text-[15px] font-bold leading-snug text-slate-900 dark:text-white sm:text-lg">{getName(s)}</h5>
+                            <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-emerald-50/70 to-transparent transition-transform duration-700 group-hover:translate-x-full dark:via-emerald-500/10" />
+                            <div className="relative shrink-0 transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-2">
+                              <ServiceIllustration
+                                name={`${s.name_ru || ""} ${getName(s)}`}
+                                fallbackIcon={<Icon className="h-9 w-9 text-slate-500" />}
+                                className="h-20 w-20 sm:h-24 sm:w-24"
+                              />
+                            </div>
+                            <div className="relative min-w-0 flex-1">
+                              <h5 className="text-[15px] font-bold leading-snug text-slate-900 transition-colors group-hover:text-emerald-700 dark:text-white sm:text-lg">{getName(s)}</h5>
                               <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{s.note || t("priceListServiceDefaultNote")}</p>
                               <p className={`mt-1 flex items-baseline gap-1 whitespace-nowrap ${theme.price}`}>
                                 <span className="text-sm font-semibold">{t("fromPrice")}</span>
@@ -441,17 +493,22 @@ export default function PriceList() {
                             </div>
                             <button
                               type="button"
-                              onClick={() => setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) })}
-                              className={`inline-flex h-10 shrink-0 items-center justify-center rounded-xl border-2 bg-white px-4 text-sm font-bold transition-colors hover:text-white dark:bg-transparent sm:h-11 sm:px-5 ${theme.button}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOrderModal({ open: true, serviceId: s.id, categoryId: s.category_id, name: getName(s) });
+                              }}
+                              className={`group/btn relative inline-flex h-10 shrink-0 items-center justify-center rounded-xl border-2 bg-white px-4 text-sm font-bold transition-all duration-300 hover:scale-105 hover:text-white hover:shadow-lg active:scale-95 dark:bg-transparent sm:h-11 sm:px-5 ${theme.button}`}
                             >
                               {t("priceListChooseButton")}
+                              <ArrowRight className="ml-1 hidden h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1 sm:inline" />
                             </button>
-                          </div>
+                          </motion.div>
                         );
                       })}
                     </div>
                   </motion.div>
                 )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -507,7 +564,7 @@ export default function PriceList() {
                   { q: t("priceListFaq4Q"), a: t("priceListFaq4A") },
                   { q: t("priceListFaq5Q"), a: t("priceListFaq5A") },
                 ].map((faq, i) => (
-                  <AccordionItem key={i} value={`faq-${i}`} className="border rounded-2xl px-5 bg-slate-50/50 dark:bg-slate-800/50 border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                  <AccordionItem key={i} value={`faq-${i}`} className="border rounded-2xl px-5 bg-slate-50/50 dark:bg-slate-800/50 border-transparent hover:border-emerald-200 hover:bg-white hover:shadow-md dark:hover:border-slate-700 transition-all duration-300">
                     <AccordionTrigger className="py-4 hover:no-underline font-bold text-slate-700 dark:text-slate-200 text-sm text-left leading-tight">
                       {faq.q}
                     </AccordionTrigger>
@@ -517,7 +574,7 @@ export default function PriceList() {
                   </AccordionItem>
                 ))}
               </Accordion>
-              <Link to="/faq" className="inline-block mt-6 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
+              <Link to="/faq" className="group inline-flex items-center mt-6 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
                 {t("priceListFaqViewAll")} →
               </Link>
             </div>
@@ -528,12 +585,21 @@ export default function PriceList() {
       {/* CTA Banner */}
       <section className="pb-20 bg-white dark:bg-slate-900">
         <div className="container px-4 mx-auto max-w-7xl">
-          <div className="bg-emerald-600 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-emerald-100">
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-600 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-emerald-100"
+          >
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/50 to-transparent pointer-events-none" />
+            <motion.div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+            <motion.div aria-hidden className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-white/5" animate={{ scale: [1.1, 1, 1.1] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-7">
               <div className="flex items-center gap-5 min-w-0">
-                <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
-                  <Headset className="w-8 h-8" />
+                <div className="relative w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
+                  <span className="absolute inset-0 rounded-full bg-white/20 animate-ping" />
+                  <Headset className="relative w-8 h-8" />
                 </div>
                 <div>
                   <h3 className="text-xl md:text-2xl font-black text-white mb-1.5">{t("priceListCtaTitle")}</h3>
@@ -544,9 +610,9 @@ export default function PriceList() {
               <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
                 <a
                   href="tel:+992979117007"
-                  className="flex items-center gap-3 text-white bg-white/10 rounded-[1.25rem] px-4 py-2.5"
+                  className="group flex items-center gap-3 text-white bg-white/10 rounded-[1.25rem] px-4 py-2.5 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
@@ -556,14 +622,14 @@ export default function PriceList() {
                 </a>
                 <Button
                   size="lg"
-                  className="bg-white dark:bg-slate-900 text-emerald-600 hover:bg-emerald-50 font-black rounded-[1.25rem] px-8 h-16 shadow-xl active:scale-95 transition-all whitespace-nowrap shrink-0"
+                  className="bg-white dark:bg-slate-900 text-emerald-600 hover:bg-emerald-50 font-black rounded-[1.25rem] px-8 h-16 shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 whitespace-nowrap shrink-0"
                   onClick={() => setOrderModal({ open: true })}
                 >
                   {t("priceListCtaButton")}
                 </Button>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -580,50 +646,97 @@ export default function PriceList() {
   );
 }
 
+function ScrollExtras() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 25, restDelta: 0.001 });
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 700);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <>
+      <motion.div style={{ scaleX }} className="fixed left-0 right-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600" />
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            type="button"
+            aria-label="Наверх"
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            whileHover={{ scale: 1.1, y: -3 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-xl shadow-emerald-300/50"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 function BenefitItem({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">{icon}</div>
+    <motion.div whileHover={{ y: -3 }} className="group flex items-center gap-3 cursor-default">
+      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 group-hover:border-emerald-200 group-hover:shadow-md">{icon}</div>
       <div>
         <p className="text-xs font-black text-slate-900 dark:text-white leading-tight mb-0.5">{title}</p>
         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">{sub}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-100 p-4 text-center dark:border-slate-800 sm:flex-row sm:gap-5 sm:border-0 sm:p-0 sm:text-left">
-      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0">
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -4 }}
+      className="group flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-100 p-4 text-center dark:border-slate-800 sm:flex-row sm:gap-5 sm:border-0 sm:p-0 sm:text-left"
+    >
+      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-emerald-100 group-hover:shadow-lg group-hover:shadow-emerald-100">
         {icon}
       </div>
       <div className="min-w-0">
         <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-none mb-1 sm:mb-2">{value}</p>
         <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium sm:uppercase sm:tracking-widest leading-tight">{label}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function StepItem({ num, title, desc }: { num: string; title: string; desc: string }) {
   return (
-    <div className="flex gap-4">
-      <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-black flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100">
+    <motion.div
+      initial={{ opacity: 0, x: -24 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.45, delay: (Number(num) - 1) * 0.08 }}
+      className="group flex gap-4"
+    >
+      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-black flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
         {num}
       </div>
       <div>
-        <h4 className="font-bold text-slate-900 dark:text-white mb-1">{title}</h4>
+        <h4 className="font-bold text-slate-900 dark:text-white mb-1 transition-colors group-hover:text-emerald-600">{title}</h4>
         <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function PriceFactor({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="flex gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800">
-      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+    <div className="group flex gap-4 p-4 rounded-2xl hover:bg-emerald-50/50 hover:translate-x-1 hover:shadow-sm dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-emerald-100 dark:hover:border-slate-800">
+      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:-rotate-6">
         {icon}
       </div>
       <div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { ArrowUp } from "lucide-react";
+import { SAMPLE_MASTERS } from "@/data/seedData";
 import { 
   Search, Star, CheckCircle2, Clock, ShieldCheck, 
   Wallet, Users, ArrowRight, Phone, MessageSquare,
@@ -35,6 +37,8 @@ const getInitials = (fullName: string) => {
 };
 
 interface TopMasterCard {
+  id: string;
+  avatar: string;
   name: string;
   rating: number;
   reviews: number;
@@ -91,20 +95,23 @@ const Index = () => {
     async function loadTopMasters() {
       const { data, error } = await supabase
         .from("master_listings")
-        .select("full_name, average_rating, total_reviews, experience_years")
+        .select("id, full_name, avatar_url, average_rating, total_reviews, experience_years")
         .eq("is_active", true)
         .order("ranking_score", { ascending: false })
         .limit(6);
 
       if (!isMounted) return;
 
-      if (error || !data || data.length === 0) {
-        setTopMasters([]);
-        return;
-      }
+      // База недоступна — показываем встроенных мастеров, чтобы блок не пропадал.
+      const rows: any[] =
+        !error && data && data.length > 0
+          ? data
+          : [...SAMPLE_MASTERS].sort((a, b) => b.average_rating - a.average_rating).slice(0, 6);
 
       setTopMasters(
-        data.map((m, idx) => ({
+        rows.map((m: any, idx: number) => ({
+          id: m.id,
+          avatar: m.avatar_url || "",
           name: m.full_name ?? "",
           rating: m.average_rating ?? 0,
           reviews: m.total_reviews ?? 0,
@@ -119,6 +126,16 @@ const Index = () => {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  // Прогресс прокрутки и кнопка «наверх».
+  const { scrollYProgress } = useScroll();
+  const scrollProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 700);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const fadeInUp = {
@@ -136,10 +153,29 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background selection:bg-emerald-100 selection:text-emerald-900 overflow-x-hidden">
+      {/* Полоса прокрутки страницы */}
+      <motion.div
+        aria-hidden
+        style={{ scaleX: scrollProgress }}
+        className="fixed left-0 right-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500"
+      />
       <Header />
 
       {/* Hero Section */}
       <section className="relative pt-12 pb-24 overflow-hidden bg-gradient-to-b from-[#f9fafb] to-white dark:from-slate-900 dark:to-slate-950">
+        {/* Плавающие цветные пятна */}
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -left-40 -top-20 h-[420px] w-[420px] rounded-full bg-emerald-200/40 blur-3xl dark:bg-emerald-500/10"
+          animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -right-32 bottom-0 h-[360px] w-[360px] rounded-full bg-teal-200/40 blur-3xl dark:bg-teal-500/10"
+          animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
         <div className="container px-4 mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             {/* Hero Left Content */}
@@ -381,6 +417,11 @@ const Index = () => {
                       <p className="text-[13px] text-slate-500 dark:text-slate-400">{t(service.priceKey)}</p>
                     </div>
                   </div>
+                  {/* Блик при наведении */}
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-emerald-100/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                  <span className="pointer-events-none absolute bottom-3 left-4 flex items-center gap-1 text-xs font-bold text-emerald-600 opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                    Найти мастера <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
                   <img
                     src={service.img}
                     alt=""
@@ -427,6 +468,8 @@ const Index = () => {
                     whileInView: { opacity: 1, y: 0 }
                   }}
                   whileHover={{ y: -8 }}
+                  onClick={() => master.id && navigate(`/masters/${master.id}`)}
+                  className="cursor-pointer"
                 >
                   <Card className="border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden group rounded-[2rem] h-full">
                     <CardContent className="p-6">
@@ -435,7 +478,11 @@ const Index = () => {
                           whileHover={{ scale: 1.1, rotate: 5 }}
                           className={`w-16 h-16 rounded-2xl ${master.color} flex items-center justify-center text-white text-xl font-black shadow-lg shadow-slate-200 transition-transform`}
                         >
-                           {personInitials(master.name)}
+                           {master.avatar ? (
+                             <img src={master.avatar} alt="" className="w-full h-full rounded-2xl object-cover" loading="lazy" />
+                           ) : (
+                             personInitials(master.name)
+                           )}
                         </motion.div>
                         <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 p-1 rounded-full shadow-lg">
                            <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
@@ -586,6 +633,25 @@ const Index = () => {
       </section>
 
       <Footer />
+
+      {/* Кнопка «наверх» */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            whileHover={{ y: -4, scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Наверх"
+            className="fixed bottom-24 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/40"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isOrderModalOpen && (

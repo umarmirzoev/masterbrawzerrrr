@@ -28,9 +28,10 @@ export default function MasterTrust() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 + i * 0.05 }}
-          className={`flex flex-col items-center text-center gap-2 p-4 rounded-2xl border ${b.bg} hover:shadow-md transition-shadow`}
+          whileHover={{ y: -6 }}
+          className={`group flex cursor-default flex-col items-center text-center gap-2 p-4 rounded-2xl border ${b.bg} transition-shadow duration-300 hover:shadow-xl`}
         >
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconColors[i]} bg-card shadow-sm`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconColors[i]} bg-card shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[360deg]`}>
             <b.icon className="w-5 h-5" />
           </div>
           <span className="text-xs sm:text-sm font-semibold text-foreground leading-tight">{t(b.key)}</span>
