@@ -50,9 +50,18 @@ export async function compressImage(file: File, maxSide = 1200): Promise<{ base6
 
 // Отправляет фото в edge-функцию ai-photo-diagnosis. Пока API-ключ не задан — бросает AiNotConfiguredError.
 export async function diagnosePhoto(base64: string, note: string, language: string): Promise<PhotoDiagnosis> {
-  const { data, error } = await supabase.functions.invoke("ai-photo-diagnosis", {
-    body: { image: base64, note, language },
+  // Анализ фото занимает 5–15 секунд. Если ИИ не ответил за 25 секунд — сервис недоступен,
+  // показываем ручной выбор категории вместо бесконечной загрузки.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new AiNotConfiguredError()), 25000);
   });
+  const { data, error } = await Promise.race([
+    supabase.functions.invoke("ai-photo-diagnosis", {
+      body: { image: base64, note, language },
+    }),
+    timeout,
+  ]).finally(() => clearTimeout(timer));
 
   if (error) {
     const ctx = (error as { context?: Response }).context;

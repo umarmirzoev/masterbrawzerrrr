@@ -168,7 +168,7 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
             language,
           },
         }),
-        15000,
+        6000,
       );
 
       if (error) throw error;
@@ -195,7 +195,9 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
 
       // Только мастера именно этой категории, лучшие по рейтингу. Чужих категорий не показываем.
       let fallbackMasters: any[] | null = null;
-      if (localCategory) {
+      // ИИ не ответил по таймауту — значит, база тоже недоступна: не ждём её ещё раз.
+      const supabaseDown = String(e?.message || "").includes("timeout");
+      if (localCategory && !supabaseDown) {
         try {
           const { data } = await withTimeout(
             supabase
@@ -205,16 +207,18 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
               .contains("service_categories", [localCategory])
               .order("average_rating", { ascending: false })
               .limit(6),
-            6000,
+            3000,
           );
           fallbackMasters = data;
         } catch (err) {
           console.warn("master_listings fallback failed:", err);
         }
-        if (!fallbackMasters?.length) {
-          // Базы нет — берём встроенных мастеров нужной категории.
-          fallbackMasters = SAMPLE_MASTERS.filter((m) => m.service_categories.includes(localCategory));
-        }
+      }
+      if (localCategory && !fallbackMasters?.length) {
+        // Базы нет — берём встроенных мастеров нужной категории, лучших по рейтингу.
+        fallbackMasters = SAMPLE_MASTERS
+          .filter((m) => m.service_categories.includes(localCategory))
+          .sort((a, b) => b.average_rating - a.average_rating);
       }
 
       const mappedMasters: MatchedMaster[] = (fallbackMasters || []).map(m => ({
