@@ -24,6 +24,7 @@ import MasterPortfolio from "@/components/master-profile/PortfolioSection";
 import MasterDistricts from "@/components/master-profile/DistrictsSection";
 import MasterTrust from "@/components/master-profile/TrustBadges";
 import SimilarMasters from "@/components/master-profile/SimilarMasters";
+import { SAMPLE_MASTERS } from "@/data/seedData";
 import MasterBookingBar from "@/components/master-profile/BookingBar";
 import MasterBookingDialog from "@/components/master-profile/BookingDialog";
 
@@ -45,50 +46,88 @@ export default function MasterProfile() {
 
   // Загружаем профиль мастера, отзывы, портфолио и похожих специалистов для полной карточки.
   useEffect(() => {
-    const load = async () => {
-      if (!id) return;
-
-      let masterData: any = null;
-      const { data: listingData } = await supabase
-        .from("master_listings").select("*").eq("id", id).maybeSingle();
-      
-      if (listingData) {
-        masterData = listingData;
-      } else {
-        const { data: listingByUser } = await supabase
-          .from("master_listings").select("*").eq("user_id", id).maybeSingle();
-        if (listingByUser) {
-          masterData = listingByUser;
-        } else {
-          const { data: profileData } = await supabase
-            .from("profiles").select("*").eq("user_id", id).maybeSingle();
-          masterData = profileData;
-        }
-      }
-
-      if (!masterData) { setLoading(false); return; }
-      setMaster(masterData);
-      // «Повторить заказ» / «Заказать снова» из кабинета клиента сразу открывает форму заказа.
-      if (searchParams.get("book") === "1") setBookingOpen(true);
-
-      const masterId = masterData.user_id || masterData.id;
-      const [reviewsRes, portfolioRes] = await Promise.all([
-        supabase.from("reviews").select("*").eq("master_id", masterId).order("created_at", { ascending: false }),
-        supabase.from("master_portfolio").select("*").eq("master_id", masterId).order("created_at", { ascending: false }),
+    // Если Supabase не отвечает, не ждём бесконечно — берём встроенных мастеров.
+    const withTimeout = <T,>(p: PromiseLike<T>, ms = 6000): Promise<T> =>
+      Promise.race([
+        Promise.resolve(p),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
       ]);
 
-      setReviews(reviewsRes.data || []);
-      setPortfolio(portfolioRes.data || []);
+    const applySample = () => {
+      const sample: any = SAMPLE_MASTERS.find((m) => m.id === id);
+      if (!sample) return false;
+      setMaster(sample);
+      setReviews([]);
+      setPortfolio([]);
+      setSimilarMasters(
+        SAMPLE_MASTERS.filter(
+          (m) => m.id !== sample.id && m.service_categories.some((c) => sample.service_categories.includes(c)),
+        ).slice(0, 4),
+      );
+      if (searchParams.get("book") === "1") setBookingOpen(true);
+      return true;
+    };
 
-      if (masterData.service_categories?.length > 0) {
-        const { data: similar } = await supabase
-          .from("master_listings").select("*")
-          .eq("is_active", true).neq("id", masterData.id)
-          .contains("service_categories", [masterData.service_categories[0]])
-          .order("average_rating", { ascending: false }).limit(4);
-        setSimilarMasters(similar || []);
+    const load = async () => {
+      if (!id) return;
+      try {
+        let masterData: any = null;
+        const { data: listingData } = await withTimeout(
+          supabase.from("master_listings").select("*").eq("id", id).maybeSingle(),
+        );
+
+        if (listingData) {
+          masterData = listingData;
+        } else {
+          const { data: listingByUser } = await withTimeout(
+            supabase.from("master_listings").select("*").eq("user_id", id).maybeSingle(),
+          );
+          if (listingByUser) {
+            masterData = listingByUser;
+          } else {
+            const { data: profileData } = await withTimeout(
+              supabase.from("profiles").select("*").eq("user_id", id).maybeSingle(),
+            );
+            masterData = profileData;
+          }
+        }
+
+        if (!masterData) {
+          applySample();
+          setLoading(false);
+          return;
+        }
+        setMaster(masterData);
+        // «Повторить заказ» / «Заказать снова» из кабинета клиента сразу открывает форму заказа.
+        if (searchParams.get("book") === "1") setBookingOpen(true);
+
+        const masterId = masterData.user_id || masterData.id;
+        const [reviewsRes, portfolioRes] = await withTimeout(
+          Promise.all([
+            supabase.from("reviews").select("*").eq("master_id", masterId).order("created_at", { ascending: false }),
+            supabase.from("master_portfolio").select("*").eq("master_id", masterId).order("created_at", { ascending: false }),
+          ]),
+        );
+
+        setReviews(reviewsRes.data || []);
+        setPortfolio(portfolioRes.data || []);
+
+        if (masterData.service_categories?.length > 0) {
+          const { data: similar } = await withTimeout(
+            supabase
+              .from("master_listings").select("*")
+              .eq("is_active", true).neq("id", masterData.id)
+              .contains("service_categories", [masterData.service_categories[0]])
+              .order("average_rating", { ascending: false }).limit(4),
+          );
+          setSimilarMasters(similar || []);
+        }
+      } catch (error) {
+        console.warn("MasterProfile load failed, using sample data:", error);
+        if (!master) applySample();
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     load();
   }, [id]);
