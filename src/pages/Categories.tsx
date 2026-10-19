@@ -28,9 +28,16 @@ const Categories = () => {
 
   // Загружаем категории и отдельно считаем количество услуг в каждой категории.
   useEffect(() => {
-    Promise.all([
-      supabase.from("service_categories").select("*").order("sort_order"),
-      supabase.from("services").select("category_id"),
+    // Не даём загрузке крутиться бесконечно, если Supabase не отвечает.
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Categories load timeout")), 8000),
+    );
+    Promise.race([
+      Promise.all([
+        supabase.from("service_categories").select("*").order("sort_order"),
+        supabase.from("services").select("category_id"),
+      ]),
+      timeout,
     ]).then(([catsRes, svcsRes]) => {
       setCategories((catsRes.data as ServiceCategory[]) || []);
       const counts: Record<string, number> = {};
@@ -38,8 +45,9 @@ const Categories = () => {
         counts[s.category_id] = (counts[s.category_id] || 0) + 1;
       });
       setServiceCounts(counts);
-      setLoading(false);
-    });
+    })
+      .catch((error) => console.error("Categories load error:", error))
+      .finally(() => setLoading(false));
   }, []);
 
   const getName = (item: { name_ru: string; name_tj: string; name_en: string }) => {

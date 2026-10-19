@@ -127,9 +127,16 @@ export default function PriceList() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [catsRes, servicesRes] = await Promise.all([
-          supabase.from("service_categories").select("*").order("sort_order"),
-          supabase.from("services").select("*").order("sort_order"),
+        // Если Supabase долго не отвечает, не крутим загрузку бесконечно: через 8 секунд показываем базовый прайс.
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("PriceList load timeout")), 8000),
+        );
+        const [catsRes, servicesRes] = await Promise.race([
+          Promise.all([
+            supabase.from("service_categories").select("*").order("sort_order"),
+            supabase.from("services").select("*").order("sort_order"),
+          ]),
+          timeout,
         ]);
 
         const cats = catsRes.data?.length ? catsRes.data : SAMPLE_SERVICE_CATEGORIES;
