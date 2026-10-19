@@ -70,6 +70,11 @@ export default function MasterProfile() {
 
     const load = async () => {
       if (!id) return;
+      // Встроенный мастер — показываем сразу, без ожидания базы.
+      if (applySample()) {
+        setLoading(false);
+        return;
+      }
       try {
         let masterData: any = null;
         const { data: listingData } = await withTimeout(

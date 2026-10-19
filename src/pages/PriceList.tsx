@@ -110,8 +110,9 @@ export default function PriceList() {
   // Временное стоковое изображение — замени на реальное фото.
   const heroImage = "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1000&h=800&fit=crop";
   const { language, t } = useLanguage();
-  const [categories, setCategories] = useState<ServiceCategory[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
+  // Сразу показываем встроенный каталог, а данные из базы подменяют его, когда придут.
+  const [categories, setCategories] = useState<ServiceCategory[]>(SAMPLE_SERVICE_CATEGORIES as ServiceCategory[]);
+  const [services, setServices] = useState<Service[]>(SAMPLE_SERVICES as Service[]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
@@ -120,8 +121,8 @@ export default function PriceList() {
       navigate(`/masters?q=${encodeURIComponent(search.trim())}`);
     }
   };
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string | null>(SAMPLE_SERVICE_CATEGORIES[0]?.id || null);
+  const [loading, setLoading] = useState(false);
   const [orderModal, setOrderModal] = useState<{ open: boolean; categoryId?: string; serviceId?: string; name?: string }>({ open: false });
 
   useEffect(() => {
@@ -139,17 +140,16 @@ export default function PriceList() {
           timeout,
         ]);
 
-        const cats = catsRes.data?.length ? catsRes.data : SAMPLE_SERVICE_CATEGORIES;
-        const servicesData = servicesRes.data?.length ? servicesRes.data : SAMPLE_SERVICES;
-
-        setCategories(cats);
-        setServices(servicesData);
-        if (cats.length > 0) setActiveCategory(cats[0].id);
+        // Подменяем встроенный каталог настоящим, только если база вернула данные.
+        if (catsRes.data?.length && servicesRes.data?.length) {
+          setCategories(catsRes.data);
+          setServices(servicesRes.data);
+          setActiveCategory((current) =>
+            catsRes.data!.some((c: any) => c.id === current) ? current : catsRes.data![0].id,
+          );
+        }
       } catch (error) {
-        console.error("PriceList load error:", error);
-        setCategories(SAMPLE_SERVICE_CATEGORIES);
-        setServices(SAMPLE_SERVICES);
-        setActiveCategory(SAMPLE_SERVICE_CATEGORIES[0]?.id || null);
+        console.warn("PriceList: Supabase недоступен, показываем встроенный каталог:", error);
       } finally {
         setLoading(false);
       }
