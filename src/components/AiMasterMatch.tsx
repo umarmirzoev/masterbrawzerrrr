@@ -22,6 +22,15 @@ import { syncOrderToLegacyBackend } from "@/lib/legacySync";
 import RecipientFields from "@/components/RecipientFields";
 import { emptyRecipient, insertOrder, recipientError, withRecipient, type OrderRecipient } from "@/lib/orderRecipient";
 import { personName, personInitials } from "@/lib/localizeNames";
+import { SAMPLE_MASTERS } from "@/data/seedData";
+
+// Если Supabase не отвечает, не крутим загрузку бесконечно.
+function withTimeout<T>(promise: PromiseLike<T>, ms: number): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
+}
 
 interface AiMasterMatchProps {
   open: boolean;
@@ -149,15 +158,18 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
     setStep("loading");
 
     try {
-      const { data, error } = await supabase.functions.invoke("ai-match-master", {
-        body: {
-          description: text,
-          district,
-          urgency,
-          budget: budget ? Number(budget) : null,
-          language,
-        },
-      });
+      const { data, error } = await withTimeout(
+        supabase.functions.invoke("ai-match-master", {
+          body: {
+            description: text,
+            district,
+            urgency,
+            budget: budget ? Number(budget) : null,
+            language,
+          },
+        }),
+        15000,
+      );
 
       if (error) throw error;
 
@@ -184,14 +196,25 @@ export default function AiMasterMatch({ open, onOpenChange, initialDescription }
       // Только мастера именно этой категории, лучшие по рейтингу. Чужих категорий не показываем.
       let fallbackMasters: any[] | null = null;
       if (localCategory) {
-        const { data } = await supabase
-          .from("master_listings")
-          .select("*")
-          .eq("is_active", true)
-          .contains("service_categories", [localCategory])
-          .order("average_rating", { ascending: false })
-          .limit(6);
-        fallbackMasters = data;
+        try {
+          const { data } = await withTimeout(
+            supabase
+              .from("master_listings")
+              .select("*")
+              .eq("is_active", true)
+              .contains("service_categories", [localCategory])
+              .order("average_rating", { ascending: false })
+              .limit(6),
+            6000,
+          );
+          fallbackMasters = data;
+        } catch (err) {
+          console.warn("master_listings fallback failed:", err);
+        }
+        if (!fallbackMasters?.length) {
+          // Базы нет — берём встроенных мастеров нужной категории.
+          fallbackMasters = SAMPLE_MASTERS.filter((m) => m.service_categories.includes(localCategory));
+        }
       }
 
       const mappedMasters: MatchedMaster[] = (fallbackMasters || []).map(m => ({
