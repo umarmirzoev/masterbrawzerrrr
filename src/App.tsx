@@ -111,6 +111,8 @@ const AnimatedRoutes = () => {
           <Route path="/services" element={<PageTransition><NotFound /></PageTransition>} />
           <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+        <Route path="/register" element={<PageTransition><Auth /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/master/:id" element={<PageTransition><MasterProfile /></PageTransition>} />
         <Route path="/masters" element={<PageTransition><Masters /></PageTransition>} />
         <Route path="/masters/:id" element={<PageTransition><MasterDetail /></PageTransition>} />
