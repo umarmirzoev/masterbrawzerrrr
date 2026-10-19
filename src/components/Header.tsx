@@ -31,6 +31,7 @@ import {
 import NotificationBell from "@/components/NotificationBell";
 import HeaderNav from "@/components/HeaderNav";
 import { FlagIcon } from "@/components/FlagIcon";
+import OrderModal from "@/components/OrderModal";
 
 const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=tj.masterchas.masterchas_app";
 const APP_STORE_URL = "https://apps.apple.com/app/id6810603725";
@@ -50,6 +51,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
 
   const handleDownloadAndroid = () => {
     window.open(GOOGLE_PLAY_URL, "_blank", "noopener,noreferrer");
@@ -112,9 +114,13 @@ export default function Header() {
             </div>
 
             <Button
-              className="hidden md:flex bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 h-11 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95"
+              type="button"
+              onClick={() => setOrderOpen(true)}
+              className="group relative hidden md:flex overflow-hidden bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 h-11 rounded-xl shadow-lg shadow-emerald-100 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-emerald-300 active:scale-95"
             >
-              {t("heroOrderButton")}
+              <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              <Wrench className="relative h-4 w-4 transition-transform duration-300 group-hover:-rotate-12" />
+              <span className="relative">{t("heroOrderButton")}</span>
             </Button>
 
             <DropdownMenu>
@@ -203,6 +209,17 @@ export default function Header() {
                       <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Master.TJ</span>
                     </div>
                   </div>
+                  <div className="px-4 pt-4">
+                    <SheetClose asChild>
+                      <Button
+                        type="button"
+                        onClick={() => setOrderOpen(true)}
+                        className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black shadow-lg shadow-emerald-200 gap-2 active:scale-95"
+                      >
+                        <Wrench className="h-5 w-5" /> {t("heroOrderButton")}
+                      </Button>
+                    </SheetClose>
+                  </div>
                   <nav className="flex-1 p-4 space-y-1">
                     {navItems.map((item) => {
                       const Icon = item.icon;
@@ -282,6 +299,7 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <OrderModal isOpen={orderOpen} onClose={() => setOrderOpen(false)} category={null} />
     </header>
   );
 }

@@ -8,7 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -68,8 +68,7 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
     >
       {children}
     </motion.div>
@@ -90,7 +89,9 @@ const AnimatedRoutes = () => {
   }, [location.pathname, location.hash]);
 
   return (
-    <AnimatePresence mode="wait">
+    // Без AnimatePresence mode="wait": он ждал окончания анимации ухода старой страницы,
+    // и если она «зависала», новая страница не открывалась до перезагрузки.
+    <>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Index /></PageTransition>} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
@@ -144,7 +145,7 @@ const AnimatedRoutes = () => {
         <Route path="/super-admin/dashboard/*" element={<SuperAdminDashboardPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </AnimatePresence>
+    </>
   );
 };
 
