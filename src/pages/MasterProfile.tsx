@@ -171,7 +171,8 @@ export default function MasterProfile() {
     );
   }
 
-  const completedOrders = Math.round((master.total_reviews || 0) * 2.5 + (master.experience_years || 0) * 15);
+  // Берём реальное число выполненных заказов мастера (раньше считалось по формуле и выходило 600+).
+  const completedOrders = Number(master.completed_orders) || Math.max(reviews.length, Number(master.total_reviews) || 0);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-muted/30">
