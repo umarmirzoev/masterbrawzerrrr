@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
+import { useCart } from "@/hooks/useCart";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,12 +25,12 @@ import {
   Phone,
   User,
   ShoppingBag,
+  ShoppingCart,
   Wrench,
   Bot,
   Download,
   Apple,
 } from "lucide-react";
-import NotificationBell from "@/components/NotificationBell";
 import HeaderNav from "@/components/HeaderNav";
 import { FlagIcon } from "@/components/FlagIcon";
 import OrderModal from "@/components/OrderModal";
@@ -160,9 +162,10 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <HeaderCartButton />
+
             {!loading && user && (
               <div className="flex items-center gap-2">
-                <NotificationBell />
                 <Button
                   onClick={() => navigate(getDashboardPath())}
                   variant="ghost"
@@ -301,5 +304,59 @@ export default function Header() {
       </div>
       <OrderModal isOpen={orderOpen} onClose={() => setOrderOpen(false)} category={null} />
     </header>
+  );
+}
+
+// Иконка корзины в шапке: счётчик товаров, подпрыгивает при добавлении товара.
+function HeaderCartButton() {
+  const { itemCount } = useCart();
+  const location = useLocation();
+  const controls = useAnimationControls();
+  const prev = useRef(itemCount);
+  const active = location.pathname === "/cart";
+
+  useEffect(() => {
+    if (itemCount > prev.current) {
+      controls.start({
+        y: [0, -8, 0, -3, 0],
+        rotate: [0, -12, 10, -4, 0],
+        transition: { duration: 0.6, ease: "easeOut" },
+      });
+    }
+    prev.current = itemCount;
+  }, [itemCount, controls]);
+
+  const label = itemCount > 0 ? `Корзина: ${itemCount}` : "Корзина";
+
+  return (
+    <Link
+      to="/cart"
+      aria-label={label}
+      title={label}
+      className={`group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-50 hover:text-emerald-600 hover:shadow-md hover:shadow-emerald-100 dark:hover:bg-emerald-500/10 ${
+        active ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+      }`}
+    >
+      <motion.span animate={controls} className="inline-flex">
+        <ShoppingCart className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+      </motion.span>
+      <AnimatePresence>
+        {itemCount > 0 && (
+          <motion.span
+            key={itemCount}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 18 }}
+            className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[20px] items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-emerald-500 to-teal-500 px-1 text-[10px] font-black text-white shadow-md shadow-emerald-300/60 dark:border-slate-950"
+          >
+            {itemCount > 99 ? "99+" : itemCount}
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-bold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-white dark:text-slate-900">
+        {label}
+      </span>
+    </Link>
   );
 }
